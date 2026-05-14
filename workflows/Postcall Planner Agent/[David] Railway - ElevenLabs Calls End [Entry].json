@@ -53,7 +53,7 @@
           "parameters": [
             {
               "name": "xi-api-key",
-              "value": "sk_18746d67f3dc75088fa8463a255c9fdfbac22446e8abde8d"
+              "value": "[PLACE YOUR ELEVENLABS API-KEY HERE]"
             }
           ]
         },
