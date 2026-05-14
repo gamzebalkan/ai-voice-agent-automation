@@ -1,0 +1,1284 @@
+{
+  "name": "Detective Agent [Entry]",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Prepare Prompt').first().json[\"The Prompt\"] }}",
+        "options": {
+          "maxIterations": 35
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        992,
+        240
+      ],
+      "id": "2f76f3fb-0bb0-425d-a775-03b8aeda0fa9",
+      "name": "The detective"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8bef4753-dc04-4387-af65-8d09aefefc82",
+              "name": "The Prompt",
+              "value": "=You are a \"Zendesk detective\" here to investigate an error. \nHere is your context: You work for GovAssist, a company assisting customers with various government applications. We handle US temporary stay visas and esta and also various electronic travel authorization for a collection of countries. \nYour role is to analyze a call that just happened between our Ai agent that is running in ElevenLabs and an inbound caller, possibly a customer or lead. \nIt would appear that the transcript of the call, when pulling all of the call information via Eleven Labs api, is empty. So now we don't really have much data about the call. Since transcript is missing, we just have metadata and the audio file of the call itself. \n\nSo now I have taken the audio file and transcribed it back to test, and here below you can see the raw text as it's outputted by elevenlabs speech to text engine. Please see the entire thing below:\n\n-------------- Start of Speech to Text output -------------------\n{{ $('When Executed by Another Workflow').item.json.transcript_text }}\n-------------- End of Speech to Text output ---------------------\n\nNow, I need you to play Zendesk detective and, using the search tools at your disposal, find us: The Zendesk ticket that is the call ticket where the recording is taking place. I don't actually have this information because, as a result of the error, nothing in the transcript is available, not even data events. So it needs to be a ticket that has as requester a profile with the phone number that called us. We happen to have the meta information of the call intact, here it is below:\n\n------------------ Start of Call Meta Data -----------------------\n{{ $('When Executed by Another Workflow').item.json.metadata }}\n------------------ End of Call Meta Data -----------------------\n\nSo I would need you to do the following :\n\n1. Locate the Zendesk ticket with requester that can be identified uniquelly using the phone call details here:\n{{ $('When Executed by Another Workflow').item.json.metadata.phone_call.toJsonString() }}\nthat had received the information below as dynamic variables at the time of the start of the call: \n{{ $('When Executed by Another Workflow').item.json.conversation_initiation_client_data.toJsonString() }}\n\nA simple Zendesk search with a query such as 'requester:{{ $('When Executed by Another Workflow').item.json.conversation_initiation_client_data.dynamic_variables.system__caller_id }}' should be quite revealing. Keep in mind the timestamps on the results and make sure it's a very recent ticket and the current time is {{ $now }}\n\n2. You should also do a user search and see if there is more than one end-user sharing this phone number and, if so, report it in your output. \n\n3. Locate the Zendesk sales ticket, if any. Find tickets from this requester(s) that you identified at point 2 and isolate only those that have the tag sales_ticket. This should only apply to calls where the caller is verified as an actual customer. \nIf you find a relevant sales ticket, store the returned object as verified_sales_ticket.\n• set ticket_id if you find a relevant sales ticket (tags include sales_ticket), otherwise \"\". \n\n4. Locate the Zendesk call ticket. \n Find tickets from this requester(s) that you identified at point 2 and isolate only those that have the tag call_overflow. \nIf you find a relevant call ticket, store the returned object. You will reuse some of its fields as instructed below.\n• set call_ticket_id if you find a relevant inbound call ticket (tags include call_overflow), otherwise null. \n\nOutput found tickets in JSON object format as below.\n\n• CRITICAL OUTPUT FORMAT: Your final message MUST be the JSON object itself (first non-whitespace character must be \"{\" and last must be \"}\"). - DO NOT wrap the JSON in markdown code fences (no ```json ... ```). DO NOT output any additional keys outside the schema and DO NOT output any surrounding array.\n\nOutput only the final JSON object.\nReturn **only** the following top-level JSON object – nothing else. \n\n{\n  \"ticket_id\": <string>,\n  \"requester_email\": \"<string|null>\",\n  \"status\": \"<open|pending|hold|solved|unchanged>\",\n  \"sales_ticket_tags\": [\"tag_1\", \"tag_2\", ...],\n  \"call_ticket_object\": [{\"call_ticket_id\": <string>, \"call_ticket_tags\": [\"tag_1\", \"tag_2\", \"...\"], \"call_ticket_subject\": \"<string|null>\",  \"call_ticket_channel\": \"<string|null>\", \"call_ticket_requester_id\": \"<string|null>\"}],\n\n  \"call_result\": \"<addressed the concern|requires specialist review|could not assist the customer|could not capture the request>\"\n}\n\n• CRITICAL OUTPUT FORMAT: Your final message MUST be the JSON object itself (first non-whitespace character must be \"{\" and last must be \"}\"). - DO NOT wrap the JSON in markdown code fences (no ```json ... ```). DO NOT output any additional keys outside the schema and DO NOT output any surrounding array.\n\n* ticket_id: sales ticket id (numeric) If sales ticket couldn't be found, send an *empty array*, e.g., ticket_id = \"\". DO NOT send null.\n* sales_ticket_tags: array of strings; MUST be the FULL verified_sales_ticket.tags array exactly as returned by Zendesk. If null, pass an array of empty strings.\n* current_ticket_status: verified_sales_ticket.status exactly as returned from zendesk_search. \n* assignee_id = sales ticket's assignee_id obtained from zendesk_search (tags include sales_ticket). If assignee_id is null, send an empty string (e.g., assignee_id = \"\"); do not send null.\n* call_result: decide one of the allowed values: \"<addressed the concern|requires specialist review|could not assist the customer|could not capture the request>\" \n\n• Important on Tags: The \"tags\" field in the output MUST be a complete array of the strings found in the Zendesk sales ticket object retrieved via zendesk_search. If the search tool returns a ticket, its tags are present in the response, look for the tags key. Do not return an empty array if the ticket in Zendesk has tags. NEVER fabricate, guess or infer any tag.\n• CRITICAL — ticket_id meaning: ticket_id MUST be the Sales Ticket ID only (a Zendesk ticket whose tags array contains sales_ticket).\n• NEVER put a call_overflow / “call ticket” / non-sales Ticket ID into ticket_id.\n• If ticket_id is null, then -> tags MUST be [] (since tags must come from the retrieved Sales Ticket), and status MUST be unchanged (you cannot safely change status without a Sales Ticket).\n• Non-sales/call_overflow / call tickets must go only into call_ticket_object (array). Retrieve tags/subject/channel from the Step 2 zendesk_search output; never guess/infer them. If the subject/channel is missing, output null.\n• Omit no keys; use `null`, `\"\"`, `false`, or `[]` as required. Do **not** emit additional prose, markdown, or logging lines.\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        784,
+        240
+      ],
+      "id": "11f97d6b-c6db-4d30-b021-ef4d96105b11",
+      "name": "Prepare Prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.elevenlabs.io/v1/speech-to-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "[PLACE YOUR API KEY HERE]"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "file"
+            },
+            {
+              "name": "model_id",
+              "value": "scribe_v1"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        256
+      ],
+      "id": "f2971fd7-f5da-4b06-95ab-27a1d0018bd2",
+      "name": "Get transcript based on audio",
+      "disabled": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://govassist.app.n8n.cloud/mcp/david_mcp_govassist",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        1552,
+        640
+      ],
+      "id": "ce6d03fe-acd2-47fa-bc52-4a7309ce000c",
+      "name": "MCP Client2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -320,
+        256
+      ],
+      "id": "bdde70b5-fc5a-4464-9bf4-3e915872e063",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.elevenlabs.io/v1/convai/conversations/{{ $json.conversation_id }}/audio",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "sk_e162b0634c5f624dac136ac738fc407643875af60c78cc94"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -64,
+        464
+      ],
+      "id": "ffc76f57-d9a7-4698-8a0e-02518b402e57",
+      "name": "Get Audio file from EL",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "=https://api.elevenlabs.io/v1/convai/conversations/{{ $json.conversation_id }}/audio",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "sk_e162b0634c5f624dac136ac738fc407643875af60c78cc94"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        256
+      ],
+      "id": "bc0866f5-02a1-44d0-94b3-e2958d07caa0",
+      "name": "Get Audio file from  EL"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8bef4753-dc04-4387-af65-8d09aefefc82",
+              "name": "The Prompt",
+              "value": "=You are a \"Zendesk detective\" here to investigate an error. \nHere is your context: You work for GovAssist, a company assisting customers with various government applications. We handle US temporary stay visas and esta and also various electronic travel authorization for a collection of countries. \nYour role is to analyze a call that just happened between our Ai agent that is running in ElevenLabs and an inbound caller, possibly a customer or lead. \nIt would appear that the transcript of the call, when pulling all of the call information via Eleven Labs api, is empty. So now we don't really have much data about the call. Since transcript is missing, we just have metadata and the audio file of the call itself. \n\nSo now I have taken the audio file and transcribed it back to test, and here below you can see the raw text as it's outputted by elevenlabs speech to text engine. Please see the entire thing below:\n\n-------------- Start of Speech to Text output -------------------\n\n{{ $json.text }}\n\n-------------- End of Speech to Text output ---------------------\n\nNow, I need you to play Zendesk detective and, using the search tools at your disposal, find us: The Zendesk ticket that is the call ticket where the recording is taking place. I don't actually have this information because, as a result of the error, nothing in the transcript is available, not even data events. So it needs to be a ticket that has as requester a profile with the phone number that called us. We happen to have the meta information of the call intact, here it is below:\n\n------------------ Start of Call Meta Data -----------------------\n{{ $('Call Ended').first().json.body.toJsonString() }}\n------------------ End of Call Meta Data -----------------------\n\nSo I would need you to do the following :\n\n1. Locate the Zendesk ticket with requester that can be identified uniquelly using the phone call details here:\n{{ $('Call Ended').item.json.body.data.metadata.phone_call.toJsonString() }} \nthat had received the information below as dynamic variables at the time of the start of the call: \n{{ $('Call Ended').first().json.body.data.conversation_initiation_client_data.dynamic_variables.toJsonString() }}\n\nA simple Zendesk search with a query such as 'requester:{{ $('Call Ended').first().json.body.data.conversation_initiation_client_data.dynamic_variables.system__caller_id }}' should be quite revealing. Keep in mind the timestamps on the results and make sure it's a very recent ticket and the current time is {{ $now }}\n\n2. You should also do a user search and see if there is more than one end-user sharing this phone number and, if so, report it in your output. \n\n3. Locate the Zendesk sales ticket, if any. Find tickets from this requester(s) that you identified at point 2 and isolate only those that are sales_ticket. This should only apply to calls where the caller is verified as an actual customer. \n\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        784,
+        32
+      ],
+      "id": "4132a988-58ab-4b90-94b1-9481f457fb34",
+      "name": "Prepare Prompt OLD PROD COPY"
+    },
+    {
+      "parameters": {
+        "errorMessage": "=Unknown call. Transcript is corrupted. See the conversation: {{ $('When Executed by Another Workflow').item.json.conversation_id }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        480,
+        384
+      ],
+      "id": "6d577a12-480e-4137-b3a2-aecbd0f1a8d4",
+      "name": "Stop and Error",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "Sales_Ticket_ID",
+              "value": "={{ $('Detective agent output').item.json.sales_ticket_id }}"
+            },
+            {
+              "key": "Call_Ticket_ID",
+              "value": "={{ $json.call_ticket_object.call_ticket_id }}"
+            },
+            {
+              "key": "Conversation_ID",
+              "value": "={{ $('Get Audio file from  EL').item.json.conversation_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1,
+      "position": [
+        2224,
+        496
+      ],
+      "id": "8c051e24-fd8d-457f-be76-8786b3568749",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fb3a4e86-294f-4e10-b707-47de3ee6e014",
+              "leftValue": "={{ $('Detective agent output').item.json.sales_ticket_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2224,
+        240
+      ],
+      "id": "2182210e-c227-486a-88a8-8bd517c25b10",
+      "name": "If Sales ticket is detected"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "uO8DjzUtBQF9fqxI",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/uO8DjzUtBQF9fqxI",
+          "cachedResultName": "merge_tickets [Entry]"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "call_ticket_object": "={{ $('Detective agent output').item.json.call_ticket_object }}",
+            "call_result": "={{ $('Detective agent output').item.json.call_result }}",
+            "transcript": "\"Transcript is corrupted. Please listen to the call record.\"",
+            "conversation_id": "=\"see call ticket for conversation_id\"",
+            "assignee_id": "\"null\"",
+            "lead_ticket_id": "\"null\"",
+            "lead_ticket_tags": "\"null\"",
+            "sales_ticket_tags": "={{ $('Detective agent output').item.json.sales_ticket_tags }}",
+            "sales_ticket_id": "={{ $('Detective agent output').item.json.sales_ticket_id }}",
+            "lead_ticket_assignee_id": "\"null\""
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sales_ticket_id",
+              "displayName": "sales_ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "call_ticket_object",
+              "displayName": "call_ticket_object",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "array",
+              "removed": false
+            },
+            {
+              "id": "sales_ticket_tags",
+              "displayName": "sales_ticket_tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "assignee_id",
+              "displayName": "assignee_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "call_result",
+              "displayName": "call_result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "transcript",
+              "displayName": "transcript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "lead_ticket_id",
+              "displayName": "lead_ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "lead_ticket_tags",
+              "displayName": "lead_ticket_tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "lead_ticket_assignee_id",
+              "displayName": "lead_ticket_assignee_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2688,
+        224
+      ],
+      "id": "ca47d3b4-618b-4b28-ab31-20d3a5c30a27",
+      "name": "Call 'merge_tickets'"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get complete Zendesk User Profile based on User ID. This is something to use when you want to see details about a specific user and you have the User ID ready. This will not work without a valid User ID. \nCall this tool before calling update_contact_info.\n\nImportant:\nThe User ID must be an integer. Sending an email, string, null, or undefined value will cause a 400 Bad Request error.\nExample of a valid User ID: 3222493531410",
+        "resource": "user",
+        "operation": "get",
+        "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('User_ID', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.zendeskTool",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        656
+      ],
+      "id": "91957342-addb-4df1-9205-a8dd8cd122f0",
+      "name": "zendesk_get_user",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "zendeskApi": {
+          "id": "gXvcotdQKkLy8319",
+          "name": "Zendesk account 3 - David"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=zendesk_search\n\nPurpose  \n-------\nQuery Zendesk’s Search API and receive the raw JSON matches. You supply only the **`query`** string; the system takes care of authentication, pagination, and error handling.\n\nInput  \n-----\n* **query** – a UTF-8 search expression up to 2 KB, for example: \n  type:ticket ticket:24788821 status<closed\n  24788821 status<closed\n  type:ticket status<closed requester:+18083916579\n  type:ticket status<closed requester:\"+18083916579\"\n  type:ticket requester:example@email.com status<closed \n\nCore Search Syntax  \n------------------\n* **type:** limits the resource you search (`ticket`, `user`, `organization`, `group`). \n\n* **Property keywords** like `status`, `requester`, `tags`, `created`, `updated`, etc., can be paired with `:`, `<`, `>`, `<=`, or `>=`. Example: `status<closed` returns any ticket in *new*, *open*, *pending*, or *hold*. \n\n* Allowed status values are *new, open, pending, hold, solved, closed*. \n* Wrap multi-word phrases in quotes: `\"passport renewal\"`.   \n* Use logical operators `AND`, `OR`, and unary `-` (NOT); group with parentheses.   \n\nSystem Limits  \n-------------\nZendesk returns only the first **1 000** records of any search and stops after **100** pages at 100 results each. \nNew or updated records may take a minute or two to appear in results. \n\nGovAssist Tags (use in `tags:` filters)  \n---------------------------------------\n* `sales_ticket` – master thread for every paid order.  \n* `govfee_paid`, `govfee_paid2` – government-fee collected.  \n* `online_renewal_draft_confirmed`, `online_draft_created` – passport-renewal milestones.  \n* Product cues: `esta`, `ds160`, `schengenpro`, `passport_renewal`.\n\nBest-Practice Tips  \n------------------\n1. Start narrow: combine `type:` with at least one field (`status`, `requester`, or `tags`) to avoid the 1 000-hit ceiling. \n2. Use `status<closed` whenever you want “active” tickets (everything except *closed*).  \n3. Tags are indexed—filter by them first, then add free-text if needed. \n4. Combine dates with status to find stale work, e.g. `type:ticket status:open updated<2025-07-01`.   \n\nQuery De-duplication (CRITICAL)\n\nYou MUST maintain a per-run list/set called attempted_zendesk_search_queries.\nBefore calling zendesk_search, check whether the exact query string has already been attempted in this run. If yes, DO NOT call it again (even if the prior result was [], errored, or timed out). Proceed to the next fallback step or stop if no fallbacks remain.\nIf you need a “retry,” it must be a different query string (e.g., quoted vs unquoted phone, phone vs email, adding/removing a filter).\nIn the final output, include tools_called with counts (e.g., \"zendesk_search x3\") so duplicate attempts are detectable.\n\nExample Queries (copy–paste and replace placeholders)  \n-----------------------------------------------------\nNote: In my examples, I will use requester: followed by inverted commas. However, one particularity of Zendesk is that we cannot search requester email using inverted commas, only phone numbers need inverted commas. So do search for requester:email if using email (without putting the email between inverted commas) and use requester:\"phone number\" when searching by phone number. For example requester:example@email.com will show results if tickets from a requester with that email exists, but requester:\"example@email.com\" will not show results, even if that requester exists in the system.\n* ** Zendes search for the candidate sales ticket**  \n\n\n* **All active sales tickets for the caller**  \n  `requester:\"[email or phone number goes here; remove inverted commas when searching for email]\" status<closed tags:sales_ticket`\n* **DS-160 progress**  \n  `type:ticket requester:\"[email or phone number]\" tags:ds160`\n* **Open tickets missing government fee**  \n  `type:ticket status:open -tags:govfee_paid -tags:govfee_paid2`\n* **Tickets created today**  \n  `type:ticket created>={{ $now.format('yyyy-MM-dd') }}` \n\nAutomatic Responses  \n-------------------\n* *400 Bad Request* – your syntax is invalid; adjust the query and retry with a different query string.\n* *Empty array* – no matches; broaden or refine your criteria and retry with a different query string.\n\nRecent Update:\n* Zendesk no longer allows sort_by and sort_order within queries. Using these will make the search return no results (and also no errors, so be careful, avoid using these even if instructed to do so elsewhere)",
+        "operation": "getAll",
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "options": {
+          "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}"
+        }
+      },
+      "id": "909af203-4832-4426-a8e3-b2cb8faddf77",
+      "name": "zendesk_search",
+      "type": "n8n-nodes-base.zendeskTool",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        656
+      ],
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to get all ticket events. This is a Zendesk ticket audit containing the ticket timeline events. All fields with a null or empty value are removed from the result.\nYou will need to provide a json payload as follows:\n{\n  \"id\":<ticket id integer>,\n \"mode\": \"recent\" | \"standard\"\n}\nThe ticket ID is always a number, a large integer number. Anything else will error out, so don't even try it. When you are checking the ticket just to confirm that an update was made correctly, simply use mode \"recent\" with the same ticket ID. Rest of the time, mode \"standard\".\nMode is always a string, should be either:\n- \"recent\" - gets the last 10 events on a ticket\nOR it may be\n- \"standard\" - gets all events on the ticket. You should use standard the first time when you look at a ticket, but you should use \"recent\" whenever you are checking for recent updates.\nYou should not use Standard more than once per run, as the result can overwhelm your context window.\nThe tool will return the ticket events. The response will contain:\nAll comments and notifications - This is a series of all internal notes, notifications or public comment that exists on the ticket. This contains any and all messages ever sent to the customer in the scope of the ticket.\nLatest user comment: the body, timestamp and user id of the last public comment made by the requester.\nAll requester comments: this is an easy to digest summary of all comments made by the requester.\nTime Elapsed since Last customer reply: self explained, how much time passed since the  customer's last reply.",
+        "workflowId": {
+          "__rl": true,
+          "value": "sEGPgONtHLZ6hGER",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/sEGPgONtHLZ6hGER",
+          "cachedResultName": "get_ticket_events [Entry]"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id', ``, 'string') }}",
+            "mode": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('mode', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "ticket_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mode",
+              "displayName": "mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1408,
+        656
+      ],
+      "id": "4b7f77cb-e8c3-417a-a4a4-547768ce26da",
+      "name": "ticket_events"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6eb43ab5-b84e-4418-b684-3c6c22e6a986",
+              "name": "Response",
+              "value": "Detective agent has successfully completed its tasks. Sales Ticket is detected. Tools called: create_call_ticket, merge_tickets",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3008,
+        224
+      ],
+      "id": "bafcc1bb-18b4-46f4-ad46-95ef554afa87",
+      "name": "Response"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1d8073ff-068a-48ab-adcf-7e89fafe2dff",
+              "name": "sales_ticket_id",
+              "value": "={{ $json.output.parseJson().ticket_id }}",
+              "type": "string"
+            },
+            {
+              "id": "64e9f096-5de6-43c4-9c0a-87173d7fde45",
+              "name": "call_ticket_object",
+              "value": "={{ $json.output.parseJson().call_ticket_object }}",
+              "type": "array"
+            },
+            {
+              "id": "00c79e26-2a8b-493c-a9c3-1411fef433bf",
+              "name": "sales_ticket_tags",
+              "value": "={{ $json.output.parseJson().sales_ticket_tags }}",
+              "type": "array"
+            },
+            {
+              "id": "dbcf8e79-c971-4335-8188-5c38eba88cbc",
+              "name": "email_adress",
+              "value": "={{ $json.output.parseJson().requester_email }}",
+              "type": "string"
+            },
+            {
+              "id": "051212e8-247f-4e3d-bda7-a16702be0cfa",
+              "name": "call_result",
+              "value": "={{ $json.output.parseJson().call_result }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1504,
+        240
+      ],
+      "id": "4decf041-bee5-40c5-934a-31d4856c1b40",
+      "name": "Detective agent output"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6eb43ab5-b84e-4418-b684-3c6c22e6a986",
+              "name": "Response",
+              "value": "Detective agent has successfully completed its tasks. No Sales Ticket is detected. Tools called: leave_IN_on_call_ticket",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2688,
+        496
+      ],
+      "id": "d1662e12-e84a-4705-adae-763d96c285a5",
+      "name": "Response1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "yUImhuMJCs1rQtZj",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/yUImhuMJCs1rQtZj",
+          "cachedResultName": "create_call_ticket [Entry]"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "call_result": "={{ $json.call_result }}",
+            "lead_ticket_id": "\"\"",
+            "call_summary_title": "={{ \"Call with \" + $('When Executed by Another Workflow').item.json.conversation_initiation_client_data.dynamic_variables.system__caller_id }}",
+            "conversation_id": "={{ $('When Executed by Another Workflow').item.json.conversation_id }}",
+            "transcript": "Transcript is corrupted. Please reach out to the customer.",
+            "call_summary": "={{ $('When Executed by Another Workflow').item.json.analysis.data_collection_results_list[3].rationale }}",
+            "sales_ticket_id": "={{ $json.sales_ticket_id }}",
+            "requester_email": "={{ $('When Executed by Another Workflow').item.json.conversation_initiation_client_data.dynamic_variables.email }}",
+            "assignee_id": "={{ $json.assignee_id }}",
+            "requester_id": "={{ $json.requester_id }}",
+            "caller_id": "={{ $('When Executed by Another Workflow').item.json.conversation_initiation_client_data.dynamic_variables.system__caller_id }}",
+            "lead_ticket_assignee_id": "\"\"",
+            "customer_name": "={{ $('When Executed by Another Workflow').item.json.conversation_initiation_client_data.dynamic_variables.name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sales_ticket_id",
+              "displayName": "sales_ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "lead_ticket_id",
+              "displayName": "lead_ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "caller_id",
+              "displayName": "caller_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "requester_email",
+              "displayName": "requester_email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "call_result",
+              "displayName": "call_result",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "call_summary_title",
+              "displayName": "call_summary_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "transcript",
+              "displayName": "transcript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "call_summary",
+              "displayName": "call_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "assignee_id",
+              "displayName": "assignee_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "lead_ticket_assignee_id",
+              "displayName": "lead_ticket_assignee_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "requester_id",
+              "displayName": "requester_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1904,
+        240
+      ],
+      "id": "422529cf-5d24-4912-a39d-76d829c54c1c",
+      "name": "Call 'create_call_ticket [Entry]'"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.5",
+          "mode": "list",
+          "cachedResultName": "gpt-5.5"
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        944,
+        496
+      ],
+      "id": "a212c1d1-4ea8-4f34-8a62-6ca5fa9c8803",
+      "name": "gpt-5.2",
+      "credentials": {
+        "openAiApi": {
+          "id": "YaIkPvO9pneLJw1Y",
+          "name": "OpenAI account Detective Agent"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "agent_id": "agent_3601k4mdj3dpe41r5w10pvzhy3bx",
+          "agent_name": "David Albright",
+          "status": "done",
+          "user_id": "+19144985408",
+          "branch_id": null,
+          "version_id": null,
+          "metadata": {
+            "start_time_unix_secs": 1777590132,
+            "accepted_time_unix_secs": 1777590133,
+            "call_duration_secs": 1,
+            "cost": 3,
+            "deletion_settings": {
+              "deletion_time_unix_secs": 1809126133,
+              "deleted_logs_at_time_unix_secs": null,
+              "deleted_audio_at_time_unix_secs": null,
+              "deleted_transcript_at_time_unix_secs": null,
+              "delete_transcript_and_pii": false,
+              "delete_audio": false
+            },
+            "feedback": {
+              "type": null,
+              "overall_score": null,
+              "likes": 0,
+              "dislikes": 0,
+              "rating": null,
+              "comment": null
+            },
+            "authorization_method": "signed_url",
+            "charging": {
+              "dev_discount": false,
+              "is_burst": false,
+              "tier": "enterprise",
+              "llm_usage": {
+                "irreversible_generation": {
+                  "model_usage": {}
+                },
+                "initiated_generation": {
+                  "model_usage": {}
+                }
+              },
+              "llm_price": 0,
+              "llm_charge": 0,
+              "call_charge": 3,
+              "free_minutes_consumed": 0,
+              "free_llm_dollars_consumed": 0,
+              "tts_usage": {
+                "primary_tts_model": "eleven_flash_v2",
+                "total_audio_output_seconds": 0,
+                "total_characters": 0,
+                "per_voice_usage": []
+              },
+              "asr_usage": {
+                "asr_model": "scribe_realtime",
+                "total_transcription_calls": 0,
+                "total_audio_input_seconds": 0
+              }
+            },
+            "phone_call": {
+              "direction": "inbound",
+              "phone_number_id": "phnum_1201k7enx5hee8gaa0zzkjm613qm",
+              "agent_number": "+12403037745",
+              "external_number": "+19144985408",
+              "type": "twilio",
+              "stream_sid": "MZfb10d8990bf8a3122e3bdc89352a4285",
+              "call_sid": "CAe8d8a6062bb36730125d020974354a0a"
+            },
+            "batch_call": null,
+            "termination_reason": "Call ended by remote party",
+            "error": null,
+            "warnings": [
+              "Connection closed before conversation started."
+            ],
+            "main_language": "en",
+            "rag_usage": {
+              "usage_count": 0,
+              "embedding_model": "e5_mistral_7b_instruct"
+            },
+            "text_only": false,
+            "features_usage": {
+              "language_detection": {
+                "enabled": true,
+                "used": false
+              },
+              "transfer_to_agent": {
+                "enabled": true,
+                "used": false
+              },
+              "transfer_to_number": {
+                "enabled": false,
+                "used": false
+              },
+              "multivoice": {
+                "enabled": false,
+                "used": false
+              },
+              "dtmf_tones": {
+                "enabled": false,
+                "used": false
+              },
+              "external_mcp_servers": {
+                "enabled": true,
+                "used": false
+              },
+              "pii_zrm_workspace": false,
+              "pii_zrm_agent": false,
+              "tool_dynamic_variable_updates": {
+                "enabled": false,
+                "used": false
+              },
+              "is_livekit": false,
+              "voicemail_detection": {
+                "enabled": false,
+                "used": false
+              },
+              "dtmf_input": {
+                "enabled": false,
+                "used": false
+              },
+              "workflow": {
+                "enabled": false,
+                "tool_node": {
+                  "enabled": false,
+                  "used": false
+                },
+                "standalone_agent_node": {
+                  "enabled": false,
+                  "used": false
+                },
+                "phone_number_node": {
+                  "enabled": false,
+                  "used": false
+                },
+                "end_node": {
+                  "enabled": false,
+                  "used": false
+                }
+              },
+              "agent_testing": {
+                "enabled": false,
+                "tests_ran_after_last_modification": false,
+                "tests_ran_in_last_7_days": false
+              },
+              "versioning": {
+                "enabled": false,
+                "used": false
+              },
+              "file_input": {
+                "enabled": true,
+                "used": false
+              }
+            },
+            "eleven_assistant": {
+              "is_eleven_assistant": false
+            },
+            "initiator_id": null,
+            "conversation_initiation_source": "twilio",
+            "conversation_initiation_source_version": null,
+            "timezone": null,
+            "async_metadata": null,
+            "whatsapp": null,
+            "agent_created_from": "unknown",
+            "agent_last_updated_from": "api",
+            "voice_rewards": []
+          },
+          "analysis": {
+            "evaluation_criteria_results": {
+              "ai_resolution": {
+                "criteria_id": "ai_resolution",
+                "result": "unknown",
+                "rationale": "No transcript to evaluate"
+              }
+            },
+            "data_collection_results": {
+              "cp_result": {
+                "data_collection_id": "cp_result",
+                "value": null,
+                "json_schema": null,
+                "rationale": "No transcript to evaluate"
+              },
+              "candidate_sales_ticket": {
+                "data_collection_id": "candidate_sales_ticket",
+                "value": null,
+                "json_schema": null,
+                "rationale": "No transcript to evaluate"
+              },
+              "product": {
+                "data_collection_id": "product",
+                "value": null,
+                "json_schema": null,
+                "rationale": "No transcript to evaluate"
+              },
+              "refund_request": {
+                "data_collection_id": "refund_request",
+                "value": null,
+                "json_schema": null,
+                "rationale": "No transcript to evaluate"
+              }
+            },
+            "evaluation_criteria_results_list": [
+              {
+                "criteria_id": "ai_resolution",
+                "result": "unknown",
+                "rationale": "No transcript to evaluate"
+              }
+            ],
+            "data_collection_results_list": [
+              {
+                "data_collection_id": "cp_result",
+                "value": null,
+                "json_schema": null,
+                "rationale": "No transcript to evaluate"
+              },
+              {
+                "data_collection_id": "candidate_sales_ticket",
+                "value": null,
+                "json_schema": null,
+                "rationale": "No transcript to evaluate"
+              },
+              {
+                "data_collection_id": "product",
+                "value": null,
+                "json_schema": null,
+                "rationale": "No transcript to evaluate"
+              },
+              {
+                "data_collection_id": "refund_request",
+                "value": null,
+                "json_schema": null,
+                "rationale": "No transcript to evaluate"
+              }
+            ],
+            "call_successful": "unknown",
+            "transcript_summary": "Summary couldn't be generated for this call.",
+            "call_summary_title": null,
+            "scoped": []
+          },
+          "visited_agents": [],
+          "conversation_initiation_client_data": {
+            "conversation_config_override": {
+              "turn": null,
+              "tts": null,
+              "conversation": null,
+              "agent": null
+            },
+            "custom_llm_extra_body": {},
+            "user_id": null,
+            "source_info": {
+              "source": null,
+              "version": null
+            },
+            "branch_id": null,
+            "environment": null,
+            "starting_workflow_node_id": null,
+            "dynamic_variables": {
+              "name": "",
+              "email": "",
+              "system__agent_id": "agent_3601k4mdj3dpe41r5w10pvzhy3bx",
+              "system__agent_turns": 0,
+              "system__current_agent_turns": 0,
+              "system__current_subagent_turns": 0,
+              "system__current_agent_id": "agent_3601k4mdj3dpe41r5w10pvzhy3bx",
+              "system__conversation_id": "conv_0701kqga1n1ye778kgm8t4bzq3mv",
+              "system__call_duration_secs": 0,
+              "system__time_utc": "2026-04-30T23:02:13.241896+00:00",
+              "system__time": "Thursday, 23:02 30 April 2026",
+              "system__timezone": null,
+              "system__is_text_only": false,
+              "system__caller_id": "+19144985408",
+              "system__called_number": "+12403037745",
+              "system__call_sid": "CAe8d8a6062bb36730125d020974354a0a",
+              "system__conversation_history": "{\"x-elevenlabs-history\": true, \"entries\": []}"
+            },
+            "tool_mock_config": {
+              "mocking_strategy": "none",
+              "fallback_strategy": "raise_error",
+              "mocked_tool_names": []
+            }
+          },
+          "environment": "production",
+          "hiding_reason": null,
+          "conversation_id": "conv_0701kqga1n1ye778kgm8t4bzq3mv",
+          "has_audio": true,
+          "has_user_audio": true,
+          "has_response_audio": true,
+          "transcript": [],
+          "tag_ids": [],
+          "transcript_text": "",
+          "transcript_quality": "corrupted_or_missing"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "The detective": {
+      "main": [
+        [
+          {
+            "node": "Detective agent output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Prompt": {
+      "main": [
+        [
+          {
+            "node": "The detective",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get transcript based on audio": {
+      "main": [
+        [
+          {
+            "node": "Prepare Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client2": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Audio file from  EL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Audio file from  EL": {
+      "main": [
+        [
+          {
+            "node": "Get transcript based on audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execution Data": {
+      "main": [
+        []
+      ]
+    },
+    "If Sales ticket is detected": {
+      "main": [
+        [
+          {
+            "node": "Call 'merge_tickets'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "zendesk_search": {
+      "ai_tool": [
+        [
+          {
+            "node": "The detective",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "zendesk_get_user": {
+      "ai_tool": [
+        [
+          {
+            "node": "The detective",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ticket_events": {
+      "ai_tool": [
+        [
+          {
+            "node": "The detective",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'merge_tickets'": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detective agent output": {
+      "main": [
+        [
+          {
+            "node": "Call 'create_call_ticket [Entry]'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'create_call_ticket [Entry]'": {
+      "main": [
+        [
+          {
+            "node": "If Sales ticket is detected",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-5.2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "The detective",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "1ad372aa-e66c-4d94-8581-27f0408ec8f0",
+  "meta": {
+    "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"
+  },
+  "id": "gZSiZBZtPSFzJ968",
+  "tags": []
+}

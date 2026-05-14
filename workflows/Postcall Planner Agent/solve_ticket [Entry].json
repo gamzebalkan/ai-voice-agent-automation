@@ -1,0 +1,1005 @@
+{
+  "name": "solve_ticket [Entry]",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "sales_ticket_id",
+              "type": "any"
+            },
+            {
+              "name": "sales_ticket_status",
+              "type": "any"
+            },
+            {
+              "name": "assignee_id",
+              "type": "any"
+            },
+            {
+              "name": "call_ticket_id",
+              "type": "any"
+            },
+            {
+              "name": "call_result",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        144,
+        1040
+      ],
+      "id": "0c24f948-9394-4390-88a5-5f04d8a20060",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Ticket should be left open!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        1696
+      ],
+      "id": "c986168b-5d73-40d1-bb5a-b54dc799e457",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "71dc9e0d-9370-4db0-9ebb-3121e92f5e5a",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        960,
+        1040
+      ],
+      "id": "2747dd24-699d-41b3-8ea9-d5fb30a3686c",
+      "name": "Sales ticket exists?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9509312b-99af-4cc7-adc5-eeafdc316d5b",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.call_result }}",
+              "rightValue": "addressed the concern",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "699bc49a-8e4a-4599-bc32-fa95eefa8518",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.call_result }}",
+              "rightValue": "could not capture the request",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1552,
+        1568
+      ],
+      "id": "a56dbadc-ca9c-4308-8ee4-391a6dcf6fbc",
+      "name": "Solve the call ticket?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "144ec019-2595-4d58-9f2c-2d2c0d179bfc",
+              "name": "Response",
+              "value": "No Sales Ticket found. Call ticket is solved.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3584,
+        1408
+      ],
+      "id": "de668301-edc4-47be-b6dc-eb733ee05b9c",
+      "name": "Response3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $('When Executed by Another Workflow').item.json.call_ticket_id }}",
+        "updateFields": {
+          "status": "solved"
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        2464,
+        1424
+      ],
+      "id": "5644e9c0-bf5b-4202-869b-2e9fb6ca2504",
+      "name": "Solve  the ticket",
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "19c00326-a002-4377-b8a5-978778113ae5",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.call_result }}",
+              "rightValue": "addressed the concern",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "f92a2647-c855-4231-86c9-18b2a6866e36",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.call_result }}",
+              "rightValue": "could not capture the request",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2176,
+        224
+      ],
+      "id": "b84c3568-919b-42bd-b064-b632b4947861",
+      "name": "David addressed the concern?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "afaff72e-c8f5-41a7-b595-2599692073e3",
+              "name": "Response",
+              "value": "Sales ticket is left open. ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2496,
+        560
+      ],
+      "id": "d9fcb102-703f-46c4-a75c-30aa5c9a2488",
+      "name": "Response2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "10psh1ilovhOtEL9",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/10psh1ilovhOtEL9",
+          "cachedResultName": "Zendesk Safe Caller"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('When Executed by Another Workflow').item.json.ticket_id }}",
+            "target": "ticket",
+            "operation": "update",
+            "payload": "={ \"status\": \"solved\" } ",
+            "options": "{}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "target",
+              "displayName": "target",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "operation",
+              "displayName": "operation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "payload",
+              "displayName": "payload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "options",
+              "displayName": "options",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3056,
+        -672
+      ],
+      "id": "a01f8bab-41b6-4bd5-bdf4-0b481215a804",
+      "name": "Zendesk Safe Caller - solve",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "19c00326-a002-4377-b8a5-978778113ae5",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.assignee_id }}",
+              "rightValue": "34647603151634",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "b43037cf-2517-42f8-905f-067ab7363f87",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.assignee_id }}",
+              "rightValue": "34450383373842",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1792,
+        240
+      ],
+      "id": "202a777a-a1ad-4a82-8630-b5160bf30c69",
+      "name": "Is assignee Casey or Jamie?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "afaff72e-c8f5-41a7-b595-2599692073e3",
+              "name": "Response",
+              "value": "=Sales ticket is solved.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3152,
+        192
+      ],
+      "id": "89ad05c2-f988-4399-bb95-97de17b600dd",
+      "name": "Response1"
+    },
+    {
+      "parameters": {
+        "content": "### Solve a ticket",
+        "height": 688,
+        "width": 2208,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1168,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "a34949f3-dec1-4eb3-bc93-1d8b3396b95e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "19c00326-a002-4377-b8a5-978778113ae5",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+              "rightValue": "solved",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "36f730d3-6ffb-4fb6-921b-701ca314dffd",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_status }}",
+              "rightValue": "solved",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1392,
+        544
+      ],
+      "id": "0ae31923-e053-4ad0-86af-6c9670cbe81b",
+      "name": "Did David open a solved Sales Ticket?"
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ $json.error.message +'. '+ $json.error.description }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        3328,
+        -192
+      ],
+      "id": "660b757e-bf0c-47f3-84f6-31103f865fc7",
+      "name": "Stop and Error1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+        "updateFields": {
+          "status": "solved"
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        2624,
+        208
+      ],
+      "id": "0949288d-071f-4db8-8982-351997470e09",
+      "name": "Solve the ticket",
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "Sales_Ticket_ID",
+              "value": "={{ $json.sales_ticket }}"
+            },
+            {
+              "key": "Sales_Ticket_Status_was",
+              "value": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_status }}"
+            },
+            {
+              "key": "Call_Ticket_ID",
+              "value": "={{ JSON.parse($('When Executed by Another Workflow').first().json.call_ticket_object.trim())[0].call_ticket_id }}"
+            },
+            {
+              "key": "Assigned_To",
+              "value": "={{ $json.agent_type }}"
+            },
+            {
+              "key": "Call_Result",
+              "value": "={{ $('When Executed by Another Workflow').item.json.call_result }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1,
+      "position": [
+        944,
+        1312
+      ],
+      "id": "df66b3ea-d503-4556-8b28-0ee04533ac0b",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('When Executed by Another Workflow').item.json;\n\nconst assignee_id = data.assignee_id;\nconst sales_ticket_id = data.sales_ticket_id;\n\nlet agent_type = \"Not AI Agent\";\n\nif (assignee_id === 34647603151634 || assignee_id === 34450383373842) {\n    agent_type = \"AI agent\";\n}\n\nconst sales_ticket_result = sales_ticket_id ? sales_ticket_id : \"No sales ticket\";\n\nreturn [\n  {\n    json: {\n      agent_type: agent_type,\n      sales_ticket: sales_ticket_result\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        1040
+      ],
+      "id": "7022c301-5a89-4810-a791-13594d6635b5",
+      "name": "Highlight Data"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error on solving the sales ticket."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        3152,
+        512
+      ],
+      "id": "762c6dce-4b4d-4b57-b3f1-04ef1c68bc89",
+      "name": "Stop and Error2"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  ticket: {\n    status: \"solved\"\n  }\n}\n}}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2896,
+        496
+      ],
+      "id": "45799d71-d433-4780-bfd7-42a9a2d03336",
+      "name": "HTTP - Solve ticket",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error on solving the call ticket."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        3616,
+        2016
+      ],
+      "id": "86ee099a-e0fd-4a34-a0fe-52e125585014",
+      "name": "Stop and Error3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $('When Executed by Another Workflow').item.json.call_ticket_id }}",
+        "updateFields": {
+          "assigneeEmail": "managers@immigrate.us",
+          "customFieldsUi": {
+            "customFieldsValues": [
+              {
+                "id": 33720327230994,
+                "value": "not_paid"
+              },
+              {
+                "id": 33720422936082,
+                "value": "managers"
+              },
+              {
+                "id": 33720461775122,
+                "value": "no_refund_requested"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        1136
+      ],
+      "id": "c3a2feb4-c99d-438b-890b-0b1659a3f249",
+      "name": "Edit fields",
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.call_ticket_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"ticket\": {\n    \"assignee_id\": 34616279135762,\n    \"custom_fields\": [\n      {\n        \"id\": 33720327230994,\n        \"value\": \"not_paid\"\n      },\n      {\n        \"id\": 33720422936082,\n        \"value\": \"david_albright\"\n      },\n      {\n        \"id\": 33720461775122,\n        \"value\": \"no_refund_requested\"\n      }\n    ],\n    \"status\": \"solved\"\n  }\n}\n",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2912,
+        1776
+      ],
+      "id": "f9ce9506-a17a-4659-a4ba-9ce1fb7c90fd",
+      "name": "HTTP - Edit fields, solve tickets",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $('When Executed by Another Workflow').item.json.call_ticket_id }}",
+        "updateFields": {
+          "status": "solved"
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        1136
+      ],
+      "id": "2a83e1fd-150b-4a8e-991e-f3051b4488b2",
+      "name": "Update a ticket",
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $('When Executed by Another Workflow').item.json.call_ticket_id }}",
+        "updateFields": {
+          "assigneeEmail": "callcenter@immigrate.us",
+          "customFieldsUi": {
+            "customFieldsValues": [
+              {
+                "id": 33720327230994,
+                "value": "not_paid"
+              },
+              {
+                "id": 33720422936082,
+                "value": "david_albright"
+              },
+              {
+                "id": 33720461775122,
+                "value": "no_refund_requested"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        1440
+      ],
+      "id": "949133a0-207a-4ddc-9b4c-149d5e9f0e62",
+      "name": "Edit  fields",
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "sales_ticket_id": "",
+          "sales_ticket_status": "",
+          "assignee_id": "",
+          "call_ticket_id": "1815259",
+          "call_result": "could not capture the request"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Highlight Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales ticket exists?": {
+      "main": [
+        [
+          {
+            "node": "Did David open a solved Sales Ticket?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Solve the call ticket?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Solve the call ticket?": {
+      "main": [
+        [
+          {
+            "node": "Edit  fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Solve  the ticket": {
+      "main": [
+        [
+          {
+            "node": "Response3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP - Edit fields, solve tickets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "David addressed the concern?": {
+      "main": [
+        [
+          {
+            "node": "Solve the ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zendesk Safe Caller - solve": {
+      "main": [
+        []
+      ]
+    },
+    "Is assignee Casey or Jamie?": {
+      "main": [
+        [
+          {
+            "node": "David addressed the concern?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Did David open a solved Sales Ticket?": {
+      "main": [
+        [
+          {
+            "node": "Is assignee Casey or Jamie?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Solve the ticket": {
+      "main": [
+        [
+          {
+            "node": "Response1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP - Solve ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response1": {
+      "main": [
+        []
+      ]
+    },
+    "Response2": {
+      "main": [
+        []
+      ]
+    },
+    "Response3": {
+      "main": [
+        []
+      ]
+    },
+    "Highlight Data": {
+      "main": [
+        [
+          {
+            "node": "Sales ticket exists?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - Solve ticket": {
+      "main": [
+        [
+          {
+            "node": "Response1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit fields": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "HTTP - Edit fields, solve tickets": {
+      "main": [
+        [
+          {
+            "node": "Response3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit  fields": {
+      "main": [
+        [
+          {
+            "node": "Solve  the ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP - Edit fields, solve tickets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "78b49f13-ecd5-434e-a190-18569fc9989b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"
+  },
+  "id": "O1YBAuk0aHdpRWTU",
+  "tags": []
+}

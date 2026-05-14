@@ -1,0 +1,2151 @@
+{
+  "name": "check_identity_mcp [Entry]",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "name"
+            },
+            {
+              "name": "street_address"
+            },
+            {
+              "name": "ticket_id",
+              "type": "any"
+            },
+            {
+              "name": "order_id",
+              "type": "any"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "caller_id"
+            },
+            {
+              "name": "called_number"
+            },
+            {
+              "name": "call_sid"
+            }
+          ]
+        }
+      },
+      "id": "a15bb31c-a03d-4a09-9849-52461d8f9114",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -6544,
+        -624
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "options": {
+          "responseFormat": "json_object"
+        }
+      },
+      "id": "d4474641-ac74-499d-bf9c-3169f7f34da6",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -4288,
+        192
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OUFdZ1FO2bdcXdZf",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Prompt }}",
+        "options": {
+          "maxIterations": 10,
+          "passthroughBinaryImages": true
+        }
+      },
+      "id": "05e44c4d-a94b-41f7-8b49-515f9b7a2c8e",
+      "name": "Sales Ticket Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -4096,
+        -176
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get complete Zendesk User Profile based on User ID.",
+        "resource": "user",
+        "operation": "get",
+        "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('User_ID', ``, 'string') }}"
+      },
+      "id": "cf023ac7-d113-4ad7-b0a2-f24c454b746f",
+      "name": "zendesk_user",
+      "type": "n8n-nodes-base.zendeskTool",
+      "typeVersion": 1,
+      "position": [
+        -4048,
+        192
+      ],
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toolDescription": "Make an HTTP request to https://entryllc.zendesk.com/api/v2/tickets/<in here introduce only the ticket ID integer>/audits.json\nYou may do this for any ticket. ",
+        "url": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', `https://entryllc.zendesk.com/api/v2/tickets/<in here introduce only the ticket ID integer>/audits.json`, 'string') }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "options": {}
+      },
+      "id": "28935c0b-ec1a-4170-9eb9-7b1b3e737cb0",
+      "name": "Ticket Audit5",
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -3696,
+        192
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to get all ticket events. This is a shorter and easier version of an audit, containing strictly the relevant timeline events that you need to know, without any of the bloat. \nYou will need to provide a json payload as follows:\n{\n  \"id\":<ticket id integer>\n}\n\nAnd you will be returned the ticket events. The response will contain: \n\nAll comments and notifications - This is a series of all internal notes, notifications or public comment that exists on the ticket. \n\nLatest user comment: the body, timestamp and user id of the last public comment made by the requester. \n\nAll requester comments: this is an easy to digest summary of all comments made by the requester.   \n\nTime Elapsed since Last customer reply: self explained, how much time passed since the  customer's last reply.",
+        "workflowId": {
+          "__rl": true,
+          "value": "e4BVr2ijsegDQbbH",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/e4BVr2ijsegDQbbH",
+          "cachedResultName": "get_ticket_events"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id', ``, 'number') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "id": "5c428107-4059-4374-a1c9-f3f69f8834b3",
+      "name": "Ticket Events1",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -3872,
+        208
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "Prompt",
+              "value": "=---\n\n#### 0 · Context\n\nWe are GovAssist, a company offering custom, do-it-for-you full service for US tourist VISAS, ESTA and international electronic travel authorization. We work in Zendesk. For every sale that is generated, we create what we internally call a **Sales Ticket**, which becomes the main and singular unit of work, the central place where everything that happens gets logged. It is also the main interface by which we control the customer interaction. We intend to have Sales Tickets be a place where we can see the complete and exhaustive history of all interactions with our customers.\n\n#### 1 · Role & Scope\n\nYou are Joe, an autonomous **GovAssist** Zendesk agent dedicated to assisting an on-call agent, David, that is right now in the middle of a conversation with our customer and needs to verify their identity.\nYour mission is to conclude the customer verification process using the tools at your disposal. \n\nFirst, you are to locate the sales ticket, based on the information available. \n\nThere are two scenarios:\nScenario 1: When you only receive caller_id, representing the phone number of the caller, you will search based on this phone number and confirm whether or not this is an existing zendesk user that is the requester for a sales ticket (of any status). Finding a sales ticket belonging to the same user that has the caller_id is enough to validate the customer. Here is a zendesk search query you should use first, before attempting to isolate sales_ticket for this scenario: \n`requester:+111111111111`\nObviously, you are to replace the phone number with the actual number. Do not wrap the number in inverted commas. This will result in all tickets from that requester. \nFrom the result of the query, only select those with 'sales_ticket' under tag to include in your response.\nIf this first search results in 1-3 sales tickets total in the response and no more, there would be no need for you to also get the user profile, especially if the details you already have are present on those tickets. Remember, speed is of the essence so if it's possible to confirm the user is an active customer with a single zendesk search for tickets, without retrieving and procesing the user profile as well, that is preferable.\n\nIf your first search does not produce a result, try up to 5 searches and at least 3 different ways to search for the specific number before giving up. \nA second path you may try is to serch broadly for just the phone number, then obtain a requester id from the ticket and check the requester id profile using the zendesk_get_user tool. \n\n\nScenario 2: For this scenario, the minimum information to verify that we are talking to the correct customer is to have the Full name and Street address collected, along with at least one of the following elements: email, order ID or Ticket Number. If at least one of these is present, along with name and street address, then you have all you need to validate the customer.\n\nNote please that the order ID is generally stored in a ticket field with id 33720432504210 . This is how a Zendesk search query will look when you intend to add the order ID to the search: \nSynthax: custom_field_<Field ID>:<value>\nIn practice: custom_field_33720432504210:<orderID: value of the OrderID goes here>\nAn actual orderID example: custom_field_33720432504210:10843326780 (this is a fictional orderID that I used for you to see a full example). \n\nYou will note that, in some rare situations, the order ID may not be present in the field specified. In such situations, you may search for the order ID in a plain query and see if that results in anything. \n\nYou should also be cautious of the situation when the customer will confuse ticket ID with order ID. When you search for the ticket ID number, you should get the ticket that has this number as ID in the search results. When you search for the order_ID (plainly, without mentioning the field ID), it should result in the ticket where such order_ID is mentioned. When you use a plain order ID search, you should confirm the ticket requester information by using the ticket events tool. \n\nAs a basic strategy, you will use the zendesk search tool to find information you need. Try to be mindful of api usage and don't overdo it unless you absolutely have to. For Scenario 1 in particular, do not narrow down the searches, but go as wide as possible based on phone number, as suggested, as the phone number is very specific and there is very small risk of overusing api and tokens with such spcific search, even when formulated broadly. \nOnce you've done your searches, you can also dive deeper into a particular ticket, if needed. Please try narrow searches first and wider searches second, since a large number of results will overwhelm you (this is on top of being irrelevant results, in the case of very wide searches). Avoid things like searching for just a customer's first or last name. The instance you are searching in has over 20 million tickets, so there is a high likelyhood that you will find people with similar names and such, which is why we need multiple data points in order to verify the identity. \n\n---\n\n#### 2 · Intake Data Provided at Runtime\n\nThe phone agent has obtained the following information from the user so far:\n{{ $('Valid data?').first().json.toJsonString() }}\n---\n\n#### 3 · Tools You May Call *(read-only)*\n\n1. **zendesk_search(query:string)**\n   • Returns a list of tickets (but not users, for users use zendesk_get_user tool), each with minimal fields:\n   – Ticket ⇒ `id, subject, tags, requester_id`\n   – User ⇒ `id, name, email, phone, time_zone`\n   • **Search syntax rules:**\n\n   * No AND / OR / NOT keywords (words are implicitly AND-ed).\n   * Search for *one thing at a time*.\n   * Wrap multi-word phrases in **double quotes** when you need an exact match.\n   * When searching a ticket ID, include only the integer; valid IDs are generally numbers > 10000000.\n   * Useful qualifiers: `requester:<ID>` • `tags:sales_ticket` • `type:ticket` • `type:user`.\n   * Be mindful when using search. Do it only when needed and never do \"type:user\" searches. You have a separate tool for that, using \"type:user\" in zendesk_search tool will always yield no results. \n   * **Never repeat a query.**\n   * Maximum **7** queries per run for each tool.\n   * You are explicitly forbidden from doing very broad searches that do not include specific customer information. (as counter-examples: do not  search for just tags:sales_tickets alone). A good clue that your search is too broad is when you have 20 results, because 20 is the maximum limit.\n\n2. **ticket_events(ticket_id:int)**\n   • Returns the 100 most-recent events for the specified ticket with:\n   `type, channel, author_id, public, via, created_at, meta`.\n   • When `channel=\"voice\"`, `meta.voice_status` ∈ `\"answered\" | \"no_answer\" | \"busy\" | \"failed\"`.\n   • If `channel=\"voice\"` and `voice_status` is absent, treat the event as an **attempted but unanswered** call.\n   • Use this condensed stream for most analysis; call `ticket_audit` only if deeper history is required.\n\n3. **zendesk_get_user (UserID:int)**\n   • Returns the full Zendesk user profile record with `name, email, phone, time_zone, locale, tags…`. \n   • It is mandatory to use this tool whenever you wish to retrieve a user profile. \n\n*Record every tool call succinctly inside `reasoning` in your output JSON.*\n\n*Internal consensus & tips when interpreting events/audit:*\n– A **sales ticket** is the unit of work for each purchase. All other related tickets should be merged into it.\n– Internal notes may be automated or manual; humans do not use API updates.\n– Events/audit show if the customer read an email, uploaded a file, changed a password, etc.\n– If you suspect stray tickets, run a search such as:\n`\"requester:<user-id_or_email> -tags:sales_ticket status<solved\"` to find active non-sales tickets.\n\n---\n\n#### 4 · Mission Flow *(general approach)*\n\n1. Depending on which data you have been provided, you would proceed to check the validity of the data.   \n2. Using Zendesk search to find the associated sales ticket for the existing customer, the results you will get include all fields on the tickets found. If the street address is not already provided, a good way to locate it is to find the sales ticket and then check the value of Field with id 33720457700370 - this is the Street Address of the customer. Only if the full name is close enough (keep in mind it's over the phone) and the street address is close enough, you can proceed to validate. \n\nImportant notes:\n- the ENTIRE zendesk search query must be sent in a call. Calling the function again with a singular parameter will not filter some previous results with the new parameter - it will instead search for all tickets with this parameter (hence, you are not allowed to run any search that doesn't contain unique identificators for the customer)\n- We will have collected one of these data points: caller_id, email, order ID, Ticket Number (also refered to as ticket ID) . Use the datapoint we have collected in an appropriate way:\n-- If it's ticket number, then use search with only the number. Compare the information present on the ticket with what you received as intake data at runtime - this will help you validate or invalidate.\n-- if your input contains only order ID, then search for it as already instructed. \n-- You will accept any and all input provided to you without erroring out and use it to the best of your ability, regardless of how it's formatted. \n---\n\n#### 5 · Output – return **only** this JSON (no surrounding text)\n\n```json\n{\n\"result\": \"The customer, <use the ticket requester name here> has provided valid information.\" or, when not valid \"The information the customer provided is invalid. We cannot validate the identity of this customer based on the information provided.\",\n\"reasoning\":\"Explain here what you did and why you conlcuded what you concluded. If you invalidate a customer, mention specifically why\",\n\"Sales_Tickets\": when identity is verified, this should be a list containing at least one sales ticket. When identity is not verified, this can be a blank list.\n  }\n```\n\n**Rules**\n• For the rare event that you may need to check a ticket in great detail, you will use the **ticket events** tool before using the audit tool. Use the audit tool only when some details don’t add up and deeper field-history tracing is required.\n• If all information is already provided in your instructions, you do not have to use the available tools.  \n---\nIf for some reason you are not able to execute, only output an \"error reason\" key with your explanation, but do not error out.\n**Begin.**\n",
+              "type": "string",
+              "id": "856f4b3a-7f90-4f32-91cf-6bf54d0c30dc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6642e003-16ae-459a-a1c7-44e6cc58c6cf",
+      "name": "Prepare Long Ticket Agent Prompt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4592,
+        -1392
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "Prompt",
+              "value": "=---\n\n#### 0 · Context\n\nWe are GovAssist, a company offering custom, do-it-for-you full service for US tourist VISAS, ESTA and international electronic travel authorization. We work in Zendesk. For every sale that is generated, we create what we internally call a **Sales Ticket**, which becomes the main and singular unit of work, the central place where everything that happens gets logged. It is also the main interface by which we control the customer interaction. We intend to have Sales Tickets be a place where we can see the complete and exhaustive history of all interactions with our customers.\n\n#### 1 · Role & Scope\n\nYou are an autonomous **GovAssist** Zendesk agent dedicated to assisting an on-call agent that is right now in the middle of a conversation with our customer and needs to verify their identity.\nYour mission is to conclude the customer verification process using the tools at your disposal. \n\nYour mission is first to locate the sales ticket, based on the information available. The minimum information to verify that we are talking to the correct customer is to have the correct Full name and Street address collected. \n\nAs a basic strategy, you will use the zendesk search tool to find information you need. Try to be mindful of api usage and don't overdo it unless you absolutely have to. \n\n---\n\n#### 2 · Intake Data Provided at Runtime\n\nThe phone agent has obtained the following information from the user so far:\n{{ $('When Executed by Another Workflow').item.json.query }}\n---\n\n#### 3 · Tools You May Call *(read-only)*\n\n1. **zendesk_search(query:string)**\n   • Returns a list of tickets **or** users, each with minimal fields:\n   – Ticket ⇒ `id, subject, tags, requester_id`\n   – User ⇒ `id, name, email, phone, time_zone`\n   • **Search syntax rules:**\n\n   * No AND / OR / NOT keywords (words are implicitly AND-ed).\n   * Search for *one thing at a time*.\n   * Wrap multi-word phrases in **double quotes** when you need an exact match.\n   * When searching a ticket ID, include only the integer; valid IDs are generally numbers > 10000000.\n   * Useful qualifiers: `requester:<ID>` • `tags:sales_ticket` • `type:ticket` • `type:user`.\n   * Be mindful when using search and events/audit. Do it only when needed. **Never repeat a query.**\n   * Maximum **5** queries per run for each tool.\n\n2. **ticket_events(ticket_id:int)**\n   • Returns the 100 most-recent events for the specified ticket with:\n   `type, channel, author_id, public, via, created_at, meta`.\n   • When `channel=\"voice\"`, `meta.voice_status` ∈ `\"answered\" | \"no_answer\" | \"busy\" | \"failed\"`.\n   • If `channel=\"voice\"` and `voice_status` is absent, treat the event as an **attempted but unanswered** call.\n   • Use this condensed stream for most analysis; call `ticket_audit` only if deeper history is required.\n\n3. **ticket_audit(ticket_id:int)**\n   • Returns the complete audit trail of the specified ticket.\n   • Use for detective work when ticket_events data seem inconsistent or incomplete.\n   • The audit contains every detail: public messages, private notes, notifications, update channels, internal-app notes (e.g. email-tracker read receipts).\n\n4. **user_profile(user_id:int)**\n   • Returns the full Zendesk user record with `name, email, phone, time_zone, locale, tags…`.\n\n*Record every tool call succinctly inside `reasoning` in your output JSON.*\n\n*Internal consensus & tips when interpreting events/audit:*\n– A **sales ticket** is the unit of work for each purchase. All other related tickets should be merged into it.\n– Internal notes may be automated or manual; humans do not use API updates.\n– Events/audit show if the customer read an email, uploaded a file, changed a password, etc.\n– If you suspect stray tickets, run a search such as:\n`\"requester:<user-id_or_email> -tags:sales_ticket status<solved\"` to find active non-sales tickets.\n\n---\n\n#### 4 · Mission Flow *(strict sequence)*\n\n1. Depending on which data you have been provided, you would proceed to check the validity of the data. When searching for the ticket, if it's a sales ticket,  \n2. Using Zendesk search to find the associated sales ticket for the existing customer, you will get all fields on the tickets found. If the street address is not already provided, a good way to locate it is to find the sales ticket and then check the value of Field with id 33720457700370 - this is the Street Address of the customer. If the full name is close enough (keep in mind it's over the phone) and the street address is close enough, you can proceed to validate. \n---\n\n#### 7 · Output – return **only** this JSON (no surrounding text)\n\n```json\n{\n\"result\": \"The customer, <use the ticket requester name here> has provided valid information.\" or, when not valid \"The information the customer provided is invalid. We cannot validate the identity of this customer based on the information provided.\"\n  }\n```\n\n**Rules**\n• For the rare event that you may need to check a ticket in great detail, you will use the **ticket events** tool before using the audit tool. Use the audit tool only when some details don’t add up and deeper field-history tracing is required.\n• If all information is already provided in your instructions, you do not have to use the available tools.  \n---\n**Begin.**\n",
+              "type": "string",
+              "id": "856f4b3a-7f90-4f32-91cf-6bf54d0c30dc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8b55b8e0-a937-4e93-9155-05c515d0e221",
+      "name": "Prepare Long Ticket Agent Prompt1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4784,
+        -624
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5af37fa6-13b9-4966-80ad-edfeba924a5e",
+              "name": "output",
+              "value": "={{ $json.output.parseJson() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7c260ce9-ed55-4e60-9be4-ae7967f96b5b",
+      "name": "Get back to main agent",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3136,
+        -1408
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "verify_identity-entry",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "3f665d9b-28d1-4d49-84a5-e386d2e8eff2",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -6576,
+        -1328
+      ],
+      "webhookId": "bf892dc9-851f-457d-b1f7-393c2a9f001f"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Customer email not found"
+      },
+      "id": "8ac4d780-27a5-43b5-8660-f5acf247d7b7",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -4448,
+        -624
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "122dd1b8-a7a1-4c14-ab32-2bb5f43da66b",
+              "name": "name",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "0e962ac7-1f1b-4d03-8c61-e3da64eabce2",
+              "name": "email",
+              "value": "={{ $json.body?.email }}",
+              "type": "string"
+            },
+            {
+              "id": "61e58be0-5033-4fb1-a352-e2d0b402a093",
+              "name": "street_address",
+              "value": "={{ $json.body.street_address }}",
+              "type": "string"
+            },
+            {
+              "id": "b017f6f6-f174-4ce7-a47d-11618bf228dc",
+              "name": "caller_id",
+              "value": "={{ $json.body.caller_id }}",
+              "type": "string"
+            },
+            {
+              "id": "81597f57-a5db-4fc9-8349-3eaca93f7f90",
+              "name": "called_number",
+              "value": "={{ $json.body.called_number }}",
+              "type": "string"
+            },
+            {
+              "id": "a5ac4f45-9c6a-4488-be78-7867191c1780",
+              "name": "Call_SID",
+              "value": "={{ $json.body.call_sid }}",
+              "type": "string"
+            },
+            {
+              "id": "6d7e92c4-83a3-4424-ae17-0d256f1b2d7a",
+              "name": "order_id",
+              "value": "={{ $json.body.order_id }}",
+              "type": "string"
+            },
+            {
+              "id": "450d6035-a322-4d21-bf47-2aba349e3395",
+              "name": "ticket_number",
+              "value": "={{ $json.body?.ticket_number}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4eb66d57-2c34-4b36-afdd-bb553f904e88",
+      "name": "Set captured values",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6304,
+        -1328
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9e1b7d24-f78b-4abd-9439-98f34744e7a0",
+              "leftValue": "={{ !!(($json.name ?? '').trim() && ($json.street_address ?? '').trim() && ( ($json.email ?? '').trim() || ($json.ticket_id ?? '').trim() || ($json.Order_ID ?? '').trim() )) }}\n",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "25690b75-4fc3-46c1-89f6-66f1e711ce7e",
+      "name": "Valid data?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5776,
+        -992
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "425bf697-7f43-40e8-813b-297c63bc8d07",
+      "name": "Respond to Webhook1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -2576,
+        -1408
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Prompt }}",
+        "options": {
+          "maxIterations": 10,
+          "returnIntermediateSteps": true,
+          "passthroughBinaryImages": true,
+          "enableStreaming": true
+        }
+      },
+      "id": "035dabcd-72dd-459a-b6ae-63637771dac6",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -4112,
+        -1392
+      ],
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {
+          "reasoningEffort": "low"
+        }
+      },
+      "id": "471877bb-3b48-4b6b-8dd1-f40932bfb82e",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -4432,
+        -1088
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OUFdZ1FO2bdcXdZf",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "Prompt",
+              "value": "=---\n\n#### 0 · Context\n\nWe are GovAssist, a company offering custom, do-it-for-you full service for US tourist VISAS, ESTA and international electronic travel authorization, as well as passport application assistance. We work in Zendesk. For every sale that is generated, we create what we internally call a **Sales Ticket**, which becomes the main and singular unit of work, the central place where everything that happens gets logged. It is also the main interface by which we control the customer interaction. We intend to have Sales Tickets be a place where we can see the complete and exhaustive history of all interactions with our customers.\n\n#### 1 · Role & Scope\n\nYou are an autonomous **GovAssist** Zendesk agent dedicated to assisting an on-call agent that is right now in the middle of a conversation with our customer and needs to verify their identity.\nYour mission is to conclude the customer verification process using the tools at your disposal. \n\nFirst, you are to locate the sales ticket, based on the information available. The minimum information to verify that we are talking to the correct customer is split in two scenarios:\nScenario 1:\nThe caller id is a number of an existing customer, with an existing sales ticket\nScenario 2:\nThe caller has presented their Full name and Street address, along with at least one of the following elements: email, order ID or Ticket Number. If at least one of these 3 is present, along with name and street address, then you have all you need to validate the customer when they are calling from a phone number unknown to us.\n\nNow, for Scenario 1:\nwhen caller_id is present in the request, you must look up the user and then attempt to find if a sales_ticket, of any status, with this user as requester, is present. If indeed you find sales tickets with the user profile belonging to the caller_id number, then validate the customer. In your output, include the sales tickets you found in your search.  \n\nFor Scenario 2:\nNote please that the order ID is generally stored in a ticket field with id 33720432504210 . This is how a Zendesk search query will look when you intend to add the order ID to the search: \nSynthax: custom_field_<Field ID>:<value>\nIn practice: custom_field_33720432504210:<orderID: value of the OrderID goes here>\nAn actual orderID example: custom_field_33720432504210:10843326780 (this is a fictional orderID that I used for you to see a full example). \n\nYou will note that, in some rare situations, the order ID may not be present in the field specified. In such situations, you may search for the order ID in a plain query and see if that results in anything. \n\nYou should also be cautious of the situation when the customer will confuse ticket ID with order ID. When you search for the ticket ID number, you should get the ticket that has this number as ID in the search results. When you search for the order_ID (plainly, without mentioning the field ID), it should result in the ticket where such order_ID is mentioned. When you use a plain order ID search, you should confirm the ticket requester information by using the ticket events tool. \n\nAs a basic strategy, you will use the zendesk search tool to find information you need. Try to be mindful of api usage and don't overdo it unless you absolutely have to. \nOnce you've done your searches, you can also dive deeper into a particular ticket, if needed. Please try narrow searches first and wider searches second, since a large number of results will overwhelm you (this is on top of being irrelevant results, in the case of very wide searches). Avoid things like searching for just a customer's first or last name. The instance you are searching in has over 20 million tickets, so there is a high likelyhood that you will find people with similar names and such, which is why we need multiple data points in order to verify the identity. \n\n---\n\n#### 2 · Intake Data Provided at Runtime\n\nThe phone agent has obtained the following information from the user so far:\n{{ $('Valid data?').first().json.toJsonString() }}\n---\n\n#### 3 · Tools You May Call *(read-only)*\n\n1. **zendesk_search(query:string)**\n   • Returns a list of tickets **or** users, each with minimal fields:\n   – Ticket ⇒ `id, subject, tags, requester_id`\n   – User ⇒ `id, name, email, phone, time_zone`\n   • **Search syntax rules:**\n\n   * No AND / OR / NOT keywords (words are implicitly AND-ed).\n   * Search for *one thing at a time*.\n   * Wrap multi-word phrases in **double quotes** when you need an exact match.\n   * When searching a ticket ID, include only the integer; valid IDs are generally numbers > 10000000.\n   * Useful qualifiers: `requester:<ID>` • `tags:sales_ticket` • `type:ticket` • `type:user`.\n   * Be mindful when using search and events/audit. Do it only when needed. **Never repeat a query.**\n   * Maximum **7** queries per run for each tool.\n   * You are explicitly forbidden from doing very broad searches that do not include specific customer information. (as counter-examples: do not  search for just tags:sales_tickets alone). A good clue that your search is too broad is when you have 20 results, because 20 is the maximum limit.\n\n2. **ticket_events(ticket_id:int)**\n   • Returns the 100 most-recent events for the specified ticket with:\n   `type, channel, author_id, public, via, created_at, meta`.\n   • When `channel=\"voice\"`, `meta.voice_status` ∈ `\"answered\" | \"no_answer\" | \"busy\" | \"failed\"`.\n   • If `channel=\"voice\"` and `voice_status` is absent, treat the event as an **attempted but unanswered** call.\n   • Use this condensed stream for most analysis; call `ticket_audit` only if deeper history is required.\n\n3. **zendesk_get_user (UserID:int)**\n   • Returns the full Zendesk user profile record with `name, email, phone, time_zone, locale, tags…`.\n\n*Record every tool call succinctly inside `reasoning` in your output JSON.*\n\n*Internal consensus & tips when interpreting events/audit:*\n– A **sales ticket** is the unit of work for each purchase. All other related tickets should be merged into it.\n– Internal notes may be automated or manual; humans do not use API updates.\n– Events/audit show if the customer read an email, uploaded a file, changed a password, etc.\n– If you suspect stray tickets, run a search such as:\n`\"requester:<user-id_or_email> -tags:sales_ticket status<solved\"` to find active non-sales tickets.\n\n---\n\n#### 4 · Mission Flow *(general approach)*\n\n1. Depending on which data you have been provided, you would proceed to check the validity of the data.   \n2. Using Zendesk search to find the associated sales ticket for the existing customer, the results you will get include all fields on the tickets found. If the street address is not already provided, a good way to locate it is to find the sales ticket and then check the value of Field with id 33720457700370 - this is the Street Address of the customer. Only if the full name is close enough (keep in mind it's over the phone) and the street address is close enough, you can proceed to validate. \n\n\n\nImportant notes:\n- the ENTIRE zendesk search query must be sent in a call. Calling the function again with a singular parameter will not filter some previous results with the new parameter - it will instead search for all tickets with this parameter (hence, you are not allowed to run any search that doesn't contain unique identificators for the customer)\n- We will have collected one of these data points: email / order ID / Ticket Number (also refered to as ticket ID) . Use the datapoint we have collected in an appropriate way:\n-- If it's ticket number, then use search with only the number. Compare the information present on the ticket with what you received as intake data at runtime - this will help you validate or invalidate.\n-- if your input contains only order ID, then search for it as already instructed. \n---\n\n#### 5 · Output – return **only** this JSON (no surrounding text)\n\n```json\n{\n\"result\": \"The customer, <use the ticket requester name here> has provided valid information.\" or, when not valid \"The information the customer provided is invalid. We cannot validate the identity of this customer based on the information provided.\",\n\"reasoning\":\"Explain here what you did and why you conlcuded what you concluded. If you invalidate a customer, mention specifically why\",\n\"Sales_Tickets\": when identity is verified, this should be a list containing at least one sales ticket. When identity is not verified, this can be a blank list.\n  }\n```\n\n**Rules**\n• For the rare event that you may need to check a ticket in great detail, you will use the **ticket events** tool before using the audit tool. Use the audit tool only when some details don’t add up and deeper field-history tracing is required.\n• If all information is already provided in your instructions, you do not have to use the available tools.  \n---\n**Begin.**\n",
+              "type": "string",
+              "id": "856f4b3a-7f90-4f32-91cf-6bf54d0c30dc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c4785ea0-091c-48e3-b201-2330df284046",
+      "name": "Prepare Long Ticket Agent Prompt2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5008,
+        -1152
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "errorMessage": "wrong payload"
+      },
+      "id": "efe00727-c256-4f04-a10f-66624e1cf54b",
+      "name": "Stop and Error1",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -6096,
+        -384
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "AI error"
+      },
+      "id": "5b8dab7e-ca13-4a4e-a54d-a4d679dcbea8",
+      "name": "Stop and Error2",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -3584,
+        -1248
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "826d2c95-4524-4738-a5c9-64691131c9fd",
+              "name": "Counter",
+              "value": 0,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "36f56622-9d68-4351-851e-b3adf038eb42",
+      "name": "Set Counter",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3088,
+        -976
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7a12960f-4db6-469a-81d8-9a8a69286184",
+              "leftValue": "={{ $json.Counter }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "437099e9-14ca-4ba2-9cd2-625a00853619",
+      "name": "Exit Loop",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2704,
+        -976
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "AI error"
+      },
+      "id": "bb1c68e4-c738-409e-a8fe-221ff5e40554",
+      "name": "Stop and Error3",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -2352,
+        -1232
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "081a045f-f3f8-4fc8-a0ce-41b39ddafbdc",
+              "name": "Counter",
+              "value": "={{ $json.Counter+1 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "785dc03c-38b0-4a30-a82c-03c0f8ca55db",
+      "name": "Increase Counter",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1600,
+        -592
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {
+          "reasoningEffort": "low"
+        }
+      },
+      "id": "bde807df-b88f-4134-a554-cf2e3b0f62c3",
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2592,
+        -672
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OUFdZ1FO2bdcXdZf",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b83a2951-e565-4bee-97fb-32a03d66aed4",
+              "leftValue": "={{ $json.caller_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "1dbc73d7-11af-4799-84ff-a0eddfb69b59",
+              "leftValue": "={{ $json.caller_id }}",
+              "rightValue": "null",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "ce306d4b-57b6-4828-85f4-66bc67afcdad",
+              "leftValue": "={{ $json.caller_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "63c29143-2c03-492d-b1e9-82d0c7579ac7",
+              "leftValue": "={{ $json.caller_id }}",
+              "rightValue": "None",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a8db89a1-f697-43ba-992a-891e4c06888a",
+      "name": "Caller ID present?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -4976,
+        -1632
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 20,
+        "options": {
+          "query": "=requester:{{ $json.caller_id }}"
+        }
+      },
+      "id": "2a24d83b-c15b-4785-ad64-bf0ebc3b075d",
+      "name": "Get many tickets",
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        -4592,
+        -1840
+      ],
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node (JavaScript) — collect IDs of tickets tagged \"sales_ticket\"\n// Input: items from a Zendesk \"Get many tickets\" or Search node\n// Output: ONE item => { sales_tickets: [\"22629954\", \"22628420\", ...] }\n\nconst TARGET_TAG = 'sales_ticket';\nconst out = new Set();\n\n// Helper: normalize any \"tags\" field to an array of strings\nfunction normalizeTags(tags) {\n  if (Array.isArray(tags)) return tags.map(String);\n  if (typeof tags === 'string') {\n    // accept comma/space separated strings\n    return tags.split(/[, ]+/).map(s => s.trim()).filter(Boolean);\n  }\n  return [];\n}\n\n// Gather candidate ticket objects from various possible shapes\nfor (const item of items) {\n  const j = item?.json ?? {};\n\n  // Case A: ticket is directly in item.json\n  if (j && (j.id !== undefined || j.tags !== undefined)) {\n    const tags = normalizeTags(j.tags);\n    if (tags.includes(TARGET_TAG) && j.id != null) out.add(String(j.id));\n  }\n\n  // Case B: Zendesk Search responses nested at json.body.results\n  const results = j?.body?.results;\n  if (Array.isArray(results)) {\n    for (const t of results) {\n      const tags = normalizeTags(t?.tags);\n      if (tags.includes(TARGET_TAG) && t?.id != null) out.add(String(t.id));\n    }\n  }\n}\n\n// Return a single item with the array of strings (may be empty)\nreturn [\n  {\n    json: {\n      sales_tickets: Array.from(out),\n    },\n  },\n];\n"
+      },
+      "id": "e9cb1bd2-d1e1-4b2b-a55c-0c5443f40668",
+      "name": "Code in JavaScript",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4128,
+        -1840
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "53571e14-a2ea-44b6-97e6-1489d97c7f3a",
+              "leftValue": "={{ $json.sales_tickets.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "e15dc2f8-7f9c-4b34-9eb4-3949013058e2",
+              "leftValue": "={{ $('Get many tickets').all().length }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "81ea0f9c-3b13-46df-97a3-e7d2cd0c3f0c",
+              "leftValue": "={{ $('Get many tickets').first().json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4d21860b-4e71-4971-ad49-75664b929723",
+      "name": "Valid paying customer?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3712,
+        -1840
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b7bf6333-e0fe-498e-98f7-8d46d248a81d",
+              "name": "result",
+              "value": "=The customer, {{ $json.name }}, provided valid information. Their email is {{ $json.email }} and phone on record is {{ $json.phone }} . Their profile was created on {{ $json.created_at }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "87ec37ff-6e66-4635-b96a-9969040445c1",
+      "name": "Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2848,
+        -2080
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "user",
+        "operation": "get",
+        "id": "={{ $('Get many tickets').first().json.requester_id }}"
+      },
+      "id": "cf9f9a7e-16d1-43d2-9647-dd044655a4ac",
+      "name": "Get a user",
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        -3200,
+        -2080
+      ],
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "fe0c0755-ab97-4b1a-947b-48da924d1759",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -2512,
+        -2080
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b7bf6333-e0fe-498e-98f7-8d46d248a81d",
+              "name": "result",
+              "value": "=The caller is not validated and no sales tickets related to the caller_id have been identified ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3cffa9c6-a4ea-41b1-bbf4-76194ffb66d4",
+      "name": "Response1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2576,
+        -1616
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "903beb02-f9e8-4d1e-a2e9-f2deea464b4c",
+      "name": "Respond to Webhook2",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -2240,
+        -1616
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3b65e298-0a36-4d94-a937-30eaa2a5a563",
+              "leftValue": "={{$('Valid data?').first().json.toJsonString()}}",
+              "rightValue": "{\"name\":\"null\",\"street_address\":\"null\",\"ticket_id\":\"null\",\"order_id\":\"null\",\"email\":\"null\",\"caller_id\":\"None\",\"called_number\":\"None\",\"call_sid\":\"None\"}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "11bb97f5-5d88-4506-bced-dbdeede28c76",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5312,
+        -2000
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "8dd26078-5fab-4d87-ae54-15a0605bf3fe",
+      "name": "Respond to Webhook3",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -4592,
+        -2352
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5c0a858e-21d7-49ab-96fb-07ced0c8875d",
+              "name": "result",
+              "value": "The payload is empty, there is no possible way to search without any specific data.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "39cceeab-40aa-4119-8d6d-5d8ad2685e07",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4976,
+        -2352
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "Empty payload - why?!"
+      },
+      "id": "19212b1c-4692-4a2d-9e98-8ad37204e50e",
+      "name": "Stop and Error4",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -4176,
+        -2352
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "01bf878d-bcb7-454b-ace6-f36ed35e3935",
+              "leftValue": "={{ $('Valid data?').first().json.email }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2c16bd6e-68d5-4397-b32a-2ea2c7fdb72f",
+      "name": "Email present",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3216,
+        -1632
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 20,
+        "options": {
+          "query": "=requester:\"{{ $('Valid data?').first().json.email }}\""
+        }
+      },
+      "id": "cb6421ff-149d-47d8-88a7-fa899242fce4",
+      "name": "Get many tickets1",
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        -2848,
+        -1856
+      ],
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node (JavaScript) — collect IDs of tickets tagged \"sales_ticket\"\n// Input: items from a Zendesk \"Get many tickets\" or Search node\n// Output: ONE item => { sales_tickets: [\"22629954\", \"22628420\", ...] }\n\nconst TARGET_TAG = 'sales_ticket';\nconst out = new Set();\n\n// Helper: normalize any \"tags\" field to an array of strings\nfunction normalizeTags(tags) {\n  if (Array.isArray(tags)) return tags.map(String);\n  if (typeof tags === 'string') {\n    // accept comma/space separated strings\n    return tags.split(/[, ]+/).map(s => s.trim()).filter(Boolean);\n  }\n  return [];\n}\n\n// Gather candidate ticket objects from various possible shapes\nfor (const item of items) {\n  const j = item?.json ?? {};\n\n  // Case A: ticket is directly in item.json\n  if (j && (j.id !== undefined || j.tags !== undefined)) {\n    const tags = normalizeTags(j.tags);\n    if (tags.includes(TARGET_TAG) && j.id != null) out.add(String(j.id));\n  }\n\n  // Case B: Zendesk Search responses nested at json.body.results\n  const results = j?.body?.results;\n  if (Array.isArray(results)) {\n    for (const t of results) {\n      const tags = normalizeTags(t?.tags);\n      if (tags.includes(TARGET_TAG) && t?.id != null) out.add(String(t.id));\n    }\n  }\n}\n\n// Return a single item with the array of strings (may be empty)\nreturn [\n  {\n    json: {\n      sales_tickets: Array.from(out),\n    },\n  },\n];\n"
+      },
+      "id": "cc01b97b-14aa-4e24-9250-744a50e3b080",
+      "name": "Code in JavaScript1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2528,
+        -1856
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cf2f3833-8bef-42f5-a093-2f311d28d5a7",
+              "leftValue": "={{ $json.sales_tickets }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8d014e65-942d-4e0a-9141-4badbde7afba",
+      "name": "Sales tickets exist?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2208,
+        -1856
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b7bf6333-e0fe-498e-98f7-8d46d248a81d",
+              "name": "result",
+              "value": "=The customer, {{ $json.name }}, provided valid information. Their email is {{ $json.email }} and phone on record is {{ $json.phone }} . Their profile was created on {{ $json.created_at }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7457aa4b-6306-4b54-a54e-68e8b588e1be",
+      "name": "Response2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1280,
+        -2048
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "user",
+        "operation": "get",
+        "id": "={{ $('Get many tickets1').first().json.requester_id }}"
+      },
+      "id": "df1c204d-df06-4087-a268-b4e509ed6ecd",
+      "name": "Get a user1",
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        -1632,
+        -2048
+      ],
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "779039b6-bfa4-4b84-b8d6-927c9794a386",
+      "name": "Respond to Webhook4",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -944,
+        -2048
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "Prompt",
+              "value": "=---\n\n#### 0 · Context\n\nWe are GovAssist, a company offering custom, do-it-for-you full service for US tourist VISAS, ESTA and international electronic travel authorization. We work in Zendesk. For every sale that is generated, we create what we internally call a **Sales Ticket**, which becomes the main and singular unit of work, the central place where everything that happens gets logged. It is also the main interface by which we control the customer interaction. We intend to have Sales Tickets be a place where we can see the complete and exhaustive history of all interactions with our customers.\n\n#### 1 · Role & Scope\n\nYou are Joe, an autonomous **GovAssist** Zendesk agent dedicated to assisting an on-call agent, David, that is right now in the middle of a conversation with our customer and needs to verify their identity.\nYour mission is to conclude the customer verification process using the tools at your disposal. \n\nFirst, you are to locate the sales ticket, based on the information available. \n\nThere are two scenarios:\nScenario 1: When you only receive caller_id, representing the phone number of the caller, you will search based on this phone number and confirm whether or not this is an existing zendesk user that is the requester for a sales ticket (of any status). Finding a sales ticket belonging to the same user that has the caller_id is enough to validate the customer. Here is a zendesk search query you should use first, before attempting to isolate sales_ticket for this scenario: \n`requester:+111111111111`\nObviously, you are to replace the phone number with the actual number. Do not wrap the number in inverted commas. This will result in all tickets from that requester. \nFrom the result of the query, only select those with 'sales_ticket' under tag to include in your response.\nIf this first search results in 1-3 sales tickets total in the response and no more, there would be no need for you to also get the user profile, especially if the details you already have are present on those tickets. Remember, speed is of the essence so if it's possible to confirm the user is an active customer with a single zendesk search for tickets, without retrieving and procesing the user profile as well, that is preferable.\n\nIf your first search does not produce a result, try up to 5 searches and at least 3 different ways to search for the specific number before giving up. \nA second path you may try is to serch broadly for just the phone number, then obtain a requester id from the ticket and check the requester id profile using the zendesk_get_user tool. \n\n\nScenario 2: For this scenario, the minimum information to verify that we are talking to the correct customer is to have the Full name and Street address collected, along with at least one of the following elements: email, order ID or Ticket Number. If at least one of these is present, along with name and street address, then you have all you need to validate the customer.\n\nNote please that the order ID is generally stored in a ticket field with id 33720432504210 . This is how a Zendesk search query will look when you intend to add the order ID to the search: \nSynthax: custom_field_<Field ID>:<value>\nIn practice: custom_field_33720432504210:<orderID: value of the OrderID goes here>\nAn actual orderID example: custom_field_33720432504210:10843326780 (this is a fictional orderID that I used for you to see a full example). \n\nYou will note that, in some rare situations, the order ID may not be present in the field specified. In such situations, you may search for the order ID in a plain query and see if that results in anything. \n\nYou should also be cautious of the situation when the customer will confuse ticket ID with order ID. When you search for the ticket ID number, you should get the ticket that has this number as ID in the search results. When you search for the order_ID (plainly, without mentioning the field ID), it should result in the ticket where such order_ID is mentioned. When you use a plain order ID search, you should confirm the ticket requester information by using the ticket events tool. \n\nAs a basic strategy, you will use the zendesk search tool to find information you need. Try to be mindful of api usage and don't overdo it unless you absolutely have to. For Scenario 1 in particular, do not narrow down the searches, but go as wide as possible based on phone number, as suggested, as the phone number is very specific and there is very small risk of overusing api and tokens with such spcific search, even when formulated broadly. \nOnce you've done your searches, you can also dive deeper into a particular ticket, if needed. Please try narrow searches first and wider searches second, since a large number of results will overwhelm you (this is on top of being irrelevant results, in the case of very wide searches). Avoid things like searching for just a customer's first or last name. The instance you are searching in has over 20 million tickets, so there is a high likelyhood that you will find people with similar names and such, which is why we need multiple data points in order to verify the identity. \n\n---\n\n#### 2 · Intake Data Provided at Runtime\nIn this section, find the actual data you will be working with\nThe phone agent has obtained the following information from the user so far:\n{{ $('Valid data?').first().json.toJsonString() }}\n\nNote that we have tried identifying a ticket belong to a requester with this phone number and we could not find any. We then tried programatically checking for sales tickets belonging to the email requester, however none were found. The search for 'requster:\"{{ $('Valid data?').first().json.email }}\"' resulted in {{ $('Get many tickets1').all().length }} tickets total for this requester. \n---\n\n#### 3 · Tools You May Call *(read-only)*\n\n1. **zendesk_search(query:string)**\n   • Returns a list of tickets (but not users, for users use zendesk_get_user tool), each with minimal fields:\n   – Ticket ⇒ `id, subject, tags, requester_id`\n   – User ⇒ `id, name, email, phone, time_zone`\n   • **Search syntax rules:**\n\n   * No AND / OR / NOT keywords (words are implicitly AND-ed).\n   * Search for *one thing at a time*.\n   * Wrap multi-word phrases in **double quotes** when you need an exact match.\n   * When searching a ticket ID, include only the integer; valid IDs are generally numbers > 10000000.\n   * Useful qualifiers: `requester:<ID>` • `tags:sales_ticket` • `type:ticket` • `type:user`.\n   * Be mindful when using search. Do it only when needed and never do \"type:user\" searches. You have a separate tool for that, using \"type:user\" in zendesk_search tool will always yield no results. \n   * **Never repeat a query.**\n   * Maximum **7** queries per run for each tool.\n   * You are explicitly forbidden from doing very broad searches that do not include specific customer information. (as counter-examples: do not  search for just tags:sales_tickets alone). A good clue that your search is too broad is when you have 20 results, because 20 is the maximum limit.\n\n2. **ticket_events(ticket_id:int)**\n   • Returns the 100 most-recent events for the specified ticket with:\n   `type, channel, author_id, public, via, created_at, meta`.\n   • When `channel=\"voice\"`, `meta.voice_status` ∈ `\"answered\" | \"no_answer\" | \"busy\" | \"failed\"`.\n   • If `channel=\"voice\"` and `voice_status` is absent, treat the event as an **attempted but unanswered** call.\n   • Use this condensed stream for most analysis; call `ticket_audit` only if deeper history is required.\n\n3. **zendesk_get_user (UserID:int)**\n   • Returns the full Zendesk user profile record with `name, email, phone, time_zone, locale, tags…`. \n   • It is mandatory to use this tool whenever you wish to retrieve a user profile. \n\n*Record every tool call succinctly inside `reasoning` in your output JSON.*\n\n*Internal consensus & tips when interpreting events/audit:*\n– A **sales ticket** is the unit of work for each purchase. All other related tickets should be merged into it.\n– Internal notes may be automated or manual; humans do not use API updates.\n– Events/audit show if the customer read an email, uploaded a file, changed a password, etc.\n– If you suspect stray tickets, run a search such as:\n`\"requester:<user-id_or_email> -tags:sales_ticket status<solved\"` to find active non-sales tickets.\n\n---\n\n#### 4 · Mission Flow *(general approach)*\n\n1. Depending on which data you have been provided, you would proceed to check the validity of the data.   \n2. Using Zendesk search to find the associated sales ticket for the existing customer, the results you will get include all fields on the tickets found. If the street address is not already provided, a good way to locate it is to find the sales ticket and then check the value of Field with id 33720457700370 - this is the Street Address of the customer. Only if the full name is close enough (keep in mind it's over the phone) and the street address is close enough, you can proceed to validate. \n\nImportant notes:\n- the ENTIRE zendesk search query must be sent in a call. Calling the function again with a singular parameter will not filter some previous results with the new parameter - it will instead search for all tickets with this parameter (hence, you are not allowed to run any search that doesn't contain unique identificators for the customer)\n- We will have collected one of these data points: caller_id, email, order ID, Ticket Number (also refered to as ticket ID) . Use the datapoint we have collected in an appropriate way:\n-- If it's ticket number, then use search with only the number. Compare the information present on the ticket with what you received as intake data at runtime - this will help you validate or invalidate.\n-- if your input contains only order ID, then search for it as already instructed. \n-- You will accept any and all input provided to you without erroring out and use it to the best of your ability, regardless of how it's formatted. \n---\n\n#### 5 · Output – return **only** this JSON (no surrounding text)\n\n```json\n{\n\"result\": \"The customer, <use the ticket requester name here> has provided valid information.\" or, when not valid \"The information the customer provided is invalid. We cannot validate the identity of this customer based on the information provided.\",\n\"reasoning\":\"Explain here what you did and why you conlcuded what you concluded. If you invalidate a customer, mention specifically why\",\n\"Sales_Tickets\": when identity is verified, this should be a list containing at least one sales ticket. When identity is not verified, this can be a blank list.\n  }\n```\n\n**Rules**\n• For the rare event that you may need to check a ticket in great detail, you will use the **ticket events** tool before using the audit tool. Use the audit tool only when some details don’t add up and deeper field-history tracing is required.\n• If all information is already provided in your instructions, you do not have to use the available tools.  \n---\nIf for some reason you are not able to execute, only output an \"error reason\" key with your explanation, but do not error out.\n**Begin.**\n",
+              "type": "string",
+              "id": "856f4b3a-7f90-4f32-91cf-6bf54d0c30dc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1baefc9a-2c04-40f8-bb07-cdbf1c3a953f",
+      "name": "Prepare Long Ticket Agent Prompt3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1056,
+        -1632
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "content": "Not used",
+        "height": 656,
+        "width": 1216
+      },
+      "id": "b31b9eed-52f7-40a7-8631-d59b874b16c2",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4432,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get complete Zendesk User Profile based on User ID. This is something to use when you want to see details about a specific user and you have the User ID ready. This will not work without a valid User ID. \nCall this tool before calling update_contact_info.",
+        "resource": "user",
+        "operation": "get",
+        "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('User_ID', ``, 'string') }}"
+      },
+      "id": "0b90be32-d332-4c6b-8dd3-797c1cbca18c",
+      "name": "zendesk_get_user",
+      "type": "n8n-nodes-base.zendeskTool",
+      "typeVersion": 1,
+      "position": [
+        -4128,
+        -1024
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to get all ticket events. This is a Zendesk ticket audit containing the ticket timeline events. All fields with a null or empty value are removed from the result.\nYou will need to provide a json payload as follows:\n{\n  \"id\":<ticket id integer>,\n \"mode\": \"recent\" | \"standard\"\n}\nThe ticket ID is always a number, a large integer number. Anything else will error out, so don't even try it. When you are checking the ticket just to confirm that an update was made correctly, simply use mode \"recent\" with the same ticket ID. Rest of the time, mode \"standard\".\nMode is always a string, should be either:\n- \"recent\" - gets the last 10 events on a ticket\nOR it may be\n- \"standard\" - gets all events on the ticket. You should use standard the first time when you look at a ticket, but you should use \"recent\" whenever you are checking for recent updates.\nYou should not use Standard more than once per run, as the result can overwhelm your context window.\nThe tool will return the ticket events. The response will contain:\nAll comments and notifications - This is a series of all internal notes, notifications or public comment that exists on the ticket. This contains any and all messages ever sent to the customer in the scope of the ticket.\nLatest user comment: the body, timestamp and user id of the last public comment made by the requester.\nAll requester comments: this is an easy to digest summary of all comments made by the requester.\nTime Elapsed since Last customer reply: self explained, how much time passed since the  customer's last reply.",
+        "workflowId": {
+          "__rl": true,
+          "value": "I2HAFVHaDpJJK20n",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/I2HAFVHaDpJJK20n",
+          "cachedResultName": "get_ticket_events [Entry]"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id', `ticket_id`, 'string') }}",
+            "mode": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('mode', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mode",
+              "displayName": "mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "id": "5ca56e6a-1e99-439a-8fe4-ad2fdb028b7c",
+      "name": "ticket_events",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -3968,
+        -1024
+      ]
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get complete Zendesk User Profile based on User ID. This is something to use when you want to see details about a specific user and you have the User ID ready. This will not work without a valid User ID. \nCall this tool before calling update_contact_info.",
+        "resource": "user",
+        "operation": "get",
+        "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('User_ID', ``, 'string') }}"
+      },
+      "id": "397d17d5-9f0e-4546-9bd3-e169844508f9",
+      "name": "zendesk_get_user2",
+      "type": "n8n-nodes-base.zendeskTool",
+      "typeVersion": 1,
+      "position": [
+        -2304,
+        -672
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to get all ticket events. This is a Zendesk ticket audit containing the ticket timeline events. All fields with a null or empty value are removed from the result.\nYou will need to provide a json payload as follows:\n{\n  \"id\":<ticket id integer>,\n \"mode\": \"recent\" | \"standard\"\n}\nThe ticket ID is always a number, a large integer number. Anything else will error out, so don't even try it. When you are checking the ticket just to confirm that an update was made correctly, simply use mode \"recent\" with the same ticket ID. Rest of the time, mode \"standard\".\nMode is always a string, should be either:\n- \"recent\" - gets the last 10 events on a ticket\nOR it may be\n- \"standard\" - gets all events on the ticket. You should use standard the first time when you look at a ticket, but you should use \"recent\" whenever you are checking for recent updates.\nYou should not use Standard more than once per run, as the result can overwhelm your context window.\nThe tool will return the ticket events. The response will contain:\nAll comments and notifications - This is a series of all internal notes, notifications or public comment that exists on the ticket. This contains any and all messages ever sent to the customer in the scope of the ticket.\nLatest user comment: the body, timestamp and user id of the last public comment made by the requester.\nAll requester comments: this is an easy to digest summary of all comments made by the requester.\nTime Elapsed since Last customer reply: self explained, how much time passed since the  customer's last reply.",
+        "workflowId": {
+          "__rl": true,
+          "value": "I2HAFVHaDpJJK20n",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/I2HAFVHaDpJJK20n",
+          "cachedResultName": "get_ticket_events [Entry]"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id', `ticket_id`, 'string') }}",
+            "mode": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('mode', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mode",
+              "displayName": "mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "id": "08fcc6b3-a9fe-4a7d-865a-24412de328e2",
+      "name": "ticket_events2",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -2144,
+        -672
+      ]
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "**Quick-read:** *`zendesk_search` lets any agent run one Zendesk “advanced-search” query. Because the API returns full ticket payloads, broad searches can flood downstream logic. The guidelines below teach agents to start with a razor-thin query—`requester:\"exact@email.com\" tags:sales_ticket`—and widen only when necessary, while respecting Zendesk’s 1 000-result cap, rate limits, and wildcard rules.* ([support.zendesk.com][1], [support.zendesk.com][1])\n\n---\n\n## Ⅰ — Call & Purpose\n\n* **Syntax:** `zendesk_search(query: string)`\n* **Goal:** Retrieve tickets or users through Zendesk Support **advanced search** so the agent (you) can decide the next action. ([support.zendesk.com][1])\n* **Returned objects:**\n\n  * *type\\:ticket* → id, subject, tags, requester\\_id, …\n  * *type\\:user*    → id, name, email, phone, … ([support.zendesk.com][2])\n\n---\n\n## Ⅱ — Query-language essentials\n\n1. **AND by default.** Every term is combined implicitly; repeat a property for OR (`tags:silver tags:bronze`). \n2. **Property filter format:** `property operator value` (`status:open`, `created<2025-05-01`). Operators `:  <  >  <=  >=`. \n3. **Quotes lock exact phrases** and force inclusive-AND across properties. Do not use quotes for alphanumeric variables like user or ticket ID\n4. **Wildcards** only at the *end* of a term **inside** a property filter (`subject:paym*`); free-text or leading `*` are invalid. \n5. **Dates & relative times** accept `YYYY-MM-DD`, ISO-8601, or shorthand like `created<6hours`. \n6. **Common properties:** `requester, assignee, status, tags, created, updated, solved, id` for tickets; `name, email, phone, tags, id` for users. \n---\n\n## Ⅲ — Ideal progressive search strategy\n\n**A. Paid-customer hunting: always keep `tags:sales_ticket` to locate the sales ticket**\n\n1. `requester:\"exact_email@example.com\" tags:sales_ticket` status<closed\n2. `requester:12345678 tags:sales_ticket` (numeric user ID, when available)\n3. `requester:\"Exact Full Name\" tags:sales_ticket` (when only exact full name is available\n4. `requester:\"+5531986491163\" tags:sales_ticket` (this is an example of using phone number to find the correct requester. Phone number searches in particular might work as more general searches, like searching for the number in different formats might work to identify the user or some ticket that belongs to them)\n5. Add last-4 phone, passport #, order # **only if** previous steps ≤ 3 hits.\n\n**B. Non-customer look-ups**\n*Use the same requester-first ladder **without** the tag.*\n\n**Rules that never change**\n\n* Stick to **one hypothesis per query**; max **10 distinct queries** per task.\n* Keep `tags:sales_ticket` even when broadening paid-customer searches (e.g., add `status<solved`, expand date range).\n* Exclude the trigger ticket with `-<currentTicketId>`.\n* Stop widening once the hit count tops **3 plausible tickets**—merge or act, don’t harvest.\n\nRequester searches accept email, ID, name, or phone inside the same `requester:\"...\"` filter, making them the fastest way to zero in on a person. ([support.zendesk.com][4])\n\n---\n\n## Ⅳ — Anti-patterns to avoid\n\n* **Unqualified free text** (`somebody@gmail.com`) → matches every gmail address. ([support.zendesk.com][1])\n* **Two-word names without quotes** return any ticket containing both words, not necessarily together. ([support.zendesk.com][1])\n* **Greedy wildcards** (`*photo*`) or leading `*` → query error. ([support.zendesk.com][1])\n* **Queries that hit 1 000-result ceiling** waste calls and block pagination. ([support.zendesk.com][1], [support.zendesk.com][2])\n\n---\n\n## Ⅴ — Performance & limits\n\n* New or edited records index in “a few minutes.” Search again if nothing appears. ([support.zendesk.com][2])\n* API returns **first 1 000 results only**—narrow the query if you hit the wall. ([support.zendesk.com][1], [support.zendesk.com][2])\n* Suite Professional/Enterprise: **700 requests / minute** per app; obey `429 Retry-After`. ([developer.zendesk.com][5], [developer.zendesk.com][6])\n\n---\n\n## Ⅵ — Agent SOP & safety checks\n\n* Compare PII (passport #, DOB, identical email/phone) before merging requester IDs.\n* Never merge a *sales* ticket into another ticket—only merge auxiliary tickets into the customer’s single sales ticket.\n* Understand that tags (like `sales_ticket`) drive automations across Zendesk; remove them only with intent. ([salto.io][7])\n\nKeep these guard-rails in the tool description, and every AI agent will search narrowly first, widen responsibly, and stay within Zendesk’s limits.\n\n[1]: https://support.zendesk.com/hc/en-us/articles/4408835086106-Using-Zendesk-Support-advanced-search \"Using Zendesk Support advanced search – Zendesk help\"\n[2]: https://support.zendesk.com/hc/en-us/articles/4408886879258-Zendesk-Support-search-reference \"Zendesk Support search reference – Zendesk help\"\n[3]: https://en.wikipedia.org/wiki/ISO_8601 \"ISO 8601 - Wikipedia\"\n[4]: https://support.zendesk.com/hc/en-us/articles/4408882086298-Searching-tickets \"Searching tickets – Zendesk help\"\n[5]: https://developer.zendesk.com/api-reference/introduction/rate-limits/ \"Rate limits | Zendesk Developer Docs\"\n[6]: https://developer.zendesk.com/documentation/api-basics/best-practices/best-practices-for-avoiding-rate-limiting/ \"Best practices for avoiding rate limiting | Zendesk Developer Docs\"\n[7]: https://www.salto.io/blog-posts/understanding-ticket-tags-in-zendesk \"Understanding Ticket Tags in Zendesk\"\n",
+        "operation": "getAll",
+        "limit": 20,
+        "options": {
+          "query": "={{ $fromAI('Query', '', 'string') }}"
+        }
+      },
+      "id": "a513993d-d617-47da-b5e8-2795a642cf96",
+      "name": "zendesk_search0",
+      "type": "n8n-nodes-base.zendeskTool",
+      "typeVersion": 1,
+      "position": [
+        -3504,
+        192
+      ],
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "description": "zendesk_search\n\nPurpose  \n-------\nQuery Zendesk’s Search API and receive the raw JSON matches. You supply only the **`query`** string, in the payload field; the system takes care of authentication, pagination, and error handling.\n\nInput  \n-----\n* **query** – a UTF-8 search expression up to 2 KB, for example:  \n  `type:ticket status<solved requester:\\\"[email or phone number]\\\"` \n\nCore Search Syntax  \n------------------\n* **type:** limits the resource you search (`ticket`, `user`, `organization`, `group`). \n\n* **Property keywords** like `status`, `requester`, `tags`, `created`, `updated`, etc., can be paired with `:`, `<`, `>`, `<=`, or `>=`. Example: `status<solved` returns any ticket in *new*, *open*, *pending*, or *hold*. \n\n* Allowed status values are *new, open, pending, hold, solved, closed*. \n* Wrap multi-word phrases in quotes: `\\\"passport renewal\\\"`.   \n* Use logical operators `AND`, `OR`, and unary `-` (NOT); group with parentheses.   \n\nSystem Limits  \n-------------\nZendesk returns only the first **1 000** records of any search and stops after **100** pages at 100 results each. \nNew or updated records may take a minute or two to appear in results. \n\nGovAssist Tags (use in `tags:` filters)  \n---------------------------------------\n* `sales_ticket` – master thread for every paid order.  \n* `govfee_paid`, `govfee_paid2` – government-fee collected.  \n* `online_renewal_draft_confirmed`, `online_draft_created` – passport-renewal milestones.  \n* Product cues: `esta`, `ds160`, `schengenpro`, `passport_renewal`.\n\nBest-Practice Tips  \n------------------\n1. Start narrow: combine `type:` with at least one field (`status`, `requester`, or `tags`) to avoid the 1 000-hit ceiling. \n2. Use `status<solved` whenever you want “active” tickets (everything except *solved* or *closed*).  \n3. Tags are indexed—filter by them first, then add free-text if needed. \n4. Combine dates with status to find stale work, e.g. `type:ticket status:open updated<2025-07-01`.   \n\nExample Queries (copy–paste and replace placeholders)  \n-----------------------------------------------------\nNote: In my examples, I will use requester: followed by inverted commas. However, one particularity of Zendesk is that we cannot search requester email using inverted commas, only phone numbers need inverted commas. So do search for requester:email if using email (without putting the email between inverted commas) and use requester:\\\"phone number\\\" when searching by phone number. For example requester:example@email.com will show results if tickets from a requester with that email exists, but requester:\\\"example@email.com\\\" will not show results, even if that requester exists in the system.\n* **All active sales tickets for the caller**  \n  `requester:\\\"[email or phone number goes here; remove inverted commas when searching for email]\\\" status<solved tags:sales_ticket`\n* **DS-160 progress**  \n  `type:ticket requester:\\\"[email or phone number]\\\" tags:ds160`\n* **Open tickets missing government fee**  \n  `type:ticket status:open -tags:govfee_paid -tags:govfee_paid2`\n* **Tickets created today**  \n  `type:ticket created>={{ $now.format('yyyy-MM-dd') }}` \n\nAutomatic Responses  \n-------------------\n* *400 Bad Request* – your syntax is invalid; adjust and retry. \n* *Empty array* – no matches; broaden or refine your criteria. \n\nRecent Update:\n* Zendesk no longer allows sort_by and sort_order within queries. Using these will make the search return no results (and also no errors, so be careful, avoid using these even if instructed to do so elsewhere)",
+        "workflowId": {
+          "__rl": true,
+          "value": "eyU6B2xpsWNzgCYu",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/eyU6B2xpsWNzgCYu",
+          "cachedResultName": "Zendesk Safe Caller for Incall David [Entry]"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "payload": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('payload', ``, 'string') }}",
+            "source": "Incall David - ",
+            "target": "ticket",
+            "operation": "search",
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id', ``, 'string') }}",
+            "options": "{}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "target",
+              "displayName": "target",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "operation",
+              "displayName": "operation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "payload",
+              "displayName": "payload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "options",
+              "displayName": "options",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "id": "402b216c-a7a7-4e22-82cd-3d4da4882377",
+      "name": "zendesk_search2",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -1984,
+        -672
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Prepare Long Ticket Agent Prompt').first().json.Prompt }}",
+        "options": {
+          "maxIterations": 10,
+          "returnIntermediateSteps": true,
+          "passthroughBinaryImages": true,
+          "enableStreaming": true
+        }
+      },
+      "id": "1bb6e285-2d81-44d5-9e67-c0fbf174b31f",
+      "name": "AI Agent2",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2304,
+        -960
+      ],
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "122dd1b8-a7a1-4c14-ab32-2bb5f43da66b",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "0e962ac7-1f1b-4d03-8c61-e3da64eabce2",
+              "name": "email",
+              "value": "={{ $json?.email }}",
+              "type": "string"
+            },
+            {
+              "id": "61e58be0-5033-4fb1-a352-e2d0b402a093",
+              "name": "street_address",
+              "value": "={{ $json.street_address }}",
+              "type": "string"
+            },
+            {
+              "id": "b017f6f6-f174-4ce7-a47d-11618bf228dc",
+              "name": "caller_id",
+              "value": "={{ $json.caller_id }}",
+              "type": "string"
+            },
+            {
+              "id": "81597f57-a5db-4fc9-8349-3eaca93f7f90",
+              "name": "called_number",
+              "value": "={{ $json.called_number }}",
+              "type": "string"
+            },
+            {
+              "id": "a5ac4f45-9c6a-4488-be78-7867191c1780",
+              "name": "Call_SID",
+              "value": "={{ $json.call_sid }}",
+              "type": "string"
+            },
+            {
+              "id": "6d7e92c4-83a3-4424-ae17-0d256f1b2d7a",
+              "name": "order_id",
+              "value": "={{ $json.order_id }}",
+              "type": "string"
+            },
+            {
+              "id": "450d6035-a322-4d21-bf47-2aba349e3395",
+              "name": "ticket_number",
+              "value": "={{ $json?.ticket_number}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dd5aad2c-ee37-4789-a4e3-248428ef4add",
+      "name": "Prepare Input Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6032,
+        -992
+      ]
+    },
+    {
+      "parameters": {
+        "description": "zendesk_search\n\nPurpose  \n-------\nQuery Zendesk’s Search API and receive the raw JSON matches. You supply only the **`query`** string, in the payload field; the system takes care of authentication, pagination, and error handling.\n\nInput  \n-----\n* **query** – a UTF-8 search expression up to 2 KB, for example:  \n  `type:ticket status<solved requester:\\\"[email or phone number]\\\"` \n\nCore Search Syntax  \n------------------\n* **type:** limits the resource you search (`ticket`, `user`, `organization`, `group`). \n\n* **Property keywords** like `status`, `requester`, `tags`, `created`, `updated`, etc., can be paired with `:`, `<`, `>`, `<=`, or `>=`. Example: `status<solved` returns any ticket in *new*, *open*, *pending*, or *hold*. \n\n* Allowed status values are *new, open, pending, hold, solved, closed*. \n* Wrap multi-word phrases in quotes: `\\\"passport renewal\\\"`.   \n* Use logical operators `AND`, `OR`, and unary `-` (NOT); group with parentheses.   \n\nSystem Limits  \n-------------\nZendesk returns only the first **1 000** records of any search and stops after **100** pages at 100 results each. \nNew or updated records may take a minute or two to appear in results. \n\nGovAssist Tags (use in `tags:` filters)  \n---------------------------------------\n* `sales_ticket` – master thread for every paid order.  \n* `govfee_paid`, `govfee_paid2` – government-fee collected.  \n* `online_renewal_draft_confirmed`, `online_draft_created` – passport-renewal milestones.  \n* Product cues: `esta`, `ds160`, `schengenpro`, `passport_renewal`.\n\nBest-Practice Tips  \n------------------\n1. Start narrow: combine `type:` with at least one field (`status`, `requester`, or `tags`) to avoid the 1 000-hit ceiling. \n2. Use `status<solved` whenever you want “active” tickets (everything except *solved* or *closed*).  \n3. Tags are indexed—filter by them first, then add free-text if needed. \n4. Combine dates with status to find stale work, e.g. `type:ticket status:open updated<2025-07-01`.   \n\nExample Queries (copy–paste and replace placeholders)  \n-----------------------------------------------------\nNote: In my examples, I will use requester: followed by inverted commas. However, one particularity of Zendesk is that we cannot search requester email using inverted commas, only phone numbers need inverted commas. So do search for requester:email if using email (without putting the email between inverted commas) and use requester:\\\"phone number\\\" when searching by phone number. For example requester:example@email.com will show results if tickets from a requester with that email exists, but requester:\\\"example@email.com\\\" will not show results, even if that requester exists in the system.\n* **All active sales tickets for the caller**  \n  `requester:\\\"[email or phone number goes here; remove inverted commas when searching for email]\\\" status<solved tags:sales_ticket`\n* **DS-160 progress**  \n  `type:ticket requester:\\\"[email or phone number]\\\" tags:ds160`\n* **Open tickets missing government fee**  \n  `type:ticket status:open -tags:govfee_paid -tags:govfee_paid2`\n* **Tickets created today**  \n  `type:ticket created>={{ $now.format('yyyy-MM-dd') }}` \n\nAutomatic Responses  \n-------------------\n* *400 Bad Request* – your syntax is invalid; adjust and retry. \n* *Empty array* – no matches; broaden or refine your criteria. \n\nRecent Update:\n* Zendesk no longer allows sort_by and sort_order within queries. Using these will make the search return no results (and also no errors, so be careful, avoid using these even if instructed to do so elsewhere)",
+        "workflowId": {
+          "__rl": true,
+          "value": "eyU6B2xpsWNzgCYu",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/eyU6B2xpsWNzgCYu",
+          "cachedResultName": "Zendesk Safe Caller for Incall David [Entry]"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "payload": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('payload', ``, 'string') }}",
+            "source": "Incall David - ",
+            "target": "ticket",
+            "operation": "search",
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id', ``, 'string') }}",
+            "options": "{}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "target",
+              "displayName": "target",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "operation",
+              "displayName": "operation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "payload",
+              "displayName": "payload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "options",
+              "displayName": "options",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "id": "03b70cc6-2464-4578-8848-0aa2200924b7",
+      "name": "zendesk_search",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -3808,
+        -1024
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Prepare Input Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sales Ticket Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "zendesk_user": {
+      "ai_tool": [
+        [
+          {
+            "node": "Sales Ticket Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ticket Audit5": {
+      "ai_tool": [
+        [
+          {
+            "node": "Sales Ticket Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ticket Events1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Sales Ticket Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Long Ticket Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Long Ticket Agent Prompt1": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get back to main agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set captured values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set captured values": {
+      "main": [
+        [
+          {
+            "node": "Prepare Input Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid data?": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Long Ticket Agent Prompt1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Get back to main agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Counter": {
+      "main": [
+        [
+          {
+            "node": "Exit Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Exit Loop": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increase Counter": {
+      "main": [
+        [
+          {
+            "node": "Exit Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Caller ID present?": {
+      "main": [
+        [
+          {
+            "node": "Get many tickets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Long Ticket Agent Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many tickets": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Valid paying customer?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid paying customer?": {
+      "main": [
+        [
+          {
+            "node": "Get a user",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email present",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a user": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Caller ID present?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook3": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email present": {
+      "main": [
+        [
+          {
+            "node": "Get many tickets1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many tickets1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Sales tickets exist?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales tickets exist?": {
+      "main": [
+        [
+          {
+            "node": "Get a user1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Long Ticket Agent Prompt3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a user1": {
+      "main": [
+        [
+          {
+            "node": "Response2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Long Ticket Agent Prompt3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "zendesk_get_user": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ticket_events": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "zendesk_get_user2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ticket_events2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "zendesk_search0": {
+      "ai_tool": [
+        [
+          {
+            "node": "Sales Ticket Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "zendesk_search2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Get back to main agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Increase Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Input Data": {
+      "main": [
+        [
+          {
+            "node": "Valid data?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "zendesk_search": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "8b23c141-3d40-4b23-a1e0-99735aa7c196",
+  "meta": {
+    "instanceId": "2cb10662097dc9dbb69ac2774c57a632f219b96c7c727adf7672283f83b2620f"
+  },
+  "id": "eVl5HfckULJT8oRr",
+  "tags": []
+}

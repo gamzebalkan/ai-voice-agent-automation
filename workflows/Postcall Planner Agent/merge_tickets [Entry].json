@@ -1,0 +1,1735 @@
+{
+  "name": "merge_tickets [Entry]",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "33ee5622-ef20-4188-9849-bc041cfdf647",
+              "name": "Response",
+              "value": "Ticket is successfully merged.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        9968,
+        1568
+      ],
+      "id": "93f3f954-3142-4d86-9d0d-e239823cd893",
+      "name": "Response"
+    },
+    {
+      "parameters": {
+        "errorMessage": "=No call ticket is found to merge. The relevant sales ticket: {{ $('When Executed by Another Workflow').item.json.ticket_id }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        3520,
+        864
+      ],
+      "id": "f094b2b6-d8be-4fe0-9fcc-b86f854f1b5d",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Count call tickets').item.json.call_ticket_count }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "0c9fa25a-bec3-4ec4-b313-2baaac47e631"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "No tickets found"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d2dd7f9d-5729-4640-bb4e-a1e347bbc6da",
+                    "leftValue": "={{ $('Count call tickets').item.json.call_ticket_count }}",
+                    "rightValue": 1,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "One ticket found"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6856bd7b-a01b-43c0-98f0-9ccb3c5ddd37",
+                    "leftValue": "={{ $('Count call tickets').item.json.call_ticket_count }}",
+                    "rightValue": 1,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "More than one"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3008,
+        880
+      ],
+      "id": "c62a2f6c-4972-4ed5-a9cd-19460dc0a85d",
+      "name": "Switch",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "sales_ticket_id",
+              "type": "any"
+            },
+            {
+              "name": "sales_ticket_tags",
+              "type": "any"
+            },
+            {
+              "name": "assignee_id",
+              "type": "any"
+            },
+            {
+              "name": "lead_ticket_id",
+              "type": "any"
+            },
+            {
+              "name": "lead_ticket_tags",
+              "type": "any"
+            },
+            {
+              "name": "lead_ticket_assignee_id",
+              "type": "any"
+            },
+            {
+              "name": "call_ticket_id",
+              "type": "any"
+            },
+            {
+              "name": "call_ticket_tags",
+              "type": "any"
+            },
+            {
+              "name": "call_ticket_subject",
+              "type": "any"
+            },
+            {
+              "name": "call_ticket_channel",
+              "type": "any"
+            },
+            {
+              "name": "conversation_id",
+              "type": "any"
+            },
+            {
+              "name": "call_result",
+              "type": "any"
+            },
+            {
+              "name": "transcript",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        4496,
+        2544
+      ],
+      "id": "72225d4e-f9d7-4fe0-909d-ebbc19732bf6",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Not handled"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        7664,
+        2688
+      ],
+      "id": "b5613848-8ac9-490b-80df-b1108f32eaf4",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error in merge."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        9168,
+        2112
+      ],
+      "id": "f19bd080-2f7b-4d9e-9c4c-5e8ab35019b1",
+      "name": "Stop and Error6"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3ae311bb-5858-4b2e-90ab-b1215a5ba0d8",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.assignee_id }}",
+              "rightValue": "=34647603151634",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        9328,
+        464
+      ],
+      "id": "a19180ff-e9af-48d4-95d3-353fed2486f0",
+      "name": "Is it assigned to Jamie?",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $('Standardize input data 55').first().json[\"Target Ticket ID\"] }}",
+        "updateFields": {
+          "assigneeEmail": "",
+          "customFieldsUi": {
+            "customFieldsValues": [
+              {
+                "id": 33720467686930,
+                "value": "updated_by_end_user"
+              },
+              {
+                "id": 33720461775122,
+                "value": "refund_was_requested"
+              }
+            ]
+          },
+          "group": 33803656170642
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        10112,
+        128
+      ],
+      "id": "e9689c8c-5a8a-4f2b-b59a-2f601376f186",
+      "name": "Zendesk - no status change",
+      "credentials": {
+        "zendeskApi": {
+          "id": "r6Mcqrp6YkvDbbjZ",
+          "name": "Zendesk account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}",
+        "updateFields": {
+          "customFieldsUi": {
+            "customFieldsValues": [
+              {
+                "id": 33720467686930,
+                "value": "updated_by_end_user"
+              }
+            ]
+          },
+          "status": "open"
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        10016,
+        464
+      ],
+      "id": "f25d35c2-d6f9-49e4-a292-9bd499d38fc3",
+      "name": "Zendesk - set status to open",
+      "credentials": {
+        "zendeskApi": {
+          "id": "r6Mcqrp6YkvDbbjZ",
+          "name": "Zendesk account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cf001a4c-336c-4dc7-8666-a7317698218d",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.billing_request }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        9616,
+        448
+      ],
+      "id": "56a6382a-5728-4de5-a8be-9489acda241f",
+      "name": "Refund requested",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        9184,
+        1568
+      ],
+      "id": "2644d825-116a-4ec4-9db0-eb3b15271055",
+      "name": "Wait",
+      "webhookId": "9b405618-58cf-4ffa-9e4d-f10da8a44ed1"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "Target_Ticket",
+              "value": "={{ $json['Target Ticket ID'] }}"
+            },
+            {
+              "key": "Source_Ticket",
+              "value": "={{ $json[\"Source Ticket ID\"] }}"
+            },
+            {
+              "key": "Debug_Link",
+              "value": "=https://david-ga.up.railway.app/workflow/qXWFmAmpYVt3IBV0/debug/{{$execution.id}}"
+            },
+            {
+              "key": "Main_Ticket_Type",
+              "value": "={{ $json.main_ticket_type }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1,
+      "position": [
+        7168,
+        3024
+      ],
+      "id": "4888e78a-fb08-4dcb-a4b0-5f6a2d690c5e",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "10psh1ilovhOtEL9",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/10psh1ilovhOtEL9",
+          "cachedResultName": "Zendesk Safe Caller [NOT IN USE]"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('When Executed by Another Workflow').item.json.ticket_id }}",
+            "target": "ticket",
+            "operation": "update",
+            "payload": "={ \"status\": \"open\" } ",
+            "options": "{}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "target",
+              "displayName": "target",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "operation",
+              "displayName": "operation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "payload",
+              "displayName": "payload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "options",
+              "displayName": "options",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2304,
+        304
+      ],
+      "id": "0cd2c708-83b4-4c33-9d10-d2b0336db839",
+      "name": "Zendesk Safe Caller - Set ST Status to Open",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        7888,
+        1856
+      ],
+      "id": "83db7b1a-0bcd-4d2b-8fee-6e298169360d",
+      "name": "Wait2",
+      "webhookId": "9b405618-58cf-4ffa-9e4d-f10da8a44ed1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}",
+        "updateFields": {
+          "customFieldsUi": {
+            "customFieldsValues": [
+              {
+                "id": 33720467686930,
+                "value": "updated_by_end_user"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        9664,
+        1568
+      ],
+      "id": "c0bcff13-5332-491a-b6cd-f93cb497729f",
+      "name": "Zendesk - add tag (no status update)",
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "call_ticket_object",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3392,
+        1152
+      ],
+      "id": "279f2c86-7db4-4ef6-8580-e1c24d7b93c3",
+      "name": "Split Out Call Tickets"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "846b2dc0-63fe-40c9-9d58-bdca160e2664",
+              "name": "Target Ticket ID",
+              "value": "={{ $('When Executed by Another Workflow').item.json.lead_ticket_id }}",
+              "type": "string"
+            },
+            {
+              "id": "08a5f8ba-8ba5-4669-8abf-2ce9c76eacde",
+              "name": "Source Ticket ID",
+              "value": "={{ $('When Executed by Another Workflow').item.json.call_ticket_id }}",
+              "type": "string"
+            },
+            {
+              "id": "b72a0d2a-e3db-4732-a836-0e15c77895c4",
+              "name": "Target Tags",
+              "value": "={{ $('When Executed by Another Workflow').item.json.lead_ticket_tags }}",
+              "type": "array"
+            },
+            {
+              "id": "6c5b30e8-b37d-4799-8e11-cd3b66d7729c",
+              "name": "Source Tags",
+              "value": "={{ $('When Executed by Another Workflow').item.json.call_ticket_tags }}",
+              "type": "array"
+            },
+            {
+              "id": "4675a724-09ff-407c-b564-5343c3ac2445",
+              "name": "Subject: ",
+              "value": "={{ $('When Executed by Another Workflow').item.json.call_ticket_object[0].call_ticket_subject }}",
+              "type": "string"
+            },
+            {
+              "id": "39eab8f3-8e70-40d1-9e20-282b69fc8c5d",
+              "name": "Channel",
+              "value": "={{ $('When Executed by Another Workflow').item.json.call_ticket_object[0].call_ticket_channel }}",
+              "type": "string"
+            },
+            {
+              "id": "99f24906-9ecd-4d29-96df-f6651be1decd",
+              "name": "Transcript",
+              "value": "={{ $('When Executed by Another Workflow').item.json.transcript }}",
+              "type": "string"
+            },
+            {
+              "id": "f6101511-ecca-4716-b192-2831dd410129",
+              "name": "Context",
+              "value": "=Call Ended Webhook",
+              "type": "string"
+            },
+            {
+              "id": "49a0c572-0340-45c0-9763-bfa22ff6fbdb",
+              "name": "call_results",
+              "value": "={{ $('When Executed by Another Workflow').item.json.call_result }}",
+              "type": "string"
+            },
+            {
+              "id": "28250118-8a99-45fe-abf2-33bb8aa4382a",
+              "name": "conversation_id",
+              "value": "={{ $('When Executed by Another Workflow').item.json.conversation_id }}",
+              "type": "string"
+            },
+            {
+              "id": "2f84b1a3-ee7e-4929-a299-57ca944ed80f",
+              "name": "assignee_id",
+              "value": "={{ $('When Executed by Another Workflow').item.json.lead_ticket_assignee_id }}",
+              "type": "string"
+            },
+            {
+              "id": "f387a9ae-3478-4a77-ba31-7f2ee13ab9a1",
+              "name": "main_ticket_type",
+              "value": "Lead Ticket",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5360,
+        2640
+      ],
+      "id": "63ed7952-bcad-4b6a-a625-f0992e0305c7",
+      "name": "Prep Merge for Lead Ticket",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "errorMessage": "Not handled"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        5360,
+        2864
+      ],
+      "id": "2b1eb4af-6092-4bdd-9775-02a5caaebcd1",
+      "name": "Stop and Error3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "846b2dc0-63fe-40c9-9d58-bdca160e2664",
+              "name": "Target Ticket ID",
+              "value": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+              "type": "string"
+            },
+            {
+              "id": "08a5f8ba-8ba5-4669-8abf-2ce9c76eacde",
+              "name": "Source Ticket ID",
+              "value": "={{ $json.call_ticket_id }}",
+              "type": "string"
+            },
+            {
+              "id": "b72a0d2a-e3db-4732-a836-0e15c77895c4",
+              "name": "Target Tags",
+              "value": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_tags }}",
+              "type": "array"
+            },
+            {
+              "id": "6c5b30e8-b37d-4799-8e11-cd3b66d7729c",
+              "name": "Source Tags",
+              "value": "={{ $json.call_ticket_tags }}",
+              "type": "array"
+            },
+            {
+              "id": "4675a724-09ff-407c-b564-5343c3ac2445",
+              "name": "Subject: ",
+              "value": "={{ $('When Executed by Another Workflow').item.json.call_ticket_subject }}",
+              "type": "string"
+            },
+            {
+              "id": "39eab8f3-8e70-40d1-9e20-282b69fc8c5d",
+              "name": "Channel",
+              "value": "={{ $('When Executed by Another Workflow').item.json.call_ticket_channel }}",
+              "type": "string"
+            },
+            {
+              "id": "99f24906-9ecd-4d29-96df-f6651be1decd",
+              "name": "Transcript",
+              "value": "={{ $('When Executed by Another Workflow').item.json.transcript }}",
+              "type": "string"
+            },
+            {
+              "id": "f6101511-ecca-4716-b192-2831dd410129",
+              "name": "Context",
+              "value": "=Call Ended Webhook",
+              "type": "string"
+            },
+            {
+              "id": "49a0c572-0340-45c0-9763-bfa22ff6fbdb",
+              "name": "call_result",
+              "value": "={{ $('When Executed by Another Workflow').item.json.call_result }}",
+              "type": "string"
+            },
+            {
+              "id": "28250118-8a99-45fe-abf2-33bb8aa4382a",
+              "name": "conversation_id",
+              "value": "={{ $('When Executed by Another Workflow').item.json.conversation_id }}",
+              "type": "string"
+            },
+            {
+              "id": "2f84b1a3-ee7e-4929-a299-57ca944ed80f",
+              "name": "assignee_id",
+              "value": "={{ $('When Executed by Another Workflow').item.json.assignee_id }}",
+              "type": "string"
+            },
+            {
+              "id": "4b6bc6a5-fc5d-432a-a6f7-86f713dafd0e",
+              "name": "main_ticket_type",
+              "value": "Sales Ticket",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5360,
+        2416
+      ],
+      "id": "020bf47f-ed21-43da-a13f-a578f4d593e9",
+      "name": "Prep Merge for Sales Ticket",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "errorMessage": "Tag control failed."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        6176,
+        2080
+      ],
+      "id": "3334c7de-308c-4fc0-a107-aba373540b01",
+      "name": "Stop and Error4"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "e88dba28-79a3-4a73-83de-8e6fcdeb44c4"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Sales Ticket"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "70523abe-5936-415a-8feb-86bcd606d4de",
+                    "leftValue": "={{ $('When Executed by Another Workflow').item.json.lead_ticket_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Unpaid Lead Ticket"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        4928,
+        2528
+      ],
+      "id": "4db60861-d824-46a5-95e8-5fb60d39bbc3",
+      "name": "Main ticket type"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4593428f-751c-4019-b12f-2bcae75b3508",
+              "name": "Target Ticket ID",
+              "value": "={{ $json[\"Target Ticket ID\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "1b355391-1cb5-4e4e-b5f3-ecc3121f67e7",
+              "name": "Source Ticket ID",
+              "value": "={{ $json[\"Source Ticket ID\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "19aef7e5-63b0-489c-9b70-b8044c106eda",
+              "name": "Channel",
+              "value": "={{ $json.Channel }}",
+              "type": "string"
+            },
+            {
+              "id": "4dbe2dd2-6d2f-4ae5-944e-c7ce07079ac6",
+              "name": "Target Tags",
+              "value": "={{ $json[\"Target Tags\"] }}",
+              "type": "array"
+            },
+            {
+              "id": "0c663c32-feea-40ca-b8ae-08a8d1b4d8f8",
+              "name": "Source Tags",
+              "value": "={{ $json[\"Source Tags\"] }}",
+              "type": "array"
+            },
+            {
+              "id": "dd42700d-1363-493f-a228-55222f28552a",
+              "name": "main_ticket_type",
+              "value": "={{ $json.main_ticket_type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6768,
+        2672
+      ],
+      "id": "95a829de-124f-4e97-b346-e04f56f3e054",
+      "name": "Standardize merge data"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Tag control failed."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        6016,
+        2816
+      ],
+      "id": "1a92ee1d-8dea-4c2b-95d9-fd8c33b6ecff",
+      "name": "Stop and Error5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3ae311bb-5858-4b2e-90ab-b1215a5ba0d8",
+              "leftValue": "={{ $json[\"Target Tags\"] }}",
+              "rightValue": "=unpaid_lead_ticket",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            },
+            {
+              "id": "d3115d58-bb37-4e6b-9bc2-e4f7bc741f68",
+              "leftValue": "={{ $json[\"Source Tags\"] }}",
+              "rightValue": "call_overflow",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            },
+            {
+              "id": "b0de029b-18be-4941-947f-d751396f28eb",
+              "leftValue": "={{ $json[\"Source Tags\"] }}",
+              "rightValue": "closed_by_merge",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            },
+            {
+              "id": "2bbeba5c-2b60-4456-9a55-25b62daf15c8",
+              "leftValue": "={{ $json[\"Source Tags\"] }}",
+              "rightValue": "unpaid_lead_ticket",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            },
+            {
+              "id": "825f539a-fe50-41cb-9334-28c6a099d77c",
+              "leftValue": "={{ $json[\"Source Tags\"] }}",
+              "rightValue": "sales_ticket",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5648,
+        2640
+      ],
+      "id": "cdbde885-080a-403c-9517-50a06538f52a",
+      "name": "Problem on  tag check?"
+    },
+    {
+      "parameters": {
+        "content": "### Reopen the Sales ticket [NOT IN USE]\n-> It is being handled by reopen_ticket tool",
+        "height": 560,
+        "width": 864,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1776,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "9cf93ceb-45eb-4212-a6fd-4b985c16dea4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $('When Executed by Another Workflow').item.json.ticket_id }}",
+        "updateFields": {
+          "status": "open"
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        2304,
+        512
+      ],
+      "id": "d735ccd9-314b-473e-9449-39c365ca592e",
+      "name": "Set ST Status to Open",
+      "credentials": {
+        "zendeskApi": {
+          "id": "r6Mcqrp6YkvDbbjZ",
+          "name": "Zendesk account 2"
+        }
+      },
+      "disabled": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fc82515b-46a5-4101-9411-6acd7f625781",
+              "leftValue": "={{ $json.current_ticket_status }}",
+              "rightValue": "solved",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "8a130286-828f-4601-a0f1-c4f77489f938",
+              "leftValue": "={{ $json.lead_ticket_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1904,
+        528
+      ],
+      "id": "3999c371-ef1f-4745-9720-a21c08771cb8",
+      "name": "Sales ticket is solved?",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "options": {
+          "query": "=requester:{{ $('Call Ended').last().json.body.data.conversation_initiation_client_data.dynamic_variables.system__caller_id }} tags:call_overflow status<solved"
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        2800,
+        2688
+      ],
+      "id": "ac996d6d-53b0-4787-9ce2-38a05780563c",
+      "name": "TEST Find active NON-Sales Tickets",
+      "alwaysOutputData": true,
+      "credentials": {
+        "zendeskApi": {
+          "id": "r6Mcqrp6YkvDbbjZ",
+          "name": "Zendesk account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $('Standardize input data 55').first().json[\"Target Ticket ID\"] }}",
+        "updateFields": {
+          "customFieldsUi": {
+            "customFieldsValues": [
+              {
+                "id": 33720467686930,
+                "value": "updated_by_end_user"
+              },
+              {
+                "id": 33720461775122,
+                "value": "refund_was_requested"
+              }
+            ]
+          },
+          "group": 33803656170642,
+          "status": "open"
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        9888,
+        128
+      ],
+      "id": "2201674a-a682-4284-ab21-f00c6ac6599e",
+      "name": "Zendesk - set open, assign to billing",
+      "credentials": {
+        "zendeskApi": {
+          "id": "r6Mcqrp6YkvDbbjZ",
+          "name": "Zendesk account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const sourceItems = $('When Executed by Another Workflow').all();\n\nfor (const item of sourceItems) {\n\n  const rawValue = item.json.call_ticket_object;\n\n  let count = 0;\n\n  try {\n    const arr = typeof rawValue === 'string'\n      ? JSON.parse(rawValue)\n      : rawValue;\n\n    count = Array.isArray(arr) ? arr.length : 0;\n\n  } catch (e) {\n    count = 0;\n  }\n\n  item.json.call_ticket_count = count;\n}\n\nreturn sourceItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2720,
+        896
+      ],
+      "id": "a1383dd4-00ff-4080-a90a-8f15b8bf9890",
+      "name": "Count call tickets",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const sourceItems = $('When Executed by Another Workflow').all();\n\nfor (const item of sourceItems) {\n\n  const rawValue = item.json.call_ticket_object;\n\n  let count = 0;\n\n  try {\n    const arr = typeof rawValue === 'string'\n      ? JSON.parse(rawValue)\n      : rawValue;\n\n    count = Array.isArray(arr) ? arr.length : 0;\n\n  } catch (e) {\n    count = 0;\n  }\n\n  item.json.ticket_count = count;\n}\n\nreturn sourceItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2896,
+        1248
+      ],
+      "id": "280d13fb-8a9b-4157-a6c3-614dfc79c6e0",
+      "name": "Count call  tickets",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ ['Phone call (inbound)', 'Voicemail', 'voice'].includes($json.Channel) || $json.Context === 'Call Ended Webhook' }}",
+                    "rightValue": "=true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fff0140a-62e6-4731-a1ba-60f59997697e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Inbound Calls"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Not Handled"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        7168,
+        2672
+      ],
+      "id": "cecbe275-b8ba-4066-bad0-4b5b344a0f5b",
+      "name": "Inbound call? OLD ZD"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}/merge.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"ids\": [{{$('Standardize merge data').item.json[\"Source Ticket ID\"] * 1}}],\n  \"source_comment\": \"We are closing this request and merging it into #{{$('Standardize merge data').first().json['Target Ticket ID']}}.\",\n  \"target_comment\": \"We are adding ticket #{{$('Standardize merge data').item.json['Source Ticket ID']}} into this request.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        8208,
+        2320
+      ],
+      "id": "c8dbbe5c-ef98-4f80-9aae-aeca95dca747",
+      "name": "Merge voicemail into  Sales Ticket",
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "disabled": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}/merge.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"ids\": [{{$('Standardize merge data').item.json[\"Source Ticket ID\"] * 1}}],\n  \"source_comment\": \"We are closing this request and merging it into #{{$('Standardize merge data').first().json['Target Ticket ID']}}.\",\n  \"target_comment\": \"We are adding ticket #{{$('Standardize merge data').item.json['Source Ticket ID']}} into this request.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        8464,
+        2320
+      ],
+      "id": "e41eb048-ba5f-45f8-ad32-68d5319891a4",
+      "name": "Merge voicemail into  Lead Ticket",
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "disabled": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "98c58a20-29c9-4e11-bbfa-47e88dca27f9",
+              "leftValue": "={{ \n  $json[\"Target Tags\"].includes(\"sales_ticket\") &&\n  $json[\"Source Tags\"].includes(\"call_overflow\") &&\n  !$json[\"Source Tags\"].includes(\"closed_by_merge\") &&\n  !$json[\"Source Tags\"].includes(\"sales_ticket\") &&\n  !$json[\"Source Tags\"].includes(\"unpaid_lead_ticket\")\n}}",
+              "rightValue": "unpaid_lead_ticket",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5472,
+        2000
+      ],
+      "id": "f48aa791-5fc9-4cb8-bdc3-54e6946ca9bf",
+      "name": "Tag control"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3ae311bb-5858-4b2e-90ab-b1215a5ba0d8",
+              "leftValue": "={{ $json[\"Target Tags\"] }}",
+              "rightValue": "sales_ticket",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            },
+            {
+              "id": "e32237a2-f784-49bd-be0d-204ab459b6b5",
+              "leftValue": "={{ $json[\"Source Tags\"] }}",
+              "rightValue": "call_overflow",
+              "operator": {
+                "type": "array",
+                "operation": "notContains",
+                "rightType": "any"
+              }
+            },
+            {
+              "id": "0f13d274-6495-4203-9ef4-4d0d39cd5be5",
+              "leftValue": "={{ $json[\"Source Tags\"] }}",
+              "rightValue": "closed_by_merge",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            },
+            {
+              "id": "2bbeba5c-2b60-4456-9a55-25b62daf15c8",
+              "leftValue": "={{ $json[\"Source Tags\"] }}",
+              "rightValue": "sales_ticket",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            },
+            {
+              "id": "98c58a20-29c9-4e11-bbfa-47e88dca27f9",
+              "leftValue": "={{ $json[\"Source Tags\"] }}",
+              "rightValue": "unpaid_lead_ticket",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5632,
+        2416
+      ],
+      "id": "450329ea-e22c-4572-8d61-cddedb0908db",
+      "name": "Problem on tag check?"
+    },
+    {
+      "parameters": {
+        "method": "=POST",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}/merge.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"ids\": [{{$('Standardize merge data').item.json[\"Source Ticket ID\"] * 1}}],\n  \"source_comment\": \"We are closing this request and merging it into #{{$('Standardize merge data').first().json['Target Ticket ID']}}.\",\n  \"target_comment\": \"We are adding ticket #{{$('Standardize merge data').item.json['Source Ticket ID']}} into this request.\"\n}",
+        "options": {}
+      },
+      "id": "c6ea89a1-b6ef-4fc3-97d4-bb73a7bda3ce",
+      "name": "Merge voicemail into Main Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        8224,
+        1856
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "sales_ticket_id": "17630",
+          "sales_ticket_tags": "[\"0__precent_prog\",\"2nd_draft_conf_sent\",\"4-6_weeks\",\"api_pushed_entry\",\"casey_failsafe\",\"casey_overall_failsafe\",\"charge_status_fix\",\"delay_notification_passport\",\"ds82_4_6week\",\"escalated_by_jamie\",\"fill_first\",\"finished_by_jamie\",\"full_refund\",\"nmi_1\",\"not_captured\",\"offset_until_date\",\"online_eligibility\",\"online_passport_draft_sent\",\"online_renewal_draft_confirmed\",\"online_renewal_passport\",\"online_renewal_tagged\",\"owner_ai_billing\",\"ownership_maestro\",\"paid\",\"pass_protection\",\"passport_submitted\",\"payment_method_card\",\"photo_uploaded\",\"pre-auth\",\"reason_personal_reason/no_longer_needed\",\"refund_was_requested\",\"refunded_by_ai\",\"sales_ticket\",\"secondary_application\",\"security_notification_sent\",\"sent_to_billing\",\"service_progresion_0\",\"service_speed_expedited\",\"unprocessed\",\"updated_by_end_user\",\"us_passport_ds82\",\"visahelpus_customer\"]",
+          "assignee_id": "34450383373842",
+          "lead_ticket_id": "",
+          "lead_ticket_tags": "[]",
+          "lead_ticket_assignee_id": "",
+          "call_ticket_id": "1272412",
+          "call_ticket_tags": "[\"call_overflow\",\"form_ticket\",\"no_product\",\"ticket_with_call_detected_maestroqa\"]",
+          "call_ticket_subject": "Missing Refund Inquiry",
+          "call_ticket_channel": "api",
+          "conversation_id": "conv_4201kpgskd7me03sp6pexqknva73",
+          "call_result": "requires specialist review",
+          "transcript": "AGENT (0s): Hello Dana Mitchell! Thank you for calling Gov-Assist. How can I help you today?\nUSER (6s): Looking for my refund.\nAGENT (9s): I can help document that. Let me first confirm your account. Can you provide your full name and the email you used when you placed the order?\nUSER (16s): Dana Mitchell, tracer041@aol.com.\nAGENT (30s): Thanks, I've confirmed your account. Now let me pull up your ticket to review your refund request.\nAGENT (40s): I can see your account. The ticket shows that on April seventeenth, the authorization for three hundred forty-seven dollars was canceled after you requested a refund for all three passport applications due to canceled travel. The billing notes indicate all three authorizations were voided that same day. Can you tell me what you're seeing on your bank statement or card account right now?\nUSER (60s): Yes, I only received two refunds.\nAGENT (66s): I understand. Just to clarify, you mentioned you only received two refunds—so you're still waiting for one more refund to appear. Can you confirm which application's refund amount you haven't seen yet, and approximately when did the two refunds post to your account?\nUSER (82s): The two refunds posted on my account yesterday.\nAGENT (88s): Got it, so two refunds posted yesterday and you're waiting on the third. The billing notes show all three...\nUSER (93s): Yes.\nAGENT (95s): The billing notes show all three authorizations were canceled on April seventeenth. Since two have already posted and these were pending authorizations being voided, the third should release within the same timeframe. To make sure the billing team can track this properly, can you confirm which of the three applications—Dana Mitchell, Anthony Bishop, or Lacey Mitchell the third—you haven't seen the refund for yet?\nUSER (117s): I don't know. I don't know which ones you charged on which accounts.\nAGENT (123s): I understand. The...\nUSER (124s): I received, I received two refunds on a Wells Fargo credit card, and I'm waiting for the one on my Brightway credit card.\nAGENT (139s): Thank you, that's helpful. I'm documenting that you received two refunds on your Wells Fargo card and you're still waiting for one refund on your Brightway credit card. The billing team will need to verify which application was charged to that card and confirm the release status. Is tracer zero four one at a o l dot com still the best email for the billing team to follow up with you?\nUSER (161s): Yes.\nAGENT (164s): Perfect. Is there anything else you want me to include for the billing specialist to review?\nUSER (170s): No, I just want them to get that done as soon as possible.\nAGENT (177s): Understood. I've documented your missing refund on the Brightway card and the billing team will follow up by email as quickly as possible. Thank you for calling."
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Out Call Tickets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Out Call Tickets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Main ticket type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is it assigned to Jamie?": {
+      "main": [
+        [
+          {
+            "node": "Refund requested",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Refund requested": {
+      "main": [
+        [
+          {
+            "node": "Zendesk - set open, assign to billing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Zendesk - set status to open",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Zendesk - add tag (no status update)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zendesk Safe Caller - Set ST Status to Open": {
+      "main": [
+        []
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Merge voicemail into Main Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out Call Tickets": {
+      "main": [
+        []
+      ]
+    },
+    "Prep Merge for Sales Ticket": {
+      "main": [
+        [
+          {
+            "node": "Problem on tag check?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep Merge for Lead Ticket": {
+      "main": [
+        [
+          {
+            "node": "Problem on  tag check?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main ticket type": {
+      "main": [
+        [
+          {
+            "node": "Prep Merge for Sales Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prep Merge for Lead Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Standardize merge data": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Problem on  tag check?": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Standardize merge data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zendesk - add tag (no status update)": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales ticket is solved?": {
+      "main": [
+        [
+          {
+            "node": "Set ST Status to Open",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Count call tickets": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inbound call? OLD ZD": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge voicemail into  Sales Ticket": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Merge voicemail into  Lead Ticket": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Tag control": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Problem on tag check?": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Standardize merge data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge voicemail into Main Ticket": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "9ca53be9-7d0e-411f-95d4-3a7d5ae6b511",
+  "meta": {
+    "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"
+  },
+  "id": "uO8DjzUtBQF9fqxI",
+  "tags": []
+}

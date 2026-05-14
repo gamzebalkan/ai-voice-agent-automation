@@ -1,0 +1,607 @@
+{
+  "name": "pick_working_ticket [Entry]",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n\"query\": null,\n\"requester\": null, \n\"product_hint\": null, \n\"known_tickets\": null\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        160,
+        1168
+      ],
+      "id": "89572a29-f398-4043-83fb-03a7cb3dc473",
+      "name": "When Executed by Another Workflow",
+      "notes": "This workflow should determine which is the working ticket for a validated customer, based on inputs such as email, phone, userid or ticket id. "
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bd25b342-15ea-4c65-9981-79542a1ada94",
+              "name": "Response",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        624
+      ],
+      "id": "b9210212-6000-4c18-a941-190b76e5cd45",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 20,
+        "options": {
+          "query": "=requester:{{ $('User Details').first().json.email }}"
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        944
+      ],
+      "id": "ab7a6076-110d-4bdc-9289-7388a99e1b57",
+      "name": "Get many tickets1",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.email }}",
+                    "rightValue": "@",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "3c91bdf4-e085-404b-8fcf-7b05c3766dd5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Email present"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "64ea24df-ffbc-45a2-bdea-b28c160deaf6",
+                    "leftValue": "={{ $json.phone }}",
+                    "rightValue": "+",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "phone present"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0bffb434-f344-42b9-b526-6d715aabadc4",
+                    "leftValue": "={{ $json.user_id }}",
+                    "rightValue": "=",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "User ID present"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        880,
+        1152
+      ],
+      "id": "69f46af5-93bb-4585-b465-944e2849ecf1",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9fab2b37-35db-4e92-bf13-55c50fb4a7ca",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        624
+      ],
+      "id": "2a3627e4-b111-466d-8e24-f3f5bb4a7cff",
+      "name": "Email present?"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 20,
+        "options": {
+          "query": "=requester:\"{{ $json.phone }}\" "
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        1168
+      ],
+      "id": "eac3c26e-abce-4900-bf68-2495217e7864",
+      "name": "Get many tickets",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 20,
+        "options": {
+          "query": "=requester:{{ $json.user_id }} "
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        1456
+      ],
+      "id": "ec8f4360-ea31-4ae8-99ff-a9bd124bcc49",
+      "name": "Get many tickets2",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node (JavaScript) — collect IDs of tickets tagged \"sales_ticket\"\n// Input: items from a Zendesk \"Get many tickets\" or Search node\n// Output: ONE item => { sales_tickets: [\"22629954\", \"22628420\", ...] }\n\nconst TARGET_TAG = 'sales_ticket';\nconst out = new Set();\n\n// Helper: normalize any \"tags\" field to an array of strings\nfunction normalizeTags(tags) {\n  if (Array.isArray(tags)) return tags.map(String);\n  if (typeof tags === 'string') {\n    // accept comma/space separated strings\n    return tags.split(/[, ]+/).map(s => s.trim()).filter(Boolean);\n  }\n  return [];\n}\n\n// Gather candidate ticket objects from various possible shapes\nfor (const item of items) {\n  const j = item?.json ?? {};\n\n  // Case A: ticket is directly in item.json\n  if (j && (j.id !== undefined || j.tags !== undefined)) {\n    const tags = normalizeTags(j.tags);\n    if (tags.includes(TARGET_TAG) && j.id != null) out.add(String(j.id));\n  }\n\n  // Case B: Zendesk Search responses nested at json.body.results\n  const results = j?.body?.results;\n  if (Array.isArray(results)) {\n    for (const t of results) {\n      const tags = normalizeTags(t?.tags);\n      if (tags.includes(TARGET_TAG) && t?.id != null) out.add(String(t.id));\n    }\n  }\n}\n\n// Return a single item with the array of strings (may be empty)\nreturn [\n  {\n    json: {\n      sales_tickets: Array.from(out),\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        1456
+      ],
+      "id": "ca3eb9ea-348a-4c0a-837e-404c862e8b9d",
+      "name": "Code in JavaScript2",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "sales_tickets"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2064,
+        1072
+      ],
+      "id": "59b65dc5-aa01-48d9-ad58-e56de94f97ba",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node (JavaScript) — collect IDs of tickets tagged \"sales_ticket\"\n// Input: items from a Zendesk \"Get many tickets\" or Search node\n// Output: ONE item => { sales_tickets: [\"22629954\", \"22628420\", ...] }\n\nconst TARGET_TAG = 'sales_ticket';\nconst out = new Set();\n\n// Helper: normalize any \"tags\" field to an array of strings\nfunction normalizeTags(tags) {\n  if (Array.isArray(tags)) return tags.map(String);\n  if (typeof tags === 'string') {\n    // accept comma/space separated strings\n    return tags.split(/[, ]+/).map(s => s.trim()).filter(Boolean);\n  }\n  return [];\n}\n\n// Gather candidate ticket objects from various possible shapes\nfor (const item of items) {\n  const j = item?.json ?? {};\n\n  // Case A: ticket is directly in item.json\n  if (j && (j.id !== undefined || j.tags !== undefined)) {\n    const tags = normalizeTags(j.tags);\n    if (tags.includes(TARGET_TAG) && j.id != null) out.add(String(j.id));\n  }\n\n  // Case B: Zendesk Search responses nested at json.body.results\n  const results = j?.body?.results;\n  if (Array.isArray(results)) {\n    for (const t of results) {\n      const tags = normalizeTags(t?.tags);\n      if (tags.includes(TARGET_TAG) && t?.id != null) out.add(String(t.id));\n    }\n  }\n}\n\n// Return a single item with the array of strings (may be empty)\nreturn [\n  {\n    json: {\n      sales_tickets: Array.from(out),\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        944
+      ],
+      "id": "5b2d6efb-7343-4033-870e-21929663bb7c",
+      "name": "ST-email_based",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node (JavaScript) — collect IDs of tickets tagged \"sales_ticket\"\n// Input: items from a Zendesk \"Get many tickets\" or Search node\n// Output: ONE item => { sales_tickets: [\"22629954\", \"22628420\", ...] }\n\nconst TARGET_TAG = 'sales_ticket';\nconst out = new Set();\n\n// Helper: normalize any \"tags\" field to an array of strings\nfunction normalizeTags(tags) {\n  if (Array.isArray(tags)) return tags.map(String);\n  if (typeof tags === 'string') {\n    // accept comma/space separated strings\n    return tags.split(/[, ]+/).map(s => s.trim()).filter(Boolean);\n  }\n  return [];\n}\n\n// Gather candidate ticket objects from various possible shapes\nfor (const item of items) {\n  const j = item?.json ?? {};\n\n  // Case A: ticket is directly in item.json\n  if (j && (j.id !== undefined || j.tags !== undefined)) {\n    const tags = normalizeTags(j.tags);\n    if (tags.includes(TARGET_TAG) && j.id != null) out.add(String(j.id));\n  }\n\n  // Case B: Zendesk Search responses nested at json.body.results\n  const results = j?.body?.results;\n  if (Array.isArray(results)) {\n    for (const t of results) {\n      const tags = normalizeTags(t?.tags);\n      if (tags.includes(TARGET_TAG) && t?.id != null) out.add(String(t.id));\n    }\n  }\n}\n\n// Return a single item with the array of strings (may be empty)\nreturn [\n  {\n    json: {\n      sales_tickets: Array.from(out),\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        1168
+      ],
+      "id": "fa73147e-33d8-428c-9b0f-656902ff5bab",
+      "name": "ST_phone_based",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize an empty Set to store unique ticket IDs\nconst uniqueTickets = new Set();\n\n// Loop through all incoming items\nfor (const item of items) {\n  const tickets = item.json.sales_tickets || [];\n  for (const t of tickets) {\n    uniqueTickets.add(t);\n  }\n}\n\n// Return a single item with the merged unique list\nreturn [\n  {\n    json: {\n      working_tickets: Array.from(uniqueTickets),\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2448,
+        1072
+      ],
+      "id": "6ce14c3a-5503-4de3-a481-3c710819929a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7822afd9-289e-4b8f-9f85-31f123a8b67b",
+              "name": "working_tickets",
+              "value": "={{ $json.working_tickets[0][0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2832,
+        1072
+      ],
+      "id": "9c4aea45-b697-4dd1-9fb2-f93a46b56ba0",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d5072e4f-8cf7-4d1c-8f0d-428d26e1f943",
+              "name": "email",
+              "value": "={{ $json.requester.parseJson().email }}",
+              "type": "string"
+            },
+            {
+              "id": "79a83f71-e932-4922-ac89-b509646b64d2",
+              "name": "phone",
+              "value": "={{ $json.requester.parseJson().phone }}",
+              "type": "string"
+            },
+            {
+              "id": "e9224a03-4998-4b23-a5a5-a4e8ae8c183d",
+              "name": "user_id",
+              "value": "={{ $json.requester.parseJson().user_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        1168
+      ],
+      "id": "b2a248a7-e183-4b6e-922f-241001cd6f4a",
+      "name": "User Details"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "pick_working_ticket-entry",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        896
+      ],
+      "id": "974b9f8c-0e36-498f-a83e-865de9bde000",
+      "name": "Webhook",
+      "webhookId": "41156388-c3b1-4f9a-a7af-ed2d6914b817"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "450d6035-a322-4d21-bf47-2aba349e3395",
+              "name": "query",
+              "value": "={{ $json.body.query }}",
+              "type": "string"
+            },
+            {
+              "id": "0e962ac7-1f1b-4d03-8c61-e3da64eabce2",
+              "name": "requester",
+              "value": "={{ $json.body.requester }}",
+              "type": "string"
+            },
+            {
+              "id": "61e58be0-5033-4fb1-a352-e2d0b402a093",
+              "name": "product_hint",
+              "value": "={{ $json.body.product_hint }}",
+              "type": "string"
+            },
+            {
+              "id": "b017f6f6-f174-4ce7-a47d-11618bf228dc",
+              "name": "known_tickets",
+              "value": "={{ $json.body.known_tickets }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        896
+      ],
+      "id": "8b5a4543-a0bc-4206-bc26-4fb7dbb19af2",
+      "name": "Set captured values"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "User Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many tickets1": {
+      "main": [
+        [
+          {
+            "node": "ST-email_based",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get many tickets1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get many tickets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get many tickets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many tickets": {
+      "main": [
+        [
+          {
+            "node": "ST_phone_based",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many tickets2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ST-email_based": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ST_phone_based": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Details": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set captured values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set captured values": {
+      "main": [
+        [
+          {
+            "node": "User Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "6a683ac6-5ad8-45ba-89db-dbc7438d32da",
+  "meta": {
+    "instanceId": "2cb10662097dc9dbb69ac2774c57a632f219b96c7c727adf7672283f83b2620f"
+  },
+  "id": "Zvidcnh8yI4yZ9Kz",
+  "tags": []
+}

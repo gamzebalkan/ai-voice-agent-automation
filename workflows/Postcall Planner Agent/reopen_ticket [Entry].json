@@ -1,0 +1,369 @@
+{
+  "name": "reopen_ticket [Entry]",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "sales_ticket_id",
+              "type": "any"
+            },
+            {
+              "name": "sales_ticket_status",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        752,
+        1024
+      ],
+      "id": "65c1a19d-86d5-4e89-bfd4-9a2e7a539d40",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "71dc9e0d-9370-4db0-9ebb-3121e92f5e5a",
+              "leftValue": "={{ $json.sales_ticket_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "fc82515b-46a5-4101-9411-6acd7f625781",
+              "leftValue": "={{ $json.sales_ticket_status }}",
+              "rightValue": "solved",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1248,
+        1024
+      ],
+      "id": "8766a19c-5365-48a4-a0c2-f03cc7430531",
+      "name": "Sales ticket is solved?"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "10psh1ilovhOtEL9",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/10psh1ilovhOtEL9",
+          "cachedResultName": "Zendesk Safe Caller"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('When Executed by Another Workflow').item.json.ticket_id }}",
+            "target": "ticket",
+            "operation": "update",
+            "payload": "={ \"status\": \"open\" } ",
+            "options": "{}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "target",
+              "displayName": "target",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "operation",
+              "displayName": "operation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "payload",
+              "displayName": "payload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "options",
+              "displayName": "options",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1664,
+        416
+      ],
+      "id": "45f34838-93d2-4bab-91db-31065c15129b",
+      "name": "Zendesk Safe Caller - Set ST Status to Open",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "144ec019-2595-4d58-9f2c-2d2c0d179bfc",
+              "name": "Response",
+              "value": "Ticket status set to open.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2368,
+        736
+      ],
+      "id": "d650642d-08a3-408a-b87c-2df2bfe8f437",
+      "name": "Response"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Ticket is already open!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        1296
+      ],
+      "id": "13dfd13c-63e1-4cc8-819a-eef579b30252",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+        "updateFields": {
+          "status": "open"
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        752
+      ],
+      "id": "d377f4eb-ab1e-4de7-aedc-983cea006fa8",
+      "name": "Set status to open",
+      "retryOnFail": true,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"ticket\": {\n    \"status\": \"open\"\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2000,
+        928
+      ],
+      "id": "d6247695-7965-439a-bdf2-5bd44a713189",
+      "name": "HTTP - Set status to open",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error while re-opening the solved ticket."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        2368,
+        944
+      ],
+      "id": "dd3e1c14-db99-4a10-8380-c4e32044a1fd",
+      "name": "Stop and Error2"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "sales_ticket_id": "19888",
+          "sales_ticket_status": "solved"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Sales ticket is solved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales ticket is solved?": {
+      "main": [
+        [
+          {
+            "node": "Set status to open",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zendesk Safe Caller - Set ST Status to Open": {
+      "main": [
+        []
+      ]
+    },
+    "Set status to open": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP - Set status to open",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - Set status to open": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "430f63d8-b40d-46d2-977b-3d7e812f88e7",
+  "meta": {
+    "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"
+  },
+  "id": "ks17HldAy0RPmxba",
+  "tags": []
+}

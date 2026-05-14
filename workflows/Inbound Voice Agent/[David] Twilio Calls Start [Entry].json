@@ -1,0 +1,1188 @@
+{
+  "name": "[David] Twilio Calls Start [Entry]",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "twilio-start/entry",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -4976,
+        1136
+      ],
+      "id": "c42b92ea-71db-4c7c-ad33-a921824af619",
+      "name": "Twilio Call initiated",
+      "webhookId": "47d41d0c-ef9e-46ac-b863-6f5e930c5ff0",
+      "notes": "Eleven Labs call ended\n\nwsec_fac72b7539268ad5147302898115f7cbc1ffcbe3a26352c4083e66ddbd56abea"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9564fc60-c982-4562-8809-21ada46dce20",
+              "name": "Results Count",
+              "value": "={{$('Search for the user in Zendesk').all().length}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3760,
+        1136
+      ],
+      "id": "abf08751-9dfb-435b-9aa0-0693454fe088",
+      "name": "Edit Fields2",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "03a9e657-5b9e-4044-be1e-b78e662b1f4e",
+              "name": "All",
+              "value": "={{$json.body}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4592,
+        1136
+      ],
+      "id": "313d51f1-46d2-48b1-8788-5be618b52ac0",
+      "name": "Body"
+    },
+    {
+      "parameters": {
+        "resource": "user",
+        "operation": "search",
+        "limit": 10,
+        "filters": {
+          "query": "={{ $json.All.parseJson().caller_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        -4176,
+        1136
+      ],
+      "id": "0a12da15-a84a-478c-be68-0488c3b7dafa",
+      "name": "Search for the user in Zendesk",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.5",
+          "mode": "list",
+          "cachedResultName": "GPT-5.5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are assisting me while I'm on the phone with the customer right now. Customer just called in and I am overwhelmed with data. \nI have the following Zendesk user details and I would like you to tell me the customer's name and email, based on all the data available to you. If you can't identify a name for the user, then just output \"Unknown Caller\". You should only output the name and email nothing else. You would just output a json, like this:\n{\n\"name\":\"full name or 'Unknown Caller' as a string value\",\n\"first_name\": \"only the first name or 'Unknown Caller' as a string value\"\n\"email\":\"email address or 'No email on record' as a string value\"\n}\n\nAnything that you would output outside the name or email as structured above  would be interpreted incorrectly, so please avoid it.\nHere are the user details that I have:\nI found {{ $('Edit Fields2').first().json[\"Results Count\"] }} profiles, with the following names listed:\n{{ $items(\"Search for the user in Zendesk\").map(item => item.json.name) }}\nHere are all the emails listed associated with these profiles:\n{{ $items(\"Search for the user in Zendesk\").map(item => item.json.email) }}\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -2592,
+        -144
+      ],
+      "id": "88ae6114-91a7-4c0b-837c-746fbca0bf06",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "OUFdZ1FO2bdcXdZf",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json[\"Results Count\"].toNumber() }}",
+                    "rightValue": 1,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    },
+                    "id": "9208d504-4c67-4352-ab5f-74545ac74d57"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "More than one profile"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1ab4e9da-a7c5-42ac-b829-7e28947c97ee",
+                    "leftValue": "={{ $json[\"Results Count\"].toNumber() }}",
+                    "rightValue": 1,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Single profile"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "008db27d-ca7f-42f0-a8e8-cddca486bebd",
+                    "leftValue": "={{ $json[\"Results Count\"].toNumber() }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "No profiles"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Not Handled"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -3328,
+        1104
+      ],
+      "id": "3749f3c5-3622-4077-b0b9-6bb0ddf9f6b5",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Not handled"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -2688,
+        1648
+      ],
+      "id": "bef08a02-9511-432d-b002-53b338a88186",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8db2cf5d-7d2b-4bad-b33d-275b07b81b29",
+              "name": "type",
+              "value": "conversation_initiation_client_data",
+              "type": "string"
+            },
+            {
+              "id": "40ccb83c-3afb-4d4d-baef-9bc2e56456f1",
+              "name": "dynamic_variables",
+              "value": "={\n\"name\":\"{{ $json.message.content.name }}\",\n\"email\":\"{{ $json.message.content.email }}\" \n}",
+              "type": "object"
+            },
+            {
+              "id": "f290c873-05d4-498f-9f14-24c22f715828",
+              "name": "conversation_config_override",
+              "value": "={\"agent\": {\"first_message\": \"Hi {{ $json.message.content.name }}, thanks for calling back! I am your virtual assistant. How may I assist you?\"}}",
+              "type": "object"
+            },
+            {
+              "id": "bfa0634f-6476-42a1-a26f-723e25280a99",
+              "name": "body",
+              "value": "={{ $('Twilio Call initiated').item.json.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -560,
+        -384
+      ],
+      "id": "04f3bd54-08b5-4591-b821-46dfece9a255",
+      "name": "Prepare all existing data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8db2cf5d-7d2b-4bad-b33d-275b07b81b29",
+              "name": "type",
+              "value": "conversation_initiation_client_data",
+              "type": "string"
+            },
+            {
+              "id": "40ccb83c-3afb-4d4d-baef-9bc2e56456f1",
+              "name": "dynamic_variables",
+              "value": "={\n\"name\":\"{{ $('OpenAI').first().json.message.content.name }}\",\n\"email\":\"{{ $('OpenAI').first().json.message.content.email }}\" \n}",
+              "type": "object"
+            },
+            {
+              "id": "f290c873-05d4-498f-9f14-24c22f715828",
+              "name": "conversation_config_override",
+              "value": "={\"agent\": {\"first_message\": \"Hi {{ $('OpenAI').first().json.message.content.name }}, thanks for calling back! I am Maya, your virtual assistant. How may I assist you?\"}}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -560,
+        -112
+      ],
+      "id": "ccd21dae-c5e1-46e1-8170-08c773f8c7fd",
+      "name": "Payload for Eleven Labs response to initiation call"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8db2cf5d-7d2b-4bad-b33d-275b07b81b29",
+              "name": "type",
+              "value": "conversation_initiation_client_data",
+              "type": "string"
+            },
+            {
+              "id": "40ccb83c-3afb-4d4d-baef-9bc2e56456f1",
+              "name": "dynamic_variables",
+              "value": "={\n  \"name\":\"{{ $('Search for the user in Zendesk').first().json.name }}\",\n  \"first_name\":\"{{ $('Search for the user in Zendesk').first().json.name.split(' ')[0] }}\",\n  \"email\":\"{{ $('Search for the user in Zendesk').first().json.email }}\"\n}",
+              "type": "object"
+            },
+            {
+              "id": "f290c873-05d4-498f-9f14-24c22f715828",
+              "name": "conversation_config_override",
+              "value": "={\"agent\": {\"first_message\": \"Hello {{ $('Search for the user in Zendesk').first().json.name }}! Thank you for calling Entry.\"}}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2272,
+        656
+      ],
+      "id": "c562357a-b770-4219-bb44-35dd4e1a221d",
+      "name": "Payload for Eleven Labs response to initiation call1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8db2cf5d-7d2b-4bad-b33d-275b07b81b29",
+              "name": "type",
+              "value": "conversation_initiation_client_data",
+              "type": "string"
+            },
+            {
+              "id": "40ccb83c-3afb-4d4d-baef-9bc2e56456f1",
+              "name": "dynamic_variables",
+              "value": "={\n\"name\":\"{{ $('Search for the user in Zendesk').first().json.name }}\",\n\"email\":\"{{ $('Search for the user in Zendesk').first().json.email }}\" \n}",
+              "type": "object"
+            },
+            {
+              "id": "f290c873-05d4-498f-9f14-24c22f715828",
+              "name": "conversation_config_override",
+              "value": "={\"agent\": {\"first_message\": \"Hello! Thank you for calling Entry. I am Maya, your virtual assistant. How may I assist you?\"}}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2688,
+        1376
+      ],
+      "id": "6d77ebca-5d30-4b5f-9747-6735459d3966",
+      "name": "Payload for Eleven Labs response to initiation call2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cd300aec-3718-4b04-a731-2cc9d957c91f",
+              "leftValue": "={{ $('Search for the user in Zendesk').first().json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2688,
+        1120
+      ],
+      "id": "0606337b-3557-4538-a643-e039b53bfc07",
+      "name": "Actual Profile found?"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -2192,
+        1488
+      ],
+      "id": "c9b8af9a-0836-4e06-a91f-0c0aada7d873",
+      "name": "Wait",
+      "webhookId": "ed608124-a60b-4802-a63c-585a4141d6da"
+    },
+    {
+      "parameters": {
+        "resource": "user",
+        "operation": "search",
+        "limit": 10,
+        "filters": {
+          "query": "={{ $('Body').first().json.All.parseJson().caller_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        -1776,
+        1488
+      ],
+      "id": "66c41116-10bb-4a95-ae60-3bb174c2d8ac",
+      "name": "Search for the user in Zendesk1",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8db2cf5d-7d2b-4bad-b33d-275b07b81b29",
+              "name": "type",
+              "value": "conversation_initiation_client_data",
+              "type": "string"
+            },
+            {
+              "id": "40ccb83c-3afb-4d4d-baef-9bc2e56456f1",
+              "name": "dynamic_variables",
+              "value": "={\n\"name\":\"{{ $('Search for the user in Zendesk1').first().json.name }}\",\n\"email\":\"{{ $('Search for the user in Zendesk1').first().json.email }}\" \n}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1344,
+        1488
+      ],
+      "id": "e3d496fa-5f0d-4bd2-8e9c-a186f254ba10",
+      "name": "Payload for Eleven Labs response to initiation call3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8db2cf5d-7d2b-4bad-b33d-275b07b81b29",
+              "name": "type",
+              "value": "conversation_initiation_client_data",
+              "type": "string"
+            },
+            {
+              "id": "40ccb83c-3afb-4d4d-baef-9bc2e56456f1",
+              "name": "dynamic_variables",
+              "value": "={\n\"name\":\"{{ $json.message.content.name }}\",\n\"email\":\"{{ $json.message.content.email }}\" \n}",
+              "type": "object"
+            },
+            {
+              "id": "f290c873-05d4-498f-9f14-24c22f715828",
+              "name": "conversation_config_override",
+              "value": "={\"agent\": {\"first_message\": \"Hi {{ $json.message.content.name }}, thanks for calling back!\"}}",
+              "type": "object"
+            },
+            {
+              "id": "bfa0634f-6476-42a1-a26f-723e25280a99",
+              "name": "body",
+              "value": "={{ $('Twilio Call initiated').first().json.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1760,
+        0
+      ],
+      "id": "64768076-fc3d-4c3b-948a-9b11b5c53d47",
+      "name": "Prepare all existing data3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8db2cf5d-7d2b-4bad-b33d-275b07b81b29",
+              "name": "type",
+              "value": "conversation_initiation_client_data",
+              "type": "string"
+            },
+            {
+              "id": "40ccb83c-3afb-4d4d-baef-9bc2e56456f1",
+              "name": "dynamic_variables",
+              "value": "={\n\"name\":\"{{ $json.message.content.name }}\",\n\"email\":\"{{ $json.message.content.email }}\" \n}",
+              "type": "object"
+            },
+            {
+              "id": "bfa0634f-6476-42a1-a26f-723e25280a99",
+              "name": "body",
+              "value": "={{ $('Twilio Call initiated').first().json.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1792,
+        -336
+      ],
+      "id": "10efda7a-009c-4057-92c2-7a781b08a0fb",
+      "name": "Prepare all existing data4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "742ef006-b80a-48d6-8d35-d69e7423fc87",
+              "leftValue": "={{ $json.dynamic_variables.name }}",
+              "rightValue": "+",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "d98d2e6e-2f1d-4db3-9b63-9e220fb0d469",
+              "leftValue": "={{ $json.dynamic_variables.name.toLowerCase() }}",
+              "rightValue": "caller",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "a4a3b8c8-b7ab-4fd4-870d-25678f529054",
+              "leftValue": "={{ $json.dynamic_variables.name }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "cc47fffb-b437-40ba-a0aa-20b405648ab4",
+              "leftValue": "={{ /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test($json.dynamic_variables.name || \"\") }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "d04f7469-6142-4580-ad14-da2e5569c96a",
+              "leftValue": "={{ $json.dynamic_variables.name }}",
+              "rightValue": "Phone Caller",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1984,
+        656
+      ],
+      "id": "178895db-dd1e-4412-82ce-e3b38b5888a5",
+      "name": "If not a valid name"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa8cec80-bb9f-4f69-816f-1ae93ffc735f",
+              "name": "=conversation_config_override",
+              "value": "={\"agent\": {\"first_message\": \"Hello! Thank you for calling Entry. This is David. How can I help you today?\"}}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1664,
+        640
+      ],
+      "id": "4a334798-65a9-416d-bf2f-6d0a20e871b5",
+      "name": "Generic first message"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa8cec80-bb9f-4f69-816f-1ae93ffc735f",
+              "name": "=conversation_config_override",
+              "value": "={\"agent\": {\"first_message\": \"Hello! Thanks for calling Entry. This is David. How can I help you today?\"}}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1184,
+        -16
+      ],
+      "id": "733544a0-ac7e-47d8-954a-4983b2332778",
+      "name": "Generic first message1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa8cec80-bb9f-4f69-816f-1ae93ffc735f",
+              "name": "=conversation_config_override",
+              "value": "={\"agent\": {\"first_message\": \"Hello {{ $json.first_name }}! Thank you for calling Entry. How can I help you today?\"}}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1680,
+        1008
+      ],
+      "id": "c49d33c5-3b66-4096-a50e-abe443e1bfda",
+      "name": "Personal first message",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa8cec80-bb9f-4f69-816f-1ae93ffc735f",
+              "name": "=conversation_config_override",
+              "value": "={\"agent\": {\"first_message\": \"Hi {{ $json.first_name }}, thanks for calling Entry! How can I help you today?\"}}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1120,
+        432
+      ],
+      "id": "cbc1688c-4133-4655-a0bb-cd49decdf276",
+      "name": "Personal first message1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "814f51c2-c30b-4521-9a50-fc477d4a097b",
+              "leftValue": "={{ $json.message.content.name }}",
+              "rightValue": "Unknown Caller",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2112,
+        -144
+      ],
+      "id": "f8d0c7d1-cacd-4fe2-99bd-376ace08bf63",
+      "name": "Unknown Caller"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const fullName = item.json.dynamic_variables?.name || \"\";\n\n  // split by space and take first part\n  const firstName = fullName.trim().split(\" \")[0];\n\n  return {\n    json: {\n      first_name: firstName\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1312,
+        432
+      ],
+      "id": "a82eab02-9f01-49fc-8f99-c4b95d7bd19b",
+      "name": "Extract first name",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "742ef006-b80a-48d6-8d35-d69e7423fc87",
+              "leftValue": "={{ $json.dynamic_variables.name }}",
+              "rightValue": "+",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            },
+            {
+              "id": "d98d2e6e-2f1d-4db3-9b63-9e220fb0d469",
+              "leftValue": "={{ $json.dynamic_variables.name.toLowerCase() }}",
+              "rightValue": "caller",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            },
+            {
+              "id": "a4a3b8c8-b7ab-4fd4-870d-25678f529054",
+              "leftValue": "={{ $json.dynamic_variables.name}}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "524a27a7-bf27-46fc-a457-c6246dee8301",
+              "leftValue": "={{ /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test($json.dynamic_variables.name || \"\") }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1520,
+        0
+      ],
+      "id": "581dda80-f1be-40ac-b07e-6e466c2312a4",
+      "name": "If not a  valid name"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const fullName = item.json.dynamic_variables?.name || \"\";\n\n  // split by space and take first part\n  const firstName = fullName.trim().split(\" \")[0];\n\n  return {\n    json: {\n      first_name: firstName\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1952,
+        1008
+      ],
+      "id": "9909f18d-cfe8-4249-989f-6458cbd8c198",
+      "name": "Extract first  name",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "deactivated",
+        "height": 240,
+        "width": 624
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2064,
+        960
+      ],
+      "typeVersion": 1,
+      "id": "1b1e0f58-447e-46f2-977a-067362c7e5fd",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa8cec80-bb9f-4f69-816f-1ae93ffc735f",
+              "name": "=conversation_config_override",
+              "value": "={\"agent\": {\"first_message\": \"Hello {{ $json.dynamic_variables.first_name }}! Thank you for calling Entry. How can I help you today?\"}}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1680,
+        816
+      ],
+      "id": "cb98f590-b3bf-40f3-b904-4bda073fa509",
+      "name": "Personal first message2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa8cec80-bb9f-4f69-816f-1ae93ffc735f",
+              "name": "=conversation_config_override",
+              "value": "={\"agent\": {\"first_message\": \"Hi {{ $('OpenAI').item.json.message.content.first_name }}, thanks for calling Entry! How can I help you today?\"}}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1184,
+        176
+      ],
+      "id": "7363b51a-218f-4d69-b2ee-2568486039a8",
+      "name": "Personal first message3"
+    }
+  ],
+  "pinData": {
+    "Twilio Call initiated": [
+      {
+        "json": {
+          "headers": {
+            "host": "david-ga-incall.up.railway.app",
+            "user-agent": "ElevenLabs/1.0",
+            "content-length": "218",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "34.59.11.47",
+            "x-forwarded-host": "david-ga-incall.up.railway.app",
+            "x-forwarded-proto": "https",
+            "x-railway-edge": "railway/us-west2",
+            "x-railway-request-id": "ovNzkDY6S8OtgBhMn6XIxQ",
+            "x-real-ip": "34.59.11.47",
+            "x-request-start": "1778013375800"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "caller_id": "+13135448174",
+            "agent_id": "agent_3601k4mdj3dpe41r5w10pvzhy3bx",
+            "called_number": "+12403037745",
+            "call_sid": "CAac95362f8a9ec98b56f5ffea0a82306b",
+            "conversation_id": "conv_8501kqwxp313ej388njdx57eavvy"
+          },
+          "webhookUrl": "https://david-ga-incall.up.railway.app/webhook/twilio-start/entry",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Twilio Call initiated": {
+      "main": [
+        [
+          {
+            "node": "Body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Body": {
+      "main": [
+        [
+          {
+            "node": "Search for the user in Zendesk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search for the user in Zendesk": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Unknown Caller",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Actual Profile found?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Payload for Eleven Labs response to initiation call2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payload for Eleven Labs response to initiation call1": {
+      "main": [
+        [
+          {
+            "node": "If not a valid name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actual Profile found?": {
+      "main": [
+        [
+          {
+            "node": "Payload for Eleven Labs response to initiation call1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Search for the user in Zendesk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search for the user in Zendesk1": {
+      "main": [
+        [
+          {
+            "node": "Payload for Eleven Labs response to initiation call3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare all existing data3": {
+      "main": [
+        [
+          {
+            "node": "If not a  valid name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If not a valid name": {
+      "main": [
+        [
+          {
+            "node": "Generic first message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Personal first message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unknown Caller": {
+      "main": [
+        [
+          {
+            "node": "Prepare all existing data4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare all existing data3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract first name": {
+      "main": [
+        [
+          {
+            "node": "Personal first message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If not a  valid name": {
+      "main": [
+        [
+          {
+            "node": "Generic first message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Personal first message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract first  name": {
+      "main": [
+        [
+          {
+            "node": "Personal first message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "3280e71c-e870-4d28-85cd-617a20eac483",
+  "meta": {
+    "instanceId": "2cb10662097dc9dbb69ac2774c57a632f219b96c7c727adf7672283f83b2620f"
+  },
+  "id": "BaRXZfSQE8g3MEWh",
+  "tags": []
+}

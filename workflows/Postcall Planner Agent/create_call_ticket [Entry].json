@@ -1,0 +1,883 @@
+{
+  "name": "create_call_ticket [Entry]",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "sales_ticket_id",
+              "type": "any"
+            },
+            {
+              "name": "lead_ticket_id",
+              "type": "any"
+            },
+            {
+              "name": "caller_id"
+            },
+            {
+              "name": "requester_email",
+              "type": "any"
+            },
+            {
+              "name": "call_result",
+              "type": "any"
+            },
+            {
+              "name": "conversation_id",
+              "type": "any"
+            },
+            {
+              "name": "call_summary_title",
+              "type": "any"
+            },
+            {
+              "name": "transcript"
+            },
+            {
+              "name": "call_summary",
+              "type": "any"
+            },
+            {
+              "name": "assignee_id",
+              "type": "any"
+            },
+            {
+              "name": "lead_ticket_assignee_id",
+              "type": "any"
+            },
+            {
+              "name": "customer_name",
+              "type": "any"
+            },
+            {
+              "name": "requester_id",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1856,
+        -624
+      ],
+      "id": "a8650710-7274-43b2-a185-ca40326188c4",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error when creating the call ticket."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        416
+      ],
+      "id": "cbb6c558-247c-46c4-b6b8-6b8fecb691eb",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "call_ticket_id",
+              "value": "=={{ String($json.body?.ticket?.id ?? $json.ticket?.id ?? '') }}"
+            },
+            {
+              "key": "sales_ticket_id",
+              "value": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        352,
+        -1024
+      ],
+      "id": "4a55f073-a1d8-4849-9727-c0a90200f03d",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d0054d40-fa1b-4f9b-aa47-907473a3b996",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1296,
+        -624
+      ],
+      "id": "9fb3022e-0758-4eac-9cf7-9a4488474a16",
+      "name": "If ST exists"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://entryllc.zendesk.com/api/v2/tickets.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\nJSON.stringify({\n  ticket: {\n    subject: $('When Executed by Another Workflow').item.json.call_summary_title,\n    comment: {\n      author_id: 34685489132818,\n      html_body:\n        \"<p><strong>Customer gave us a call.</strong></p><br><br>\" +\n        \"<p><strong>Here is the call transcript:</strong></p><p>\" +\n        ($('When Executed by Another Workflow').item.json.transcript || '')\n          .replace(/\"/g, '\\\\\"')\n          .replace(/\\n/g, '<br>') +\n        \"</p><br><br>\" +\n        \"<p><strong>Call Result:</strong> \" +\n        ($('When Executed by Another Workflow').item.json.call_result || '') +\n        \"</p>\",\n      public: false\n    },\n    group_id: 33803651912722,\n    tags: [\"call_overflow\", \"no_product\", \"form_ticket\", \"ticket_with_call_detected_maestroqa\"],\n    requester: (() => {\n      // Reference the trigger node specifically for the caller data\n      const triggerData = $('When Executed by Another Workflow').item.json;\n      \n      const name =\n        triggerData.customer_name && triggerData.customer_name.trim() !== \"\"\n          ? triggerData.customer_name.trim()\n          : \"Phone Caller \" + (triggerData.caller_id || '');\n\n      const base = {\n        name,\n        phone: (triggerData.caller_id || '').replace(/[^0-9+]/g, '')\n      };\n\n      if (triggerData.requester_email && triggerData.requester_email.trim() !== \"\") {\n        base.email = triggerData.requester_email.trim().toLowerCase();\n      }\n\n      return base;\n    })()\n  }\n})\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -688,
+        128
+      ],
+      "id": "e52cb529-6085-48a6-a06c-764ab11507e6",
+      "name": "Create Call  Ticket",
+      "retryOnFail": true,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43e11f98-ee3d-43ba-82d3-37ca1f9aefb5",
+              "name": "call_ticket_id",
+              "value": "={{ $json.ticket.id }}",
+              "type": "string"
+            },
+            {
+              "id": "3fe97a8d-8a27-4e1a-aec0-eee8154683f4",
+              "name": "call_ticket_tags",
+              "value": "={{ $json.ticket.tags }}",
+              "type": "array"
+            },
+            {
+              "id": "a80d8f11-3413-49bb-9ec5-637f3e5b9746",
+              "name": "call_ticket_subject",
+              "value": "={{ $json.ticket.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "4a51ff42-0518-4282-ac52-a7051334546d",
+              "name": "call_ticket_channel",
+              "value": "={{ $json.ticket.via.channel }}",
+              "type": "string"
+            },
+            {
+              "id": "14c4af85-a2ad-4157-875a-ad082290651c",
+              "name": "call_ticket_requester_id",
+              "value": "={{ $json.ticket.requester_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        608,
+        -1024
+      ],
+      "id": "17ecc090-83a5-4545-a119-a80d5f4e4b2f",
+      "name": "Response"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error when adding tag."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        112,
+        128
+      ],
+      "id": "575d9687-9e54-402a-98d8-149a4e23678d",
+      "name": "Stop and Error2"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -448,
+        112
+      ],
+      "id": "f51165dc-63ce-4f4e-aa41-322aefa9c636",
+      "name": "Wait",
+      "webhookId": "acd7f569-dce8-4bb1-b9a7-9ad61240e7bf"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://entryllc.zendesk.com/api/v2/tickets.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\nJSON.stringify({\n  ticket: {\n    subject: $('When Executed by Another Workflow').item.json.call_summary_title,\n    requester_id: $('When Executed by Another Workflow').item.json.requester_id,\n    comment: {\n      author_id: 34685489132818,\n      html_body:\n        \"<p><strong>Customer gave us a call.</strong></p><br><br>\" +\n        \"<p><strong>Here is the call transcript:</strong></p><p>\" +\n        ($('When Executed by Another Workflow').item.json.transcript || '')\n          .replace(/\"/g, '\\\\\"')\n          .replace(/\\n/g, '<br>') +\n        \"</p><br><br>\" +\n        \"<p><strong>Call Result:</strong> \" +\n        ($('When Executed by Another Workflow').item.json.call_result || '') +\n        \"</p>\",\n      public: false\n    },\n    group_id: 33803651912722,\n    tags: [\"call_overflow\", \"no_product\", \"form_ticket\", \"ticket_with_call_detected_maestroqa\"]\n  }\n})\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -752,
+        -992
+      ],
+      "id": "ea238f8a-13be-40ef-8ccf-2c941d500f69",
+      "name": "Create Call Ticket - no summary",
+      "retryOnFail": true,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://entryllc.zendesk.com/api/v2/tickets.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\nJSON.stringify({\n  ticket: {\n    subject: $('When Executed by Another Workflow').item.json.call_summary_title,\n    requester_id: $json[\"users\"][0][\"id\"],\n    comment: {\n      author_id: 34685489132818,\n      html_body:\n        \"<p><strong>Customer gave us a call.</strong></p><br><br>\" +\n        \"<p><strong>Here is the call transcript:</strong></p><p>\" +\n        ($('When Executed by Another Workflow').item.json.transcript || '')\n          .replace(/\"/g, '\\\\\"')\n          .replace(/\\n/g, '<br>') +\n        \"</p><br><br>\" +\n        \"<p><strong>Call Result:</strong> \" +\n        ($('When Executed by Another Workflow').item.json.call_result || '') +\n        \"</p>\",\n      public: false\n    },\n    group_id: 33803651912722,\n    tags: [\"call_overflow\", \"ticket_with_call_detected_maestroqa\"]\n  }\n})\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -640,
+        -1296
+      ],
+      "id": "35f26959-83f0-42aa-a699-45d890751be5",
+      "name": "Create Call Ticket - no summary OLD-WORKING",
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://entryllc.zendesk.com/api/v2/users/search.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "=email: {{ $('When Executed by Another Workflow').item.json.requester_email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -2768,
+        800
+      ],
+      "id": "bb27466d-206b-46ca-827d-9a509338c18a",
+      "name": "Search User via email",
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://entryllc.zendesk.com/api/v2/users/search.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={   \"phone\": \"{{ $('When Executed by Another Workflow').item.json.caller_id }}\" }"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -3712,
+        784
+      ],
+      "id": "bbf66ee2-cdca-4bd7-9edf-949d3be025ef",
+      "name": "Search User via phone",
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1e60c4b7-1439-4b03-92dc-d35d7fd4c7ff",
+              "leftValue": "={{ $json.users[0].id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2480,
+        800
+      ],
+      "id": "b54c52e0-8400-4422-92ad-87a8f300d16c",
+      "name": "User  found?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d0054d40-fa1b-4f9b-aa47-907473a3b996",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2016,
+        1376
+      ],
+      "id": "b7461999-6ff6-48f7-af4a-a1af34f1f886",
+      "name": "If  ST exists"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Search User via phone').item.json.users[0].id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "number",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "840afb4b-be04-482f-9687-995275ee7ddd"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Found by phone"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "65f1b752-272e-4a87-afb6-7d82829a3c9a",
+                    "leftValue": "={{ !$('Search User via phone').item.json.users?.[0]?.id && $('When Executed by Another Workflow').item.json.requester_email ? true : false }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Email available"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ebd63aed-580a-41a8-9dc2-999fe00a1f21",
+                    "leftValue": "={{ !$('Search User via phone').item.json.users?.[0]?.id && !$('When Executed by Another Workflow').item.json.requester_email ? true : false }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "No email available"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -3312,
+        768
+      ],
+      "id": "b92133a0-f742-479a-a1e5-9a2ffddf1447",
+      "name": "User found?"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -416,
+        -1008
+      ],
+      "id": "5da59504-9029-407e-9581-e24e36184512",
+      "name": "Wait1",
+      "webhookId": "acd7f569-dce8-4bb1-b9a7-9ad61240e7bf"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error when adding tag."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        16,
+        -896
+      ],
+      "id": "4a2ae85b-ee90-421b-b524-e7029b019a8b",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error when creating the call ticket."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -624
+      ],
+      "id": "f04e3c60-7ec8-4392-8afe-0c4df1b693a9",
+      "name": "Stop and Error3"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $json.ticket.id }}.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\nJSON.stringify({\n  ticket: {\n    custom_fields: [\n      {\n        id: 33720422936082,\n        value: \"david_albright\"\n      }\n    ],\n  }\n})\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -256,
+        112
+      ],
+      "id": "978c1e61-cb41-4fa1-a3d7-3260468604f2",
+      "name": "Add ticket owner",
+      "retryOnFail": true,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $json.ticket.id }}.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\nJSON.stringify({\n  ticket: {\n    custom_fields: [\n      {\n        id: 33720422936082,\n        value: \"david_albright\"\n      }\n    ]\n  }\n})\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -224,
+        -1008
+      ],
+      "id": "4ab34fce-9ab2-4854-8b59-de9ae3ea2aa9",
+      "name": "Add ticket  owner",
+      "retryOnFail": true,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "sales_ticket_id": "339912",
+          "lead_ticket_id": "",
+          "caller_id": "+15592739549",
+          "requester_email": "pdisario11@gmail.com",
+          "call_result": "requires specialist review",
+          "conversation_id": "conv_9201kqcsjdeaff3tpwshcz9vvexc",
+          "call_summary_title": "Passport Status Update",
+          "transcript": "AGENT (0s): Hello Paul Disario! Thank you for calling Entry. How can I help you today?\nUSER (6s): Uh, just trying to find the status of my passport.\nAGENT (10s): I can help you check on that...\nUSER (11s): Entry, how may I help you?\nAGENT (14s): I apologize for the...\nUSER (15s): ... asshole gets his fucking ugly face all over it.Hello?\nAGENT (21s): Hi, I'm here...\nUSER (23s): Yes, I wanna get the status of my passport.\nAGENT (27s): I can help you with that. Let me pull up your passport order to check the current status.\nAGENT (37s): Okay, I've pulled up your passport renewal order. Based on what I'm seeing, your application went through the draft review and photo steps, and the team was working on the government fee settlement process. The most recent note shows the case was escalated for specialist review to move it forward, and a specialist will need to provide you with the current status and next steps. What specific question do you have about your passport, or what outcome are you looking for today?\nUSER (61s): Could I speak with the person in charge of my passport, please?\nAGENT (67s): I can document your request and get it to the right team. What can I help you with?\nUSER (71s): Well, nobody... Well, nobody responded to my earlier request, so can I get somebody on the phone now?\nAGENT (79s): I understand you haven't received a response yet. Let me capture what you need so the specialist team can follow up with you as quickly as possible. What specifically do you need help with regarding your passport renewal?\nUSER (90s): I wanna know the status of my passport.\nAGENT (94s): I understand. From what I can see in your order, the application went through the draft and photo steps, and the last note shows it was escalated for specialist review regarding the government fee settlement process. However, I don't have visibility into what happened after that escalation or the current processing stage. I'll document that you need a current status update on your passport renewal. Is there a specific deadline or travel date you're concerned about?\nUSER (119s): Yes, I'd like to have it right... I'd like to have a response today.\nAGENT (124s): I understand you need a response today. I'll note the urgency and document that you're requesting same-day follow-up on your passport status. Do you have upcoming travel, or is there another reason you need the update urgently today?\nUSER (137s): Upcoming travel.\nAGENT (140s): Got it. When is your travel date?\nUSER (143s): Um, tomorrow.\nAGENT (147s): Okay, I'm documenting that you have travel tomorrow and need an urgent status update today on your passport renewal. The specialist team will see this marked as priority and will follow up as quickly as possible. Just to confirm, the best email for them to...\nUSER (159s): When will, when will they, when will they follow up?\nAGENT (163s): I can't give you an exact time, but I'm marking this as urgent with your travel date tomorrow so the specialist team will prioritize it and respond as quickly as possible today. Let me confirm the best email for them to reach you - is pdisario11at gmail dot com still the best one?\nUSER (180s): Pdisario11@gmail.com.\nAGENT (187s): Perfect, I've confirmed pdisario11 at gmail dot com. Let me summarize what I'm...\nUSER (191s): No. No, no, no, no, no, no. Pdesario11@gmail.com.\nAGENT (201s): Got it, P D E S A R I O one one at gmail dot com. Let me make sure I have that correct - can you spell the part before the at sign for me letter by letter?\nUSER (211s): Yeah, P Disario, D P D I S A R I O 11.At gmail dot com.\nAGENT (222s): Perfect, thank you. So that's P D I S A R I O one one at gmail dot com. Let me quickly summarize what I'm documenting: You need an urgent status update on your passport renewal because you have travel tomorrow, and the specialist team will email you at P D I S A R I O one one at gmail dot com as quickly as possible today. Is there anything else you want me to include for the specialist?\nUSER (247s): Uh, no.\nAGENT (251s): Alright, the team will follow up with you as quickly as possible today. Safe travels.",
+          "call_summary": "<p>I called to request an urgent status update on my passport renewal and asked to speak with the person in charge because I had not received a prior response.</p><p>I verified the order is in specialist review related to the government fee settlement process; I do not have visibility beyond that escalation.</p><p>I stated I am traveling tomorrow and requested a same-day update; I confirmed the best email for follow-up is pdisario11@gmail.com (caller corrected it after an initial misspelling).</p>",
+          "assignee_id": "",
+          "lead_ticket_assignee_id": "",
+          "customer_name": "Paul Disario",
+          "requester_id": "34791051894162"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "If ST exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If ST exists": {
+      "main": [
+        [
+          {
+            "node": "Create Call Ticket - no summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Call  Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Call  Ticket": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execution Data": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response": {
+      "main": [
+        []
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Add ticket owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Call Ticket - no summary": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search User via email": {
+      "main": [
+        [
+          {
+            "node": "User  found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search User via phone": {
+      "main": [
+        [
+          {
+            "node": "User found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User found?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Search User via email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If  ST exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Add ticket  owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add ticket owner": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add ticket  owner": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "51e0f01d-939d-49ee-9204-438e16aaec26",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"
+  },
+  "id": "yUImhuMJCs1rQtZj",
+  "tags": []
+}

@@ -1,0 +1,2289 @@
+{
+  "name": "get_ticket_events [Entry]",
+  "nodes": [
+    {
+      "parameters": {
+        "errorMessage": "={{ $json.error.message }}...\n\nDebug Link: https://primary-production-08e3.up.railway.app/workflow/9Z0obijop6SkbJxi/debug/{{ $execution.id }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -1520,
+        416
+      ],
+      "id": "7f614acc-64c9-45fa-9a1a-eab0bd4d1372",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "63c11329-b768-4e5d-a06a-89a7b82d5ed6",
+              "leftValue": "={{ $json.error.message }}",
+              "rightValue": "The resource you are requesting could not be found",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1760,
+        224
+      ],
+      "id": "be0f2600-b46b-4ecc-b51a-57b3d5f0d2df",
+      "name": "invalid resource requested"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "79650b08-8134-490f-b5af-8605bce6287a",
+              "name": "Error message",
+              "value": "={{ $json.error.message }}. It is possibly a deleted ticket or a ticket tthat is not in our database.",
+              "type": "string"
+            },
+            {
+              "id": "7e34d50c-9521-4c76-826a-ce544893589e",
+              "name": "Requested resource",
+              "value": "={{ $json.ticket_id }}",
+              "type": "string"
+            },
+            {
+              "id": "bf903706-b0c3-4fcb-bcc4-db54f34a931c",
+              "name": "Debug link",
+              "value": "=https://primary-production-08e3.up.railway.app/workflow/9Z0obijop6SkbJxi/debug/{{$execution.id}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1520,
+        208
+      ],
+      "id": "8c03a459-ccdf-4c65-a7e9-91690731cab7",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "id",
+              "type": "any"
+            },
+            {
+              "name": "mode"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2752,
+        -112
+      ],
+      "id": "51d5b8d3-8b65-4a01-83ec-61665300a06f",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "counter",
+              "value": "0"
+            },
+            {
+              "name": "audits_all",
+              "value": "={{$json.audits}}"
+            },
+            {
+              "name": "next_page",
+              "value": "={{$json.next_page}}"
+            },
+            {
+              "name": "max_loops",
+              "value": "={{Math.ceil($json.count/100)-1}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ccab7cdf-66fd-4013-adcc-c2365158d14e",
+      "name": "Set Loop Vars",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -928,
+        -1024
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$json.next_page}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "options": {}
+      },
+      "id": "2550bfbe-e68d-4c20-bb99-4b6a5e7c629c",
+      "name": "Get Next Audit Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        240,
+        -688
+      ],
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "counter",
+              "value": "={{ parseInt($('If').first().json.counter) + 1 }}"
+            },
+            {
+              "name": "next_page",
+              "value": "={{$json.next_page}}"
+            },
+            {
+              "name": "audits_all",
+              "value": "={{$json.audits}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b4ec391d-f50f-4bc3-a2c8-920c84ddb9c6",
+      "name": "Set Next Loop",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -688
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "/**\n * Combines all audit pages, finds requester_id, then\n * returns the newest public comment written by that requester.\n *\n * Works with these node names:\n *   • \"Ticket Audit\"            → first page\n *   • \"Get Next Audit Page\"     → page 2 … page N\n * If your node names differ, just change the strings in $items().\n */\n\n// ------------------------------------------------------------\n// 1) Collect every audits[] array the workflow already holds\n// ------------------------------------------------------------\nconst audits = [];\n\n// page 1  (Ticket Audit always returns one item)\nfor (const itm of $items('Ticket Audit')) {\n\tif (Array.isArray(itm.json.audits)) audits.push(...itm.json.audits);\n}\n\n// page 2-N  (may be zero items if the ticket fits on one page)\nfor (const itm of $items('Get Next Audit Page')) {\n\tif (Array.isArray(itm.json.audits)) audits.push(...itm.json.audits);\n}\n\nif (!audits.length) throw new Error('No audits found – make sure node names match');\n\n// Zendesk already gives oldest➜newest, but enforce it anyway\naudits.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));\n\n// ------------------------------------------------------------\n// 2) Discover requester_id from the dedicated “requester_id” event\n//    (it appears only once, near the very beginning)\n// ------------------------------------------------------------\nlet requesterId = null;\n\nfor (const audit of audits.slice(0, 5)) {          // first few audits are enough\n\tfor (const ev of audit.events || []) {\n\t\tif ((ev.type === 'Create' || ev.type === 'Change') &&\n\t\t    ev.field_name === 'requester_id' &&\n\t\t    ev.value) {\n\t\t\trequesterId = Number(ev.value);        // Zendesk stores it as string\n\t\t\tbreak;\n\t\t}\n\t}\n\tif (requesterId) break;\n}\n\n// Fallback: first public comment if the special event is missing\nif (!requesterId) {\n\tfor (const audit of audits) {\n\t\tfor (const ev of audit.events || []) {\n\t\t\tif (ev.type === 'Comment' && ev.public) {\n\t\t\t\trequesterId = ev.author_id;\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t\tif (requesterId) break;\n\t}\n}\n\nif (!requesterId) throw new Error('Unable to determine requester_id');\n\n// ------------------------------------------------------------\n// 3) Walk backwards to locate the requester’s last public reply\n// ------------------------------------------------------------\nlet lastComment = null;\n\nfor (let i = audits.length - 1; i >= 0 && !lastComment; i--) {\n\tconst audit = audits[i];\n\tconst evs   = audit.events || [];\n\n\tfor (let j = evs.length - 1; j >= 0; j--) {\n\t\tconst ev = evs[j];\n\n\t\tif (ev.type === 'Comment' &&\n\t\t    ev.public === true &&\n\t\t    ev.author_id === requesterId) {\n\n\t\t\tlastComment = {\n\t\t\t\tbody       : ev.body || ev.plain_body || '',\n\t\t\t\tcreated_at : audit.created_at,   // audit timestamp\n\t\t\t\taudit_id   : audit.id\n\t\t\t};\n\t\t\tbreak;\n\t\t}\n\t}\n}\n\n// ------------------------------------------------------------\n// 4) Output a single tidy item\n// ------------------------------------------------------------\nreturn [{\n\tjson: {\n\t\trequester_id        : requesterId,\n\t\tlast_end_user_comment: lastComment        // null if the user never replied\n\t}\n}];\n"
+      },
+      "id": "e5856f0c-9e89-41a5-88f9-cc691ab1d984",
+      "name": "Extract Last End-User Comment",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        -1376
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "63c11329-b768-4e5d-a06a-89a7b82d5ed6",
+              "leftValue": "={{ $json.count }}",
+              "rightValue": 100,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1520,
+        -304
+      ],
+      "id": "7964c2f5-33b8-49d9-ad9a-27953ba29ca1",
+      "name": "Multi-page audit?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "90895097-a42d-4df7-afba-25b50231d42a",
+              "leftValue": "={{$json.next_page !== null}}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "c2251807-9822-45c7-8d34-a901b02193fe",
+              "leftValue": "={{$json.counter}}",
+              "rightValue": "={{ $('Set Loop Vars').first().json.max_loops }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -608,
+        -1024
+      ],
+      "id": "0d5d1fb3-c4fe-4df7-8922-0293d4f7c470",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**********************************************************************\n *  “Audits – comments + notifications only”\n *\n *  INPUT  : items from\n *           • Ticket Audit            (page-1)\n *           • Get Next Audit Page     (page-2 … page-N)\n *\n *  OUTPUT : 1 item\n *           {\n *             \"audits\": [\n *                {\n *                  \"id\"        : 23076188830354,\n *                  \"created_at\": \"2024-12-04T23:01:42Z\",\n *                  \"events\"    : [\n *                     { …filtered Comment… },\n *                     { …filtered Notification… }\n *                  ]\n *                },\n *                …\n *             ]\n *           }\n *********************************************************************/\n\n/* ------------------------------------------------------------------ */\n/* 1.  Gather every audits[] array                                     */\n/* ------------------------------------------------------------------ */\nconst allAudits = [];\n\n// first page\nfor (const itm of $items('Ticket Audit')) {\n\tif (Array.isArray(itm.json.audits)) allAudits.push(...itm.json.audits);\n}\n\n// page 2-N\nfor (const itm of $items('Get Next Audit Page')) {\n\tif (Array.isArray(itm.json.audits)) allAudits.push(...itm.json.audits);\n}\n\nif (!allAudits.length) throw new Error('No audits found – check node names');\n\n// guarantee chronological order\nallAudits.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));\n\n/* ------------------------------------------------------------------ */\n/* 2.  Build a Zendesk-like structure with only interesting events     */\n/* ------------------------------------------------------------------ */\nconst filteredAudits = [];\n\nfor (const audit of allAudits) {\n\tconst wantedEvents = [];\n\n\tfor (const ev of audit.events || []) {\n\n\t\tif (ev.type === 'Comment') {\n\t\t\twantedEvents.push({\n\t\t\t\ttype      : 'Comment',\n\t\t\t\tauthor_id : ev.author_id ?? audit.author_id,\n\t\t\t\tpublic    : ev.public,\n\t\t\t\tbody      : ev.plain_body || ev.body || '',\n\t\t\t\tcreated_at: audit.created_at\n\t\t\t});\n\n\t\t} else if (ev.type === 'Notification') {\n\t\t\twantedEvents.push({\n\t\t\t\ttype       : 'Notification',\n\t\t\t\trecipients : ev.recipients || [],\n\t\t\t\tsubject    : ev.subject || '',\n\t\t\t\tbody       : ev.body || '',\n\t\t\t\tcreated_at : audit.created_at\n\t\t\t});\n\t\t}\n\t}\n\n\t// keep only audits that still contain at least one event\n\tif (wantedEvents.length) {\n\t\tfilteredAudits.push({\n\t\t\tid         : audit.id,\n\t\t\tcreated_at : audit.created_at,\n\t\t\tevents     : wantedEvents\n\t\t});\n\t}\n}\n\n/* ------------------------------------------------------------------ */\n/* 3.  Emit one tidy item                                              */\n/* ------------------------------------------------------------------ */\nreturn [{\n\tjson: {\n\t\taudits: filteredAudits          // fully parseable JSON, no stringifying\n\t}\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        -1376
+      ],
+      "id": "52fdc255-2d7c-461c-af48-360db01e764c",
+      "name": "Extract only relevant events"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        -688
+      ],
+      "id": "8fa8647f-85a6-4334-8e54-fa81229fb871",
+      "name": "Wait2",
+      "webhookId": "44b374cd-906f-4efd-a095-4892f87b3e05"
+    },
+    {
+      "parameters": {
+        "functionCode": "/**********************************************************************\n *  “Last End-User Comment (works with or without loop)”\n *\n *  INPUT  : this Function can sit anywhere after “Ticket Audit”.\n *           If you ran a loop with “Get Next Audit Page”, leave that\n *           node name unchanged; otherwise the try/catch just skips it.\n *\n *  OUTPUT : 1 item\n *           {\n *             \"requester_id\"         : <number>,\n *             \"last_end_user_comment\": {\n *                   \"body\"       : <string>,\n *                   \"created_at\" : <ISO-date>,\n *                   \"audit_id\"   : <number>\n *             }           // or null if the user never posted publicly\n *           }\n *********************************************************************/\n\n/* ------------------------------------------------------------------ */\n/* Helper – gather audits from a node **only if it exists**           */\n/* ------------------------------------------------------------------ */\nfunction auditsFrom(nodeName) {\n\ttry {\n\t\treturn $items(nodeName).flatMap(i =>\n\t\t\tArray.isArray(i.json.audits) ? i.json.audits : []);\n\t} catch (e) {\n\t\t// node name not found (single-page scenario) – no audits from it\n\t\treturn [];\n\t}\n}\n\n/* ------------------------------------------------------------------ */\n/* 1) Collect audits from every relevant node                         */\n/* ------------------------------------------------------------------ */\nlet audits = [];\n\n// page-1 comes from Ticket Audit (always present)\naudits.push(...auditsFrom('Ticket Audit'));\n\n// page-2 … N come from Get Next Audit Page (may not exist)\naudits.push(...auditsFrom('Get Next Audit Page'));\n\n// Fallback: maybe this Function received the audits directly as input\nif (!audits.length) {\n\tfor (const itm of items) {\n\t\tif (Array.isArray(itm.json.audits)) audits.push(...itm.json.audits);\n\t}\n}\n\nif (!audits.length) throw new Error('No audits found – check node names');\n\naudits.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));\n\n/* ------------------------------------------------------------------ */\n/* 2) Identify requester_id from the dedicated requester_id event     */\n/* ------------------------------------------------------------------ */\nlet requesterId = null;\nfor (const audit of audits.slice(0, 5)) {            // first few audits\n\tfor (const ev of audit.events || []) {\n\t\tif ((ev.type === 'Create' || ev.type === 'Change') &&\n\t\t    ev.field_name === 'requester_id' &&\n\t\t    ev.value) {\n\t\t\trequesterId = Number(ev.value);\n\t\t\tbreak;\n\t\t}\n\t}\n\tif (requesterId) break;\n}\n\n// fallback: first public comment in ticket\nif (!requesterId) {\n\tfor (const audit of audits) {\n\t\tfor (const ev of audit.events || []) {\n\t\t\tif (ev.type === 'Comment' && ev.public) {\n\t\t\t\trequesterId = ev.author_id;\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t\tif (requesterId) break;\n\t}\n}\n\nif (!requesterId) throw new Error('Unable to determine requester_id');\n\n/* ------------------------------------------------------------------ */\n/* 3) Walk backwards to grab the latest public reply from requester   */\n/* ------------------------------------------------------------------ */\nlet lastComment = null;\n\nfor (let i = audits.length - 1; i >= 0 && !lastComment; i--) {\n\tconst audit = audits[i];\n\tfor (let j = (audit.events || []).length - 1; j >= 0; j--) {\n\t\tconst ev = audit.events[j];\n\t\tif (ev.type === 'Comment' &&\n\t\t    ev.public === true &&\n\t\t    ev.author_id === requesterId) {\n\n\t\t\tlastComment = {\n\t\t\t\tbody       : ev.body || ev.plain_body || '',\n\t\t\t\tcreated_at : audit.created_at,\n\t\t\t\taudit_id   : audit.id\n\t\t\t};\n\t\t\tbreak;\n\t\t}\n\t}\n}\n\n/* ------------------------------------------------------------------ */\n/* 4) Emit one tidy item                                              */\n/* ------------------------------------------------------------------ */\nreturn [{\n\tjson: {\n\t\trequester_id        : requesterId,\n\t\tlast_end_user_comment: lastComment\n\t}\n}];\n"
+      },
+      "id": "8d13a4c1-2692-4bf2-8c2c-060cbef9f302",
+      "name": "Extract Last End-User Comment1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        96
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        240,
+        304
+      ],
+      "id": "608b989d-65bd-4076-a7f6-a5e4d11e01dd",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76eb092c-4f8a-499c-9b17-4fbd24826e37",
+              "name": "All comments and notifications",
+              "value": "={{ $('Merge').last().json.audits }}",
+              "type": "string"
+            },
+            {
+              "id": "cee2cf81-d254-40ab-b06d-0522b1567c04",
+              "name": "Latest user comment",
+              "value": "={{ $('Merge').first().json.last_end_user_comment === null\n\t? 'End-user never commented on the ticket.'\n\t: $('Merge').first().json }}",
+              "type": "string"
+            },
+            {
+              "id": "fdaa4178-2cfc-4d22-b809-52098f1821a0",
+              "name": "Time Elapsed since Last customer reply",
+              "value": "={{ $json.last_end_user_comment\n  ? $now.diff(DateTime.fromISO($json.last_end_user_comment.created_at), ['days','hours','minutes']).toHuman()\n  : 'Customer never replied on this ticket'}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        736,
+        304
+      ],
+      "id": "cac316a9-6b37-42af-97e9-a411b0eac1ac",
+      "name": "Extract key values to be used1",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76eb092c-4f8a-499c-9b17-4fbd24826e37",
+              "name": "All comments and notifications",
+              "value": "={{$('Extract only relevant events').all()}}",
+              "type": "string"
+            },
+            {
+              "id": "cee2cf81-d254-40ab-b06d-0522b1567c04",
+              "name": "Latest user comment",
+              "value": "={{ $('Extract Last End-User Comment').first().json.last_end_user_comment === null\n\t? 'End-user never commented on the ticket.'\n\t: $('Extract Last End-User Comment').first().json }}",
+              "type": "string"
+            },
+            {
+              "id": "42c0f090-1521-421d-8bdc-9918b06a79da",
+              "name": "Time Elapsed since Last customer reply",
+              "value": "={{ $('Extract Last End-User Comment').first().json.last_end_user_comment\n  ? $now.diff(DateTime.fromISO($('Extract Last End-User Comment').first().json.last_end_user_comment.created_at), ['days','hours','minutes']).toHuman()\n  : 'Customer never replied to our emails'\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        -1376
+      ],
+      "id": "ad014cac-9ab1-4609-8432-f18b7767f275",
+      "name": "Extract key values to be used2"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**********************************************************************\n *  “Zendesk audits → single item with audits array”\n ********************************************************************/\n\n/* helper: remove null values deeply */\nfunction stripNulls(v) {\n  if (v === null) return undefined;\n  if (Array.isArray(v)) return v.map(stripNulls).filter(x => x !== undefined);\n  if (typeof v === 'object') {\n    const o = {};\n    for (const [k, val] of Object.entries(v)) {\n      const c = stripNulls(val);\n      if (c !== undefined) o[k] = c;\n    }\n    return o;\n  }\n  return v;\n}\n\n/* helper: turn Change/tags into tags_added / tags_removed */\nfunction compactTagChange(ev) {\n  const isTags =\n    ev.type === 'Change' &&\n    ev.field_name === 'tags' &&\n    Array.isArray(ev.value) &&\n    Array.isArray(ev.previous_value);\n\n  if (!isTags) return [ev];\n\n  const added   = ev.value.filter(t => !ev.previous_value.includes(t));\n  const removed = ev.previous_value.filter(t => !ev.value.includes(t));\n\n  if (!added.length && !removed.length) return [];     // no real change\n\n  const out = { type: 'Change' };\n  if (added.length)   out.tags_added   = added;\n  if (removed.length) out.tags_removed = removed;\n  return [out];\n}\n\n/* helper: keep exactly one `body` */\nfunction pickBody(ev) {\n  const text = s => typeof s === 'string' && s.trim();\n  if (!text(ev.body)) {\n    ev.body = text(ev.plain_body) ? ev.plain_body\n          : text(ev.html_body)   ? ev.html_body\n          : ev.body;\n  }\n  delete ev.plain_body;\n  delete ev.html_body;\n  return ev;\n}\n\n/* -------- MAIN --------------------------------------------------- */\nconst auditsIn = items[0].json.audits ?? [];\n\nconst auditsOut = auditsIn.map(a => {\n  const eventsProcessed = (a.events ?? [])\n    .flatMap(compactTagChange)   // maybe drop empty tag-diffs\n    .map(pickBody)               // single body\n    .map(stripNulls);            // purge nulls inside events\n\n  return {\n    id         : a.id,\n    created_at : a.created_at,\n    events     : eventsProcessed,\n  };\n});\n\n// emit ONE item with audits array\nreturn [{ json: { audits: auditsOut } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        560
+      ],
+      "id": "fd6ce117-9671-427e-88c6-567f2205af37",
+      "name": "Extract comments and notifications"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ─────────────────────────────────────────────\n// n8n Code node :  filter to Comment / Notification\n// ─────────────────────────────────────────────\n\n// get all incoming items\nconst items = $input.all();\n\nreturn items.map(item => {\n\t/* 1. grab audits array (or fall back to empty) */\n\tconst audits = item.json?.audits ?? [];\n\n\t/* 2. filter the events in every audit                */\n\t/*    – keep only Comment or Notification events      */\n\tconst cleanedAudits = audits\n\t\t.map(audit => {\n\t\t\tconst keptEvents = (audit.events || []).filter(ev =>\n\t\t\t\tev.type === 'Comment' || ev.type === 'Notification',\n\t\t\t);\n\t\t\treturn { ...audit, events: keptEvents };\n\t\t})\n\t\t/* 3. drop audits that are now event-less */\n\t\t.filter(audit => audit.events.length > 0);\n\n\t/* 4. write the cleaned audits back into the item */\n\treturn {\n\t\t...item,               // preserve metadata (paired items, binary, etc.)\n\t\tjson: {\n\t\t\t...item.json,\n\t\t\taudits: cleanedAudits,\n\t\t},\n\t};\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        560
+      ],
+      "id": "9ca2fcac-fabb-4bc9-98c6-df7344fc11f9",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $json.id }}/audits.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "options": {
+          "pagination": {
+            "pagination": {
+              "paginationMode": "off"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2064,
+        -288
+      ],
+      "id": "55d32b04-7227-4da4-a501-ecc1cd859b7a",
+      "name": "Ticket Audit",
+      "credentials": {
+        "zendeskApi": {
+          "id": "u7bG1BtWeb2RQR5k",
+          "name": "Zendesk account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1760,
+        -112
+      ],
+      "id": "c70d5043-f155-442d-8e9a-0bbffbf98bbf",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Input Data').item.json.mode }}",
+                    "rightValue": "recent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "71a79dd7-1d0c-47d8-91fc-803454ff245c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Recent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6ae5f1d1-8bba-4189-a34e-dde58c8ddd71",
+                    "leftValue": "={{ $('Prepare Input Data').item.json.mode }}",
+                    "rightValue": "=standard",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Standard"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        288
+      ],
+      "id": "b538679e-0d6f-4eba-82fb-4ea464b7183d",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "79650b08-8134-490f-b5af-8605bce6287a",
+              "name": "All comments and notifications",
+              "value": "={{ $json[\"All comments and notifications\"].parseJson().slice(-10) }}",
+              "type": "string"
+            },
+            {
+              "id": "0e921640-c02e-4e49-ba97-48cb207bdc95",
+              "name": "",
+              "value": "={{ $json[\"All comments and notifications\"].parseJson().length }} ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1536,
+        112
+      ],
+      "id": "305b1ecd-9839-40cb-bbc8-502d5a693ea0",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: $json[\"All comments and notifications\"]\n// Output: { cleaned_events: [...] }\n\nconst raw = $json[\"All comments and notifications\"];\nconst audits = typeof raw === 'string' ? JSON.parse(raw) : raw;\n\nfunction isEmpty(value) {\n  if (value === null || value === undefined) return true;\n  if (typeof value === 'string' && value.trim() === '') return true;\n  if (Array.isArray(value) && value.length === 0) return true;\n  return false;\n}\n\nfunction deepClean(obj) {\n  if (Array.isArray(obj)) {\n    return obj\n      .map(deepClean)\n      .filter(v => !isEmpty(v));\n  }\n\n  if (typeof obj === 'object' && obj !== null) {\n    const cleaned = {};\n    for (const [key, value] of Object.entries(obj)) {\n      const v = deepClean(value);\n      if (!isEmpty(v)) {\n        cleaned[key] = v;\n      }\n    }\n    return cleaned;\n  }\n\n  return obj;\n}\n\nfunction simplifyAttachments(arr) {\n  if (!Array.isArray(arr)) return [];\n\n  return arr.map(a => ({\n    content_type: a?.content_type ?? null,\n    file_name: a?.file_name ?? null,\n    content_url: a?.content_url ?? a?.mapped_content_url ?? null,\n  }));\n}\n\nconst cleanedEvents = [];\n\nfor (const audit of (Array.isArray(audits) ? audits : [])) {\n  const created_at = audit?.created_at;\n  const events = Array.isArray(audit?.events) ? audit.events : [];\n\n  for (const ev of events) {\n    const eventObj = {\n      created_at,\n      type: ev?.type,\n      public: ev?.public,\n      author_id: ev?.author_id,\n      body: ev?.body,\n      attachments: simplifyAttachments(ev?.attachments),\n    };\n\n    cleanedEvents.push(deepClean(eventObj));\n  }\n}\n\nreturn [\n  {\n    json: {\n      events: cleanedEvents,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        112
+      ],
+      "id": "e68b2f1d-e70c-4aca-886a-e5adc56d2f2b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a90bb8ba-4643-45b2-a984-81b184c08d69",
+              "name": "events",
+              "value": "={{ $json.events }}",
+              "type": "array"
+            },
+            {
+              "id": "1010c3d5-9b93-459c-97a1-a49e4d51f840",
+              "name": "Latest user comment",
+              "value": "={{ $('Extract key values to be used1').item.json[\"Latest user comment\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "814ee038-5f43-4697-b62b-26a21d0f52cf",
+              "name": "Time Elapsed since Last customer reply",
+              "value": "={{ $('Extract key values to be used1').item.json[\"Time Elapsed since Last customer reply\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2096,
+        112
+      ],
+      "id": "3761ddb1-1788-41b6-b9d0-e05347a5f56f",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: $json[\"All comments and notifications\"]\n// Output: { cleaned_events: [...] }\n\nconst raw = $json[\"All comments and notifications\"];\nconst audits = typeof raw === 'string' ? JSON.parse(raw) : raw;\n\nfunction isEmpty(value) {\n  if (value === null || value === undefined) return true;\n  if (typeof value === 'string' && value.trim() === '') return true;\n  if (Array.isArray(value) && value.length === 0) return true;\n  return false;\n}\n\nfunction deepClean(obj) {\n  if (Array.isArray(obj)) {\n    return obj\n      .map(deepClean)\n      .filter(v => !isEmpty(v));\n  }\n\n  if (typeof obj === 'object' && obj !== null) {\n    const cleaned = {};\n    for (const [key, value] of Object.entries(obj)) {\n      const v = deepClean(value);\n      if (!isEmpty(v)) {\n        cleaned[key] = v;\n      }\n    }\n    return cleaned;\n  }\n\n  return obj;\n}\n\nfunction simplifyAttachments(arr) {\n  if (!Array.isArray(arr)) return [];\n\n  return arr.map(a => ({\n    content_type: a?.content_type ?? null,\n    file_name: a?.file_name ?? null,\n    content_url: a?.content_url ?? a?.mapped_content_url ?? null,\n  }));\n}\n\nconst cleanedEvents = [];\n\nfor (const audit of (Array.isArray(audits) ? audits : [])) {\n  const created_at = audit?.created_at;\n  const events = Array.isArray(audit?.events) ? audit.events : [];\n\n  for (const ev of events) {\n    const eventObj = {\n      created_at,\n      type: ev?.type,\n      public: ev?.public,\n      author_id: ev?.author_id,\n      body: ev?.body,\n      attachments: simplifyAttachments(ev?.attachments),\n    };\n\n    cleanedEvents.push(deepClean(eventObj));\n  }\n}\n\nreturn [\n  {\n    json: {\n      events: cleanedEvents,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1536,
+        496
+      ],
+      "id": "a0df0373-ea6f-48fa-a30a-3ae2b0fcaedc",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a90bb8ba-4643-45b2-a984-81b184c08d69",
+              "name": "events",
+              "value": "={{ $json.events }}",
+              "type": "array"
+            },
+            {
+              "id": "1010c3d5-9b93-459c-97a1-a49e4d51f840",
+              "name": "Latest user comment",
+              "value": "={{ $('Extract key values to be used1').item.json[\"Latest user comment\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "814ee038-5f43-4697-b62b-26a21d0f52cf",
+              "name": "Time Elapsed since Last customer reply",
+              "value": "={{ $('Extract key values to be used1').item.json[\"Time Elapsed since Last customer reply\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1856,
+        496
+      ],
+      "id": "97c62ed1-5d58-4f6b-9c59-633482588aac",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: $json[\"All comments and notifications\"]\n// Output: { cleaned_events: [...] }\n\nconst raw = $json[\"All comments and notifications\"];\nconst audits = typeof raw === 'string' ? JSON.parse(raw) : raw;\n\nfunction isEmpty(value) {\n  if (value === null || value === undefined) return true;\n  if (typeof value === 'string' && value.trim() === '') return true;\n  if (Array.isArray(value) && value.length === 0) return true;\n  return false;\n}\n\nfunction deepClean(obj) {\n  if (Array.isArray(obj)) {\n    return obj\n      .map(deepClean)\n      .filter(v => !isEmpty(v));\n  }\n\n  if (typeof obj === 'object' && obj !== null) {\n    const cleaned = {};\n    for (const [key, value] of Object.entries(obj)) {\n      const v = deepClean(value);\n      if (!isEmpty(v)) {\n        cleaned[key] = v;\n      }\n    }\n    return cleaned;\n  }\n\n  return obj;\n}\n\nfunction simplifyAttachments(arr) {\n  if (!Array.isArray(arr)) return [];\n\n  return arr.map(a => ({\n    content_type: a?.content_type ?? null,\n    file_name: a?.file_name ?? null,\n    content_url: a?.content_url ?? a?.mapped_content_url ?? null,\n  }));\n}\n\nconst cleanedEvents = [];\n\nfor (const audit of (Array.isArray(audits) ? audits : [])) {\n  const created_at = audit?.created_at;\n  const events = Array.isArray(audit?.events) ? audit.events : [];\n\n  for (const ev of events) {\n    const eventObj = {\n      created_at,\n      type: ev?.type,\n      public: ev?.public,\n      author_id: ev?.author_id,\n      body: ev?.body,\n      attachments: simplifyAttachments(ev?.attachments),\n    };\n\n    cleanedEvents.push(deepClean(eventObj));\n  }\n}\n\nreturn [\n  {\n    json: {\n      events: cleanedEvents,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        304
+      ],
+      "id": "29a1931f-dc0a-4f26-9d54-ab649c15abe9",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a90bb8ba-4643-45b2-a984-81b184c08d69",
+              "name": "events",
+              "value": "={{ $json.events }}",
+              "type": "array"
+            },
+            {
+              "id": "1010c3d5-9b93-459c-97a1-a49e4d51f840",
+              "name": "Latest user comment",
+              "value": "={{ $('Extract key values to be used1').item.json[\"Latest user comment\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "814ee038-5f43-4697-b62b-26a21d0f52cf",
+              "name": "Time Elapsed since Last customer reply",
+              "value": "={{ $('Extract key values to be used1').item.json[\"Time Elapsed since Last customer reply\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1840,
+        304
+      ],
+      "id": "30fbaa6a-8c44-4baf-9695-61d971ed5f1b",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: $json[\"All comments and notifications\"]\n// Output: { events: [...] }\n\nconst raw = $json[\"All comments and notifications\"];\n\n// 1) Parse input safely\nlet parsed;\ntry {\n  parsed = typeof raw === \"string\" ? JSON.parse(raw) : raw;\n} catch (e) {\n  return [{ json: { events: [], error: \"Failed to parse All comments and notifications JSON\", details: String(e) } }];\n}\n\n// 2) Normalize to an array of audits\nfunction extractAudits(payload) {\n  // payload can be: array of n8n items, single n8n item, audits array, or wrapper objects\n  const candidates = Array.isArray(payload) ? payload : [payload];\n\n  // Case A: array of audits directly\n  if (candidates.length && candidates[0] && typeof candidates[0] === \"object\" && Array.isArray(candidates[0].events)) {\n    return candidates;\n  }\n\n  // Case B: n8n items like [{ json: { audits: [...] } }, ...]\n  const audits = [];\n  for (const c of candidates) {\n    if (!c || typeof c !== \"object\") continue;\n\n    // direct audits\n    if (Array.isArray(c.audits)) audits.push(...c.audits);\n\n    // n8n item wrapper\n    if (c.json && Array.isArray(c.json.audits)) audits.push(...c.json.audits);\n\n    // sometimes payload is { json: { json: { audits: [...] } } }\n    if (c.json && c.json.json && Array.isArray(c.json.json.audits)) audits.push(...c.json.json.audits);\n  }\n  return audits;\n}\n\nconst audits = extractAudits(parsed);\n\nfunction isEmpty(value) {\n  if (value === null || value === undefined) return true;\n  if (typeof value === \"string\" && value.trim() === \"\") return true;\n  if (Array.isArray(value) && value.length === 0) return true;\n  if (typeof value === \"object\" && !Array.isArray(value) && Object.keys(value).length === 0) return true;\n  return false;\n}\n\nfunction deepClean(obj) {\n  if (Array.isArray(obj)) {\n    return obj.map(deepClean).filter(v => !isEmpty(v));\n  }\n\n  if (typeof obj === \"object\" && obj !== null) {\n    const cleaned = {};\n    for (const [key, value] of Object.entries(obj)) {\n      const v = deepClean(value);\n      if (!isEmpty(v)) cleaned[key] = v;\n    }\n    return cleaned;\n  }\n\n  return obj;\n}\n\nfunction simplifyAttachments(arr) {\n  if (!Array.isArray(arr)) return [];\n  return arr.map(a => ({\n    content_type: a?.content_type ?? null,\n    file_name: a?.file_name ?? null,\n    content_url: a?.content_url ?? a?.mapped_content_url ?? null,\n  }));\n}\n\n// 3) Build cleaned events\nconst cleanedEvents = [];\n\nfor (const audit of (Array.isArray(audits) ? audits : [])) {\n  const created_at = audit?.created_at; // keep audit.created_at as you intended\n  const events = Array.isArray(audit?.events) ? audit.events : [];\n\n  for (const ev of events) {\n    const eventObj = {\n      created_at,\n      type: ev?.type,\n      public: ev?.public,\n      author_id: ev?.author_id,\n      body: ev?.body,\n      subject: ev?.subject,       // useful for Notification\n      recipients: ev?.recipients, // useful for Notification\n      attachments: simplifyAttachments(ev?.attachments),\n    };\n\n    const cleaned = deepClean(eventObj);\n    if (!isEmpty(cleaned)) cleanedEvents.push(cleaned);\n  }\n}\n\nreturn [\n  {\n    json: {\n      events: cleanedEvents,\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -1376
+      ],
+      "id": "15dc0043-a20d-42fb-b8b1-8f26a0426e04",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a90bb8ba-4643-45b2-a984-81b184c08d69",
+              "name": "events",
+              "value": "={{ $json.events }}",
+              "type": "array"
+            },
+            {
+              "id": "1010c3d5-9b93-459c-97a1-a49e4d51f840",
+              "name": "Latest user comment",
+              "value": "={{ $('Extract Last End-User Comment').first().json.last_end_user_comment }}",
+              "type": "string"
+            },
+            {
+              "id": "814ee038-5f43-4697-b62b-26a21d0f52cf",
+              "name": "Time Elapsed since Last customer reply",
+              "value": "={{ $('Extract Last End-User Comment').first().json.last_end_user_comment\n  ? $now.diff(DateTime.fromISO($('Extract Last End-User Comment').first().json.last_end_user_comment.created_at), ['days','hours','minutes']).toHuman()\n  : 'Customer never replied to our emails'\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1408,
+        -1376
+      ],
+      "id": "68a4ecff-3860-4a1f-8c4b-5bacb4503d5c",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Input Data').item.json.mode }}",
+                    "rightValue": "recent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "71a79dd7-1d0c-47d8-91fc-803454ff245c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Recent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6ae5f1d1-8bba-4189-a34e-dde58c8ddd71",
+                    "leftValue": "={{ $('Prepare Input Data').item.json.mode }}",
+                    "rightValue": "=standard",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Standard"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        -1808
+      ],
+      "id": "513a253c-7d72-4547-9e20-aee09d276b7a",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0].json;\n\nif (!input?.audits || !Array.isArray(input.audits)) {\n  return [{ json: { events: [] } }];\n}\n\n// Flatten all events\nconst allEvents = input.audits.flatMap(audit => {\n  if (!Array.isArray(audit.events)) return [];\n  return audit.events.map(event => ({\n    ...event,\n    audit_id: audit.id,\n    audit_created_at: audit.created_at,\n  }));\n});\n\n// Sort by event.created_at descending\nallEvents.sort((a, b) => {\n  return new Date(b.created_at) - new Date(a.created_at);\n});\n\nreturn [\n  {\n    json: {\n      events: allEvents\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -1792
+      ],
+      "id": "3e625c27-44dd-44b6-ac02-5a8fcbe4f129",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76eb092c-4f8a-499c-9b17-4fbd24826e37",
+              "name": "Recent Events",
+              "value": "={{ $json.events }}",
+              "type": "string"
+            },
+            {
+              "id": "cee2cf81-d254-40ab-b06d-0522b1567c04",
+              "name": "Latest user comment",
+              "value": "={{ $('Extract Last End-User Comment').first().json.last_end_user_comment === null\n\t? 'End-user never commented on the ticket.'\n\t: $('Extract Last End-User Comment').first().json }}",
+              "type": "string"
+            },
+            {
+              "id": "42c0f090-1521-421d-8bdc-9918b06a79da",
+              "name": "Time Elapsed since Last customer reply",
+              "value": "={{ $('Extract Last End-User Comment').first().json.last_end_user_comment\n  ? $now.diff(DateTime.fromISO($('Extract Last End-User Comment').first().json.last_end_user_comment.created_at), ['days','hours','minutes']).toHuman()\n  : 'Customer never replied to our emails'\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        -2016
+      ],
+      "id": "be8eead8-7efa-4e4b-a0ce-f1b9bc46b5c6",
+      "name": "Respond"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a90bb8ba-4643-45b2-a984-81b184c08d69",
+              "name": "events",
+              "value": "={{ $json.events }}",
+              "type": "array"
+            },
+            {
+              "id": "1010c3d5-9b93-459c-97a1-a49e4d51f840",
+              "name": "Latest user comment",
+              "value": "={{ $('Extract Last End-User Comment').first().json.last_end_user_comment === null\n\t? 'End-user never commented on the ticket.'\n\t: $('Extract Last End-User Comment').first().json }}",
+              "type": "string"
+            },
+            {
+              "id": "814ee038-5f43-4697-b62b-26a21d0f52cf",
+              "name": "Time Elapsed since Last customer reply",
+              "value": "={{ $('Extract Last End-User Comment').first().json.last_end_user_comment\n  ? $now.diff(DateTime.fromISO($('Extract Last End-User Comment').first().json.last_end_user_comment.created_at), ['days','hours','minutes']).toHuman()\n  : 'Customer never replied to our emails'\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        -1792
+      ],
+      "id": "efc2c125-fff0-4920-a0b0-b5d536220792",
+      "name": "Standard Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**********************************************************************\n *  “Audits – comments + notifications only”\n *\n *  INPUT  : items from\n *           • Ticket Audit            (page-1)\n *           • Get Next Audit Page     (page-2 … page-N)\n *\n *  OUTPUT : 1 item\n *           {\n *             \"audits\": [\n *                {\n *                  \"id\"        : 23076188830354,\n *                  \"created_at\": \"2024-12-04T23:01:42Z\",\n *                  \"events\"    : [\n *                     { …filtered Comment… },\n *                     { …filtered Notification… }\n *                  ]\n *                },\n *                …\n *             ]\n *           }\n *********************************************************************/\n\n/* ------------------------------------------------------------------ */\n/* 1.  Gather every audits[] array                                     */\n/* ------------------------------------------------------------------ */\nconst allAudits = [];\n\n// first page\nfor (const itm of $items('Ticket Audit')) {\n\tif (Array.isArray(itm.json.audits)) allAudits.push(...itm.json.audits);\n}\n\n// page 2-N\nfor (const itm of $items('Get Next Audit Page')) {\n\tif (Array.isArray(itm.json.audits)) allAudits.push(...itm.json.audits);\n}\n\nif (!allAudits.length) throw new Error('No audits found – check node names');\n\n// guarantee chronological order\nallAudits.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));\n\n/* ------------------------------------------------------------------ */\n/* 2.  Build a Zendesk-like structure with only interesting events     */\n/* ------------------------------------------------------------------ */\nconst filteredAudits = [];\n\nfor (const audit of allAudits) {\n\tconst wantedEvents = [];\n\n\tfor (const ev of audit.events || []) {\n\n\t\tif (ev.type === 'Comment') {\n\t\t\twantedEvents.push({\n\t\t\t\ttype      : 'Comment',\n\t\t\t\tauthor_id : ev.author_id ?? audit.author_id,\n\t\t\t\tpublic    : ev.public,\n\t\t\t\tbody      : ev.plain_body || ev.body || '',\n\t\t\t\tcreated_at: audit.created_at\n\t\t\t});\n\n\t\t} else if (ev.type === 'Notification') {\n\t\t\twantedEvents.push({\n\t\t\t\ttype       : 'Notification',\n\t\t\t\trecipients : ev.recipients || [],\n\t\t\t\tsubject    : ev.subject || '',\n\t\t\t\tbody       : ev.body || '',\n\t\t\t\tcreated_at : audit.created_at\n\t\t\t});\n\t\t}\n\t}\n\n\t// keep only audits that still contain at least one event\n\tif (wantedEvents.length) {\n\t\tfilteredAudits.push({\n\t\t\tid         : audit.id,\n\t\t\tcreated_at : audit.created_at,\n\t\t\tevents     : wantedEvents\n\t\t});\n\t}\n}\n\n/* ------------------------------------------------------------------ */\n/* 3.  Emit one tidy item                                              */\n/* ------------------------------------------------------------------ */\nreturn [{\n\tjson: {\n\t\taudits: filteredAudits          // fully parseable JSON, no stringifying\n\t}\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        -1792
+      ],
+      "id": "c4ae3961-6635-432c-b7d0-d240f072b94f",
+      "name": "Extract only relevant events1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Run Once for All Items\n\nconst input = items[0].json;\n\nif (!input?.audits || !Array.isArray(input.audits)) {\n  return [{ json: { events: [] } }];\n}\n\n// 1. Flatten all events, preserving audit context if needed\nconst allEvents = input.audits.flatMap(audit => {\n  if (!Array.isArray(audit.events)) return [];\n  return audit.events.map(event => ({\n    ...event,\n    audit_id: audit.id,\n    audit_created_at: audit.created_at,\n  }));\n});\n\n// 2. Sort by event.created_at descending (most recent first)\nallEvents.sort((a, b) => {\n  return new Date(b.created_at) - new Date(a.created_at);\n});\n\n// 3. Take the most recent 10\nconst latest10 = allEvents.slice(0, 10);\n\nreturn [\n  {\n    json: {\n      events: latest10\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -2016
+      ],
+      "id": "c76385a6-abf2-40ab-b8f2-9d17a50e09e5",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Need to insert mode correctly. Needs to be set to either 'standard' or 'recent'"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        -1488
+      ],
+      "id": "add21123-a078-4525-9139-dd2927f41990",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ed699c72-4302-4487-bfe2-f57975a81a74",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2992,
+        -400
+      ],
+      "id": "66e87e74-7fd8-47e4-9af8-944e270dd386",
+      "name": "Webhook",
+      "webhookId": "ed699c72-4302-4487-bfe2-f57975a81a74"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "61e58be0-5033-4fb1-a352-e2d0b402a093",
+              "name": "id",
+              "value": "={{ $json.body.id }}",
+              "type": "string"
+            },
+            {
+              "id": "b017f6f6-f174-4ce7-a47d-11618bf228dc",
+              "name": "mode",
+              "value": "={{ $json.body.mode }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2768,
+        -400
+      ],
+      "id": "719559cc-f6f3-46aa-90cf-b9e747c62000",
+      "name": "Set captured values"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "61e58be0-5033-4fb1-a352-e2d0b402a093",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "b017f6f6-f174-4ce7-a47d-11618bf228dc",
+              "name": "mode",
+              "value": "={{ $json.mode }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2288,
+        -288
+      ],
+      "id": "f9bbbc2e-be50-4362-999c-407848a37b01",
+      "name": "Prepare Input Data"
+    }
+  ],
+  "pinData": {
+    "Extract only relevant events": [
+      {
+        "json": {
+          "audits": [
+            {
+              "id": 32818509181458,
+              "created_at": "2026-01-25T23:58:49Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 32818453513490,
+                  "public": false,
+                  "body": "This is a Passport Service (Renewal Application DS-82) Sales Ticket. \n Please be sure to follow the step by step instructions: \n https://govassist.atlassian.net/wiki/spaces/~569726474/pages/23614095440/Passport+Service \n Please be sure to check for other tickets from this customer and merge them as needed. \nApplication URL:\nhttps://admin.govassist.com/ds82/applicant/6976ab067911f8003dd3a48c\n\n \nSite ID: apply.passport.ivs.us\nApplicant Information:\n\nApplicant_ID: 6976ab067911f8003dd3a48c\nApplicant_Status: Photo not uploaded\nApplicant_Payment_Status: Captured\nApplicant_First_Name: Karan\nApplicant_Last_Name: Hazrah\nApplicant_Email: karanhazrah@gmail.com\nApplicant_Birth_Country: IND\nApplicant_Birth_Date: 1983-01-09\nApplicant_Created_At: 2026-01-25 23:45:10\n\n \nPayment Information:\n\nCustomer InformationNameKaran HazrahEmailkaranhazrah@gmail.comPhoneN/AAddressN/ATransaction DetailsOrder IDN/AReference Number11629654823Transaction Date2026-01-25 19:58:43Transaction TypeCHARGEPayment MethodCREDIT_CARDPayment GatewaynmiProductsProduct NamePriceQuantityShipping FeeRenewal: Passport Application DS82$119.00 USD1$19.95 USD4-6 Weeks Standard$0.00 USD1$0.00 USD  ⚠️ Government Fee Status  This order does NOT include any government fees.  Payment SummaryTotal Amount$138.95 USDShipping Fee$19.95 USDPlatform Fee$0.00 USDDiscount$0.00 USD Company Information:\n\n\nSite ID: apply.passport.ivs.us\nSource Site: N/A\n \n \n Show Raw Payment Data \norderId: 11629654823 \nzendeskId: null \nskipZendesk: false \ninvoiceEmail: karanhazrah@gmail.com \nuserEmail: karanhazrah@gmail.com \ninvoiceFirstName: Karan \ninvoiceLastName: Hazrah \ninvoiceAmountUSD: 138.95 \ninvoiceAmount: 138.95 \ncurrency: USD \ninvoiceZipCode: 22193 \nreferenceNumber: 11629654823 \ninvoiceURL: null \ninvoiceInfoURL: null \ntransactionDate: 2026-01-25 19:58:43 \navsResponse: null \ntransactionType: CHARGE \nproductName: Renewal: Passport Application DS82, 4-6 Weeks Standard \ncontractName: Renewal: Passport Application DS82, 4-6 Weeks Standard \ncustomerPhone: null \ncartProducts:\ncartProducts 0:\ncartProducts 0 id: 788 \ncartProducts 0 name: Renewal: Passport Application DS82 \ncartProducts 0 price: 119 \ncartProducts 0 government_fee: 0 \ncartProducts 0 shipping_fee: 19.95 \ncartProducts 0 exclude_from_conversion: false \ncartProducts 0 upsell_id: null \ncartProducts 0 quantity: 1 \ncartProducts 0 service_speed: service_speed_standard \ncartProducts 0 currency: USD \ncartProducts 1:\ncartProducts 1 id: 259 \ncartProducts 1 name: 4-6 Weeks Standard \ncartProducts 1 price: 0 \ncartProducts 1 government_fee: 0 \ncartProducts 1 shipping_fee: 0 \ncartProducts 1 exclude_from_conversion: true \ncartProducts 1 upsell_id: 259 \ncartProducts 1 quantity: 1 \ncartProducts 1 service_speed: service_speed_standard \ncartProducts 1 currency: USD \napplicationId: 6976ab067911f8003dd3a48c \nsite_id: apply.passport.ivs.us \nsalesAgent: null \ncouponCode: null \npaymentGateway: nmi \ncardCountry: UNITED STATES \npaymentCountry: United States \npaymentMethod: CREDIT_CARD \nemailTemplateId: null \nzendeskProduct: null \nshouldCreateZendeskTicket: true \nattachment: null \ngclid: null \nformData: null \nformTitle: null \nsourceSiteId: null \ngeState: null \ngeLocation: null \ngeCountry: null \ngeHavePassport: null \ngeFlow: null \ndiy: null \ntsaStatusInUS: null \ntsaFlow: null \ndiscountValue: 0 \nplatformFee: 0 \nshippingFee: 19.95 \nquantity: 1 \ntotalAmount: 138.95 \ninitialCharge: 138.95 \nserviceSpeed: service_speed_standard \nincludeGovFees: false \nexternal_product_name: null \nexternal_charged_amount: null \nskipReceiptEmail: false",
+                  "created_at": "2026-01-25T23:58:49Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    32818453513490
+                  ],
+                  "subject": "[{{ticket.brand.name}}] We Received your Passport Renewal Application",
+                  "body": "<p>Hello {{ticket.requester.first_name}},<br><br>Thank you for choosing our <b>Passport Renewal Assistance Service (DS-82)</b>. We're here to be your guide through this journey!<br><br>We’ve received your information and will be working on completing your renewal with the U.S. Department of State as quickly as possible. Once that’s done, we’ll be here to walk you through the next steps.<br><br>We’ve created this ticket for you so we can keep you updated and provide any guidance you need along the way. Just reply to this email whenever you need assistance, and we’ll be right on it!*<b><br><br>*Please note: Our service doesn't include the government mandatory fee if not opted upon purchase. By paying, you authorize us to charge your card for the mentioned fee.</b><br><br>To keep everything error-free, we might reach out for a quick confirmation. Processing delays can happen, so please keep your phone close.<br><br>Remember: Once your application is submitted to the U.S. Department of State, you won't be able to use your old passport until the new one arrives.<br><br><p>Finally, let us know how you prefer to be contacted:</p><ul><li>Email and text</li><li>Phone call</li><li>Video call</li></ul><p>You can contact us at:</p><ul><li>Phone📞: <a href=\"tel:+12084708100\">+1 (208) 470-8100</a></li><li>Online 🌐: <a href=\"https://govassist.com/contact\">https://govassist.com/contact</a></li><li>WhatsApp <img src=\"https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg\" alt=\"WhatsApp\" width=\"16\" style=\"vertical-align:middle; margin-right:4px;\">: <a href=\"https://wa.me/12563339906\">Click here to message us</a></li></ul><br><br>Kind regards,<br>Global Support<br>{{ticket.brand.name}} Team, 1629 K St., Suite 300, Washington, D.C. 20006, United States,<br><br><b>Please note:</b> This automatic message has been sent to {{ticket.requester.name}}, along with any additional Passport Renewal applications you have submitted on behalf of others.</p>",
+                  "created_at": "2026-01-25T23:58:49Z"
+                }
+              ]
+            },
+            {
+              "id": 32818497212178,
+              "created_at": "2026-01-25T23:58:50Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": -1,
+                  "public": false,
+                  "body": "We couldn't deliver this message - the customer does not have a phone number",
+                  "created_at": "2026-01-25T23:58:50Z"
+                }
+              ]
+            },
+            {
+              "id": 32818500277778,
+              "created_at": "2026-01-25T23:58:50Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "The applicant has not submitted passport photo. An automated email will be sent to the customer requesting it and an internal comment will be made once that happens. If for some reason the email is not sent, we need to follow up and request it manually.",
+                  "created_at": "2026-01-25T23:58:50Z"
+                }
+              ]
+            },
+            {
+              "id": 32818509201042,
+              "created_at": "2026-01-25T23:58:51Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Initial reply has been sent to the client, please don't resend it.",
+                  "created_at": "2026-01-25T23:58:51Z"
+                }
+              ]
+            },
+            {
+              "id": 32818517427474,
+              "created_at": "2026-01-25T23:58:52Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "The automatic email requesting for a photo was sent to the applicant.",
+                  "created_at": "2026-01-25T23:58:52Z"
+                }
+              ]
+            },
+            {
+              "id": 32818509236242,
+              "created_at": "2026-01-25T23:58:54Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "This client qualifies Online Renewal Customer. Do not proceed with a Physical kit unless it's needed or the customer is not eligible for the online renewal.",
+                  "created_at": "2026-01-25T23:58:54Z"
+                }
+              ]
+            },
+            {
+              "id": 32831807976466,
+              "created_at": "2026-01-26T11:58:46Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "[AUTO_CAPTURE] NMI: Authorization for transaction 11629654823 was captured and completed successfully.",
+                  "created_at": "2026-01-26T11:58:46Z"
+                }
+              ]
+            },
+            {
+              "id": 32831784223122,
+              "created_at": "2026-01-26T11:58:47Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Application PAYMENT status was changed to: CAPTURED",
+                  "created_at": "2026-01-26T11:58:47Z"
+                }
+              ]
+            },
+            {
+              "id": 32848881774354,
+              "created_at": "2026-01-27T00:13:43Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Second photo reminder sent via email and SMS.",
+                  "created_at": "2026-01-27T00:13:43Z"
+                }
+              ]
+            },
+            {
+              "id": 32849397864210,
+              "created_at": "2026-01-27T01:18:25Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": true,
+                  "body": "Hi Karan,l1_guard  Thanks for getting your DS-82 renewal started. The next step we need from you is your passport-style photo upload.  Please upload your photo using this secure link:  Upload&nbsp;passport&nbsp;photo  Quick photo tips: plain/light background, face fully visible, no glasses, no hats, even lighting, and no shadows.  Once your photo is uploaded, we’ll continue with the next review steps. \n\n  Best regards, \n\nJamie Lee\n\nThe GovAssist Brand",
+                  "created_at": "2026-01-27T01:18:25Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    32818453513490
+                  ],
+                  "subject": "[{{ticket.account}}] Re: {{ticket.title}}",
+                  "body": "{% unless ticket.latest_comment.value contains '![Email Tracking pixel](https://backend.growthdot.com' or ticket.ticket_field_360021250320 == '1' or ticket.requester.role != 'End-user' %} <p style=\"height:0;margin:0;\"><img alt='Track Resource' src=\"https://backend.growthdot.com/reply-after-this/{{ticket.id}}_{{ticket.latest_comment.id}}.gif\"></p> {% endunless %}Your Ticket ID ({{ticket.id}}) has been updated. You can reply to this email to provide any additional comments. Your request is currently under review, and we will get back to you as soon as possible.\n{{ticket.comments_formatted}}",
+                  "created_at": "2026-01-27T01:18:25Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    31750668344082
+                  ],
+                  "subject": "[{{ticket.account}}] Assignment: {{ticket.title}}",
+                  "body": "You have been assigned to this ticket (#{{ticket.id}}).\n\n{{ticket.comments_formatted}}",
+                  "created_at": "2026-01-27T01:18:25Z"
+                }
+              ]
+            },
+            {
+              "id": 32849365788690,
+              "created_at": "2026-01-27T01:18:31Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": false,
+                  "body": "UCC hygiene + next step  Renewal type in Zendesk = online_renewal_passport (in-scope).  GET UCC: status=65 (Photo Not Uploaded), paymentStatus=1 (Captured). Occupation present: \"Transport\" (already normalized). employeerOrSchool empty.  Data fix: patched UCC eligibility.nameChanged to false (isNameChanged=false) and cleared additionalNames array (was [\"\"]).  Publicly requested photo upload using ticket field link 25930497547666; set ticket to pending w/ offset 2026-02-10 and assigned to Jamie to prevent unassigned pending.",
+                  "created_at": "2026-01-27T01:18:31Z"
+                }
+              ]
+            },
+            {
+              "id": 32861182039954,
+              "created_at": "2026-01-27T11:28:05Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Portrait photo uploaded by customer",
+                  "created_at": "2026-01-27T11:28:05Z"
+                }
+              ]
+            },
+            {
+              "id": 32861151865618,
+              "created_at": "2026-01-27T11:28:13Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Draft has been sent to the client (Online Renewal Eligible)",
+                  "created_at": "2026-01-27T11:28:13Z"
+                }
+              ]
+            },
+            {
+              "id": 32861172306834,
+              "created_at": "2026-01-27T11:28:13Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Review draft automatically generated and sent to customer after payment and photo upload. Review link: undefined",
+                  "created_at": "2026-01-27T11:28:13Z"
+                }
+              ]
+            },
+            {
+              "id": 32861172329746,
+              "created_at": "2026-01-27T11:28:14Z",
+              "events": [
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    32818453513490
+                  ],
+                  "subject": "Your Online Renewal: Draft created [response required]",
+                  "body": "Hello {{ticket.requester.first_name}},\n\nJust a quick follow-up — thank you again for your patience. As mentioned earlier, your application draft has been completed in the My Travel Gov account we created for you. The document was sent in a separate email, so please make sure to check your inbox and spam/junk folder in case it was filtered.\n\nOnce you’ve had a chance to review the application, we’d just need your confirmation that all the details are accurate so we can move forward with the next step of your application.\n\nIf you notice anything that needs to be corrected or updated, feel free to reply to this email and we’ll take care of it right away.\n\nPlease note that the email address listed on your application is one we’ve created specifically for your case. This allows us to receive updates directly and keep you informed throughout the process.\n\nIf there’s anything else you need, don’t hesitate to reach out to us at +1 (856) 556-3505, through https://govassist.com/contact, or via WhatsApp.",
+                  "created_at": "2026-01-27T11:28:14Z"
+                }
+              ]
+            },
+            {
+              "id": 32861199803154,
+              "created_at": "2026-01-27T11:28:14Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Email has been sent to customer with subject: \"Your Passport Form Application Draft (Attachment included)\"\n \n\n    \n      \n      \n      \n      \n      \n      \n      \n      \n      \n    \n    \n      \n         \n          \n            \n              \n                \n                  \n                    \n                      \n                        \n                          \n                            \n                                    \n                                      \n                                        \n    \n      \n         \n      \n    \n  \n      \n        \n        \n      \n    \n    \n      \n        \n          \n        \n      \n    \n  \n    \n      \n          Hello &nbsp;Karan&nbsp;Hazrah, \n \n \n Thank you for your patience.\n\n\n\nWe’ve prepared a draft of your application, which you can review securely using the link below:   \n      \n    \n  \n    \n      \n         \n  \n    \n      \n        \n           \n        \n      \n      \n        \n           \n               https://doc-review.govassist.com/?docid=6978a14c1c53c301581c0818 \n           \n        \n      \n    \n  \n   \n\n      \n    \n  \n    \n      \n          Please take a moment to carefully review the document. If everything looks correct, you can confirm it directly through the link. If you spot any mistakes or need updates, you’ll have the option to request changes there as well. \n \n \n Once we receive your confirmation, we’ll proceed with the next steps.\n\n&nbsp; \n Kind regards,&nbsp; \n \n \n GovAssist Global Support Team&nbsp;   \n      \n    \n  \n    \n      \n         If you have questions or concerns, please contact our GovAssist Global Support Team. \n\n\t\t\t By obtaining services from our website you have agreed to the following: \n\n\t\t\t Terms of Use | Refund Policy | Privacy Policy | Disclaimer \n\n\t\t\t GovAssist LLC 1629 K St., Suite 300, Washington, D.C. 20006, United States, +1-856-556-3505",
+                  "created_at": "2026-01-27T11:28:14Z"
+                }
+              ]
+            },
+            {
+              "id": 32861200129938,
+              "created_at": "2026-01-27T11:28:17Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "The customer was informed about the completed draft.",
+                  "created_at": "2026-01-27T11:28:17Z"
+                }
+              ]
+            },
+            {
+              "id": 32861191431826,
+              "created_at": "2026-01-27T11:29:27Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "[11:29 UTC] Portrait photo uploaded by customer \n \n [11:29 UTC] Portrait photo uploaded by customer",
+                  "created_at": "2026-01-27T11:29:27Z"
+                }
+              ]
+            },
+            {
+              "id": 32886552194706,
+              "created_at": "2026-01-28T09:04:22Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": false,
+                  "body": "Run update (DS-82 Online)  Renewal type verified: online_renewal_passport (in-scope). UCC checked: status moved from Draft sent to client (status=72) to Bot in progress (status=2) after submission initiation; paymentStatus=1 (Captured). Occupation present/clean: \"Transport\"; employer/school empty (OK). Name aligned with passport book name (KARAN HAZRAH).  Action taken: Ran DS-82 submission (applicationId 6976ab067911f8003dd3a48c) — queue message sent successfully.  Note: Wait tool returned error (\"Workflow does not exist\"), so I could not pause in-run to observe completion. Scheduled follow-up to re-check UCC status and proceed based on result (Submitted &amp; Paid vs error).",
+                  "created_at": "2026-01-28T09:04:22Z"
+                }
+              ]
+            },
+            {
+              "id": 32886648546322,
+              "created_at": "2026-01-28T09:06:25Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Passport Book (Government Fee) Charge Failed  Fee charge attempt failed   Original transaction id: 11629654823  Amount: 149  Status: failed  Failure reason: Insufficient funds  Charged at: 2026-01-28 05:06:25  Type: Passport Book (Government Fee)",
+                  "created_at": "2026-01-28T09:06:25Z"
+                }
+              ]
+            },
+            {
+              "id": 32886587242002,
+              "created_at": "2026-01-28T09:06:26Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "undefined undefined:Application status was changed to: BOT - PAYMENT FAILED",
+                  "created_at": "2026-01-28T09:06:26Z"
+                }
+              ]
+            },
+            {
+              "id": 32896589888658,
+              "created_at": "2026-01-28T14:07:19Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "[14:07 UTC] Portrait photo uploaded by customer \n \n [14:07 UTC] Portrait photo uploaded by customer",
+                  "created_at": "2026-01-28T14:07:19Z"
+                }
+              ]
+            },
+            {
+              "id": 32898714447634,
+              "created_at": "2026-01-28T15:06:53Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Passport Book (Government Fee) Charge Failed  Fee charge attempt failed   Original transaction id: 11629654823  Amount: 149  Status: failed  Failure reason: Insufficient funds  Charged at: 2026-01-28 11:06:52  Type: Passport Book (Government Fee)",
+                  "created_at": "2026-01-28T15:06:53Z"
+                }
+              ]
+            },
+            {
+              "id": 32898699304978,
+              "created_at": "2026-01-28T15:06:54Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "undefined undefined:Application status was changed to: BOT - PAYMENT FAILED",
+                  "created_at": "2026-01-28T15:06:54Z"
+                }
+              ]
+            },
+            {
+              "id": 32908963413778,
+              "created_at": "2026-01-29T00:12:40Z",
+              "events": [
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    32818453513490
+                  ],
+                  "subject": "Stay Safe Online: Important Security Tips from {{ticket.brand.name}}",
+                  "body": "<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Important Security Tips</title>\n    <style>\n        body {\n            font-family: Arial, sans-serif;\n            line-height: 1.8;\n            margin: 0;\n            padding: 0;\n            background-color: #f4f4f4;\n            font-size: 18px;\n        }\n        .email-container {\n            max-width: 800px;\n            margin: 0 auto;\n            padding: 20px;\n            background-color: white;\n            border-radius: 8px;\n            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\n        }\n        h1 {\n            color: #003366;\n            font-size: 26px;\n        }\n        h2 {\n            color: #00509E;\n            margin-top: 20px;\n            font-size: 22px;\n        }\n        ul {\n            padding-left: 25px;\n        }\n        p {\n            margin-bottom: 15px;\n        }\n    </style>\n</head>\n<body>\n<div class=\"email-container\">\n    <h1>Dear {{ticket.requester.first_name}},</h1>\n    <p>At {{ticket.brand.name}}, your trust and security are our top priorities. As a company providing online travel support—including visa document preparation, interview scheduling, and assistance with U.S. Embassy accounts—we take every step to ensure your personal information is protected.</p>\n    <p>Please take a moment to review the following important tips to protect yourself against phishing scams and online fraud:</p>\n\n    <h2>How to Stay Safe:</h2>\n    <ul>\n        <li>Only trust emails and messages from official {{ticket.brand.name}} addresses (ending in @{{ticket.brand.name}}.com). If something looks suspicious, contact us before clicking.</li>\n        <li>Never share your U.S. Embassy account credentials with anyone. We create and deliver these credentials securely—{{ticket.brand.name}} will never ask you to re-enter them through any third-party link, except when accessing the official U.S. Embassy website.</li>\n        <li>Be cautious of ads, pop-ups, or messages claiming to be from the U.S. Embassy, {{ticket.brand.name}}, or other official sources. Always verify the source before clicking.</li>\n        <li>Protect your passport account details, credit card information, and saved documents on your device with strong passwords and updated antivirus software.</li>\n        <li>Avoid downloading attachments or clicking links from unknown senders. These can be used to steal personal data or infect your device.</li>\n        <li>Look for small signs of phishing: strange URLs, poor grammar, or urgent language asking for immediate action.</li>\n        <li>Only fill out official forms using links we provide or those hosted on .gov domains or verified {{ticket.brand.name}} channels.</li>\n    </ul>\n\n    <h2>We're Here to Help</h2>\n    <p>If you ever suspect that your account or personal data may have been compromised, please contact our support team immediately at <strong>support@{{ticket.brand.name}}.com</strong></p>\n    <p>We’re committed to helping you travel with peace of mind and will continue to work diligently to protect your information.</p>\n\n    <p><strong>Stay safe,<br>The {{ticket.brand.name}} Team<br>Your Trusted Partner in Global Travel</strong></p>\n</div>\n</body>\n</html>\n",
+                  "created_at": "2026-01-29T00:12:40Z"
+                }
+              ]
+            },
+            {
+              "id": 32910413224466,
+              "created_at": "2026-01-29T03:14:19Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": true,
+                  "body": "Hi Karan,  l1_guardThank you for uploading your passport photo and completing the draft review step.  When we attempted to pay the required U.S. government passport fee so we can submit your renewal, the payment did not go through (reason returned: insufficient funds). Until the government fee is paid, we can’t complete the submission.  Please use the secure link below to complete the government fee payment for your application:  Pay&nbsp;government&nbsp;fee  Once that payment is completed, we’ll proceed with the submission right away. \n\n  Best regards, \n\nJamie Lee\n\nThe GovAssist Brand",
+                  "created_at": "2026-01-29T03:14:19Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    32818453513490
+                  ],
+                  "subject": "[{{ticket.account}}] Re: {{ticket.title}}",
+                  "body": "{% unless ticket.latest_comment.value contains '![Email Tracking pixel](https://backend.growthdot.com' or ticket.ticket_field_360021250320 == '1' or ticket.requester.role != 'End-user' %} <p style=\"height:0;margin:0;\"><img alt='Track Resource' src=\"https://backend.growthdot.com/reply-after-this/{{ticket.id}}_{{ticket.latest_comment.id}}.gif\"></p> {% endunless %}Your Ticket ID ({{ticket.id}}) has been updated. You can reply to this email to provide any additional comments. Your request is currently under review, and we will get back to you as soon as possible.\n{{ticket.comments_formatted}}",
+                  "created_at": "2026-01-29T03:14:19Z"
+                }
+              ]
+            },
+            {
+              "id": 32910446958738,
+              "created_at": "2026-01-29T03:14:29Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": false,
+                  "body": "Gov fee payment failed workflow executed  Evidence: IT notes 2026-01-28 09:06Z and 15:06Z: “Passport Book (Government Fee) Charge Failed” (insufficient funds). UCC currently shows Payment failed (status=51), paymentStatus=1 (Captured for service fee).  Actions this run: Patched UCC status to Pending submission (status=1). Sent customer gov-fee payment link (book only): https://payments.govassist.com/762/6976ab067911f8003dd3a48c?force_upsells=304. Set Zendesk to pending with offset 2026-02-13. Ticket remains assigned to Jamie.  Next step: When IT posts “This client made a new payment for the same application.” run DS-82 submission once and monitor for Submitted &amp; Paid (status=5).",
+                  "created_at": "2026-01-29T03:14:29Z"
+                }
+              ]
+            },
+            {
+              "id": 32910386282130,
+              "created_at": "2026-01-29T03:15:44Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": true,
+                  "body": "Hi Karan,  l1_guard  Thanks again for completing your photo upload and draft review.  At the submission step, the required U.S. government passport fee payment did not go through (the response returned was “insufficient funds”), so we can’t complete the submission until that payment is successfully processed.  Please use the secure link below to complete the government fee payment for your application:  Pay&nbsp;government&nbsp;fee  Once that’s completed, we’ll proceed with the submission right away. \n\n  Best regards, \n\nJamie Lee\n\nThe GovAssist Brand",
+                  "created_at": "2026-01-29T03:15:44Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    32818453513490
+                  ],
+                  "subject": "[{{ticket.account}}] Re: {{ticket.title}}",
+                  "body": "{% unless ticket.latest_comment.value contains '![Email Tracking pixel](https://backend.growthdot.com' or ticket.ticket_field_360021250320 == '1' or ticket.requester.role != 'End-user' %} <p style=\"height:0;margin:0;\"><img alt='Track Resource' src=\"https://backend.growthdot.com/reply-after-this/{{ticket.id}}_{{ticket.latest_comment.id}}.gif\"></p> {% endunless %}Your Ticket ID ({{ticket.id}}) has been updated. You can reply to this email to provide any additional comments. Your request is currently under review, and we will get back to you as soon as possible.\n{{ticket.comments_formatted}}",
+                  "created_at": "2026-01-29T03:15:44Z"
+                }
+              ]
+            },
+            {
+              "id": 32916230427282,
+              "created_at": "2026-01-29T09:08:05Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Passport Book (Government Fee) Charge Failed  Fee charge attempt failed   Original transaction id: 11629654823  Amount: 149  Status: failed  Failure reason: Insufficient funds  Charged at: 2026-01-29 05:08:04  Type: Passport Book (Government Fee)",
+                  "created_at": "2026-01-29T09:08:05Z"
+                }
+              ]
+            },
+            {
+              "id": 32916216648210,
+              "created_at": "2026-01-29T09:08:06Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "undefined undefined:Application status was changed to: BOT - PAYMENT FAILED",
+                  "created_at": "2026-01-29T09:08:06Z"
+                }
+              ]
+            },
+            {
+              "id": 32924045270802,
+              "created_at": "2026-01-29T13:14:58Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": true,
+                  "body": "Hi Karan, l1_guard Thanks again for completing your photo upload and reviewing the draft.  At the submission step, the required U.S. Department of State government passport fee payment did not go through (the response returned was “insufficient funds”), so we can’t complete the submission until that payment is successfully processed.  Please use the secure link below to complete the government fee payment for your application:  Pay&nbsp;government&nbsp;fee  Once it’s completed, we’ll proceed with the submission right away. \n\n  Best regards, \n\nJamie Lee\n\nThe GovAssist Brand",
+                  "created_at": "2026-01-29T13:14:58Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    32818453513490
+                  ],
+                  "subject": "[{{ticket.account}}] Re: {{ticket.title}}",
+                  "body": "{% unless ticket.latest_comment.value contains '![Email Tracking pixel](https://backend.growthdot.com' or ticket.ticket_field_360021250320 == '1' or ticket.requester.role != 'End-user' %} <p style=\"height:0;margin:0;\"><img alt='Track Resource' src=\"https://backend.growthdot.com/reply-after-this/{{ticket.id}}_{{ticket.latest_comment.id}}.gif\"></p> {% endunless %}Your Ticket ID ({{ticket.id}}) has been updated. You can reply to this email to provide any additional comments. Your request is currently under review, and we will get back to you as soon as possible.\n{{ticket.comments_formatted}}",
+                  "created_at": "2026-01-29T13:14:58Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    31750668344082
+                  ],
+                  "subject": "[{{ticket.account}}] Re: {{ticket.title}}",
+                  "body": "This ticket (#{{ticket.id}}) has been updated.\n\n{{ticket.comments_formatted}}",
+                  "created_at": "2026-01-29T13:14:58Z"
+                }
+              ]
+            },
+            {
+              "id": 32935455067538,
+              "created_at": "2026-01-29T21:17:56Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Passport Book (Government Fee) Charge Failed  Fee charge attempt failed   Original transaction id: 11629654823  Amount: 149  Status: failed  Failure reason: Insufficient funds  Charged at: 2026-01-29 17:17:55  Type: Passport Book (Government Fee)",
+                  "created_at": "2026-01-29T21:17:56Z"
+                }
+              ]
+            },
+            {
+              "id": 32935455080594,
+              "created_at": "2026-01-29T21:17:56Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Dear Karan Hazrah, \n\n We're pleased to inform you that your U.S. Passport Online Renewal application is now ready for the final step of paying the government fee. \n\n To streamline the process, the U.S. Department of State recently updated its application platform. Everything has been fully prepared on our end, and we are now waiting for your final payment to proceed with the submission. \n\n As agreed, the government fee is charged separately. However, our attempt to process this payment was unsuccessful. \n\n Please click the link below to pay the official government fee for your Passport Online Renewal application:\n\nhttps://payments.govassist.com/792?force_upsells=304 \n\n Once your payment is completed, we will immediately submit your application and keep you updated on its progress. \n\n A quick note about fees and process: \n \n The 138.95 USD previously paid covers our processing and review service. The 149.00 USD additional fee covers the government fee paid to the U.S. Department of State. \n Please note that the email address listed on your application was created specifically for this renewal process to ensure smooth coordination. \n After the payment and submission, your current passport will no longer be valid for travel until your new one is issued and delivered. \n \n\n Thank you for your prompt attention to this final step. We truly appreciate your trust in us throughout your renewal process. \n\n You can contact us at: https://govassist.com/contact or reply to this email. \n\n Best regards,\n\nGovAssist Global Support",
+                  "created_at": "2026-01-29T21:17:56Z"
+                }
+              ]
+            },
+            {
+              "id": 32935421126418,
+              "created_at": "2026-01-29T21:17:57Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "undefined undefined:Application status was changed to: BOT - PAYMENT FAILED",
+                  "created_at": "2026-01-29T21:17:57Z"
+                }
+              ]
+            },
+            {
+              "id": 32937728468114,
+              "created_at": "2026-01-30T01:02:07Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": true,
+                  "body": "Hi Karan,  l1_guard  Thanks for completing your photo upload and reviewing the draft.  When we attempted to pay the required U.S. Department of State government fee to finalize submission, the payment did not go through (the response returned was “insufficient funds”). Until that government fee is successfully paid, we can’t complete the submission.  Please use the secure link below to complete the government fee payment for your application:  Pay&nbsp;government&nbsp;fee  Once the payment is completed, we’ll proceed with the submission right away and keep you updated. \n\n  Best regards, \n\nJamie Lee\n\nThe GovAssist Brand",
+                  "created_at": "2026-01-30T01:02:07Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    32818453513490
+                  ],
+                  "subject": "[{{ticket.account}}] Re: {{ticket.title}}",
+                  "body": "{% unless ticket.latest_comment.value contains '![Email Tracking pixel](https://backend.growthdot.com' or ticket.ticket_field_360021250320 == '1' or ticket.requester.role != 'End-user' %} <p style=\"height:0;margin:0;\"><img alt='Track Resource' src=\"https://backend.growthdot.com/reply-after-this/{{ticket.id}}_{{ticket.latest_comment.id}}.gif\"></p> {% endunless %}Your Ticket ID ({{ticket.id}}) has been updated. You can reply to this email to provide any additional comments. Your request is currently under review, and we will get back to you as soon as possible.\n{{ticket.comments_formatted}}",
+                  "created_at": "2026-01-30T01:02:07Z"
+                }
+              ]
+            },
+            {
+              "id": 32938604608402,
+              "created_at": "2026-01-30T03:07:20Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Passport Book (Government Fee) Charge Failed  Fee charge attempt failed   Original transaction id: 11629654823  Amount: 149  Status: failed  Failure reason: Insufficient funds  Charged at: 2026-01-29 23:07:19  Type: Passport Book (Government Fee)",
+                  "created_at": "2026-01-30T03:07:20Z"
+                }
+              ]
+            },
+            {
+              "id": 32938612304914,
+              "created_at": "2026-01-30T03:07:20Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Dear Karan Hazrah, \n\n We're pleased to inform you that your U.S. Passport Online Renewal application is now ready for the final step of paying the government fee. \n\n To streamline the process, the U.S. Department of State recently updated its application platform. Everything has been fully prepared on our end, and we are now waiting for your final payment to proceed with the submission. \n\n As agreed, the government fee is charged separately. However, our attempt to process this payment was unsuccessful. \n\n Please click the link below to pay the official government fee for your Passport Online Renewal application:\n\nhttps://payments.govassist.com/792?force_upsells=304 \n\n Once your payment is completed, we will immediately submit your application and keep you updated on its progress. \n\n A quick note about fees and process: \n \n The 138.95 USD previously paid covers our processing and review service. The 149.00 USD additional fee covers the government fee paid to the U.S. Department of State. \n Please note that the email address listed on your application was created specifically for this renewal process to ensure smooth coordination. \n After the payment and submission, your current passport will no longer be valid for travel until your new one is issued and delivered. \n \n\n Thank you for your prompt attention to this final step. We truly appreciate your trust in us throughout your renewal process. \n\n You can contact us at: https://govassist.com/contact or reply to this email. \n\n Best regards,\n\nGovAssist Global Support",
+                  "created_at": "2026-01-30T03:07:20Z"
+                }
+              ]
+            },
+            {
+              "id": 32938620443026,
+              "created_at": "2026-01-30T03:07:21Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "undefined undefined:Application status was changed to: BOT - PAYMENT FAILED",
+                  "created_at": "2026-01-30T03:07:21Z"
+                }
+              ]
+            },
+            {
+              "id": 32945886191506,
+              "created_at": "2026-01-30T10:04:09Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": true,
+                  "body": "Hi Karan,  l1_guard  Thanks again for completing your photo upload and draft review.  At the final submission step, the required U.S. Department of State government fee payment ($149) did not go through (the response returned was “insufficient funds”). Until that government fee is successfully paid, we can’t complete the submission.  Please use the secure link below to complete the government fee payment for your application:  Pay&nbsp;government&nbsp;fee  Once the payment is completed, we’ll proceed with the submission right away and keep you updated here. \n\n  Best regards, \n\nJamie Lee\n\nThe GovAssist Brand",
+                  "created_at": "2026-01-30T10:04:09Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    32818453513490
+                  ],
+                  "subject": "[{{ticket.account}}] Re: {{ticket.title}}",
+                  "body": "{% unless ticket.latest_comment.value contains '![Email Tracking pixel](https://backend.growthdot.com' or ticket.ticket_field_360021250320 == '1' or ticket.requester.role != 'End-user' %} <p style=\"height:0;margin:0;\"><img alt='Track Resource' src=\"https://backend.growthdot.com/reply-after-this/{{ticket.id}}_{{ticket.latest_comment.id}}.gif\"></p> {% endunless %}Your Ticket ID ({{ticket.id}}) has been updated. You can reply to this email to provide any additional comments. Your request is currently under review, and we will get back to you as soon as possible.\n{{ticket.comments_formatted}}",
+                  "created_at": "2026-01-30T10:04:09Z"
+                }
+              ]
+            },
+            {
+              "id": 32949611018258,
+              "created_at": "2026-01-30T12:05:46Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Dear Karan Hazrah, \n\n We're pleased to inform you that your U.S. Passport Online Renewal application is now ready for the final step of paying the government fee. \n\n To streamline the process, the U.S. Department of State recently updated its application platform. Everything has been fully prepared on our end, and we are now waiting for your final payment to proceed with the submission. \n\n As agreed, the government fee is charged separately. However, our attempt to process this payment was unsuccessful. \n\n Please click the link below to pay the official government fee for your Passport Online Renewal application:\n\nhttps://payments.govassist.com/792?force_upsells=304 \n\n Once your payment is completed, we will immediately submit your application and keep you updated on its progress. \n\n A quick note about fees and process: \n \n The 138.95 USD previously paid covers our processing and review service. The 149.00 USD additional fee covers the government fee paid to the U.S. Department of State. \n Please note that the email address listed on your application was created specifically for this renewal process to ensure smooth coordination. \n After the payment and submission, your current passport will no longer be valid for travel until your new one is issued and delivered. \n \n\n Thank you for your prompt attention to this final step. We truly appreciate your trust in us throughout your renewal process. \n\n You can contact us at: https://govassist.com/contact or reply to this email. \n\n Best regards,\n\nGovAssist Global Support",
+                  "created_at": "2026-01-30T12:05:46Z"
+                }
+              ]
+            },
+            {
+              "id": 32949656406418,
+              "created_at": "2026-01-30T12:05:46Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Passport Book (Government Fee) Charge Failed  Fee charge attempt failed   Original transaction id: 11629654823  Amount: 149  Status: failed  Failure reason: Insufficient funds  Charged at: 2026-01-30 08:05:45  Type: Passport Book (Government Fee)",
+                  "created_at": "2026-01-30T12:05:46Z"
+                }
+              ]
+            },
+            {
+              "id": 32949649924370,
+              "created_at": "2026-01-30T12:05:47Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "undefined undefined:Application status was changed to: BOT - PAYMENT FAILED",
+                  "created_at": "2026-01-30T12:05:47Z"
+                }
+              ]
+            },
+            {
+              "id": 32960761556114,
+              "created_at": "2026-01-30T19:33:09Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": true,
+                  "body": "Hi Karan,  l1_guard  Thanks again for completing your photo upload and draft review.  To finalize submission, the required U.S. Department of State government fee payment ($149) still needs to be completed. Our prior attempt was returned as “insufficient funds”, so submission can’t be completed until the government fee is successfully paid.  Pay&nbsp;government&nbsp;fee  Once that payment is completed, we’ll proceed with the submission right away and keep you updated here. \n\n  Best regards, \n\nJamie Lee\n\nThe GovAssist Brand",
+                  "created_at": "2026-01-30T19:33:09Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    32818453513490
+                  ],
+                  "subject": "[{{ticket.account}}] Re: {{ticket.title}}",
+                  "body": "{% unless ticket.latest_comment.value contains '![Email Tracking pixel](https://backend.growthdot.com' or ticket.ticket_field_360021250320 == '1' or ticket.requester.role != 'End-user' %} <p style=\"height:0;margin:0;\"><img alt='Track Resource' src=\"https://backend.growthdot.com/reply-after-this/{{ticket.id}}_{{ticket.latest_comment.id}}.gif\"></p> {% endunless %}Your Ticket ID ({{ticket.id}}) has been updated. You can reply to this email to provide any additional comments. Your request is currently under review, and we will get back to you as soon as possible.\n{{ticket.comments_formatted}}",
+                  "created_at": "2026-01-30T19:33:09Z"
+                }
+              ]
+            },
+            {
+              "id": 32960812241682,
+              "created_at": "2026-01-30T19:33:19Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": false,
+                  "body": "Run summary (DS-82 Online)  UCC verified: status=Payment failed (status=51), paymentStatus=Captured (paymentStatus=1), renewal eligible=true, documentTypeForPDF book-only, occupation=\"Transport\" (already compliant), employer/school empty.  Actions taken  1) Patched UCC status to Pending submission (status=1) per gov-fee-charge-failed workflow.  2) Sent customer correct gov-fee payment link (book-only): https://payments.govassist.com/762/6976ab067911f8003dd3a48c?force_upsells=304 (replacing incorrect generic /792 link seen in IT notes).  3) Set Zendesk to pending; kept existing pending offset date (2026-02-14) to avoid shortening the waiting window.  Next step  Wait for IT note: “This client made a new payment for the same application.” Then run DS-82 submission once (if no prior Submitted &amp; Paid evidence).",
+                  "created_at": "2026-01-30T19:33:19Z"
+                }
+              ]
+            },
+            {
+              "id": 32962018764050,
+              "created_at": "2026-01-30T21:05:22Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Passport Book (Government Fee) Charge Failed  Fee charge attempt failed   Original transaction id: 11629654823  Amount: 149  Status: failed  Failure reason: Insufficient funds  Charged at: 2026-01-30 17:05:21  Type: Passport Book (Government Fee)",
+                  "created_at": "2026-01-30T21:05:22Z"
+                }
+              ]
+            },
+            {
+              "id": 32962046762642,
+              "created_at": "2026-01-30T21:05:22Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Dear Karan Hazrah, \n\n We're pleased to inform you that your U.S. Passport Online Renewal application is now ready for the final step of paying the government fee. \n\n To streamline the process, the U.S. Department of State recently updated its application platform. Everything has been fully prepared on our end, and we are now waiting for your final payment to proceed with the submission. \n\n As agreed, the government fee is charged separately. However, our attempt to process this payment was unsuccessful. \n\n Please click the link below to pay the official government fee for your Passport Online Renewal application:\n\nhttps://payments.govassist.com/792?force_upsells=304 \n\n Once your payment is completed, we will immediately submit your application and keep you updated on its progress. \n\n A quick note about fees and process: \n \n The 138.95 USD previously paid covers our processing and review service. The 149.00 USD additional fee covers the government fee paid to the U.S. Department of State. \n Please note that the email address listed on your application was created specifically for this renewal process to ensure smooth coordination. \n After the payment and submission, your current passport will no longer be valid for travel until your new one is issued and delivered. \n \n\n Thank you for your prompt attention to this final step. We truly appreciate your trust in us throughout your renewal process. \n\n You can contact us at: https://govassist.com/contact or reply to this email. \n\n Best regards,\n\nGovAssist Global Support",
+                  "created_at": "2026-01-30T21:05:22Z"
+                }
+              ]
+            },
+            {
+              "id": 32962062945042,
+              "created_at": "2026-01-30T21:05:23Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "undefined undefined:Application status was changed to: BOT - PAYMENT FAILED",
+                  "created_at": "2026-01-30T21:05:23Z"
+                }
+              ]
+            },
+            {
+              "id": 32996107688978,
+              "created_at": "2026-02-01T22:40:07Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": true,
+                  "body": "Hi Karan,  l1_guardWe have everything ready to submit your U.S. passport online renewal, but the required U.S. Department of State government fee payment ($149) did not go through previously (returned as “insufficient funds”).  Please complete the government fee payment using the secure link below so we can finalize submission:  Pay&nbsp;government&nbsp;fee  Once it’s completed, we’ll proceed with the submission right away and keep you updated here. \n\n  Best regards, \n\nJamie Lee\n\nThe GovAssist Brand",
+                  "created_at": "2026-02-01T22:40:07Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    32818453513490
+                  ],
+                  "subject": "[{{ticket.account}}] Re: {{ticket.title}}",
+                  "body": "{% unless ticket.latest_comment.value contains '![Email Tracking pixel](https://backend.growthdot.com' or ticket.ticket_field_360021250320 == '1' or ticket.requester.role != 'End-user' %} <p style=\"height:0;margin:0;\"><img alt='Track Resource' src=\"https://backend.growthdot.com/reply-after-this/{{ticket.id}}_{{ticket.latest_comment.id}}.gif\"></p> {% endunless %}Your Ticket ID ({{ticket.id}}) has been updated. You can reply to this email to provide any additional comments. Your request is currently under review, and we will get back to you as soon as possible.\n{{ticket.comments_formatted}}",
+                  "created_at": "2026-02-01T22:40:07Z"
+                }
+              ]
+            },
+            {
+              "id": 32996108104594,
+              "created_at": "2026-02-01T22:40:16Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 31750668344082,
+                  "public": false,
+                  "body": "Run update (DS-82 Online)  Ticket verified in-scope: Renewal type field 22887783848850=online_renewal_passport.  UCC check (2026-02-01): status=Payment failed (status=51); paymentStatus=Captured (paymentStatus=1); documentTypeForPDF book-only; isNameChanged=false; eligibility.nameChanged=false; occupation=\"Transport\" (already compliant); photoUploadedToZendesk=true.  Actions this run:  1) Patched UCC status to Pending submission (status=1) per gov-fee-charge-failed workflow (patch success).  2) Sent customer the correct application-specific government-fee payment link (762/{applicationId} with force_upsells=304) and replaced the incorrect generic /792 link seen in prior automation notes.  3) Set Zendesk to pending with offset 2026-02-16 (14-day wait + buffer per offset rule). Ticket remains assigned to Jamie.  Next step: Wait for internal confirmation note: “This client made a new payment for the same application.” Then run DS-82 submission bot once and monitor for Submitted and Paid (status=5).",
+                  "created_at": "2026-02-01T22:40:16Z"
+                }
+              ]
+            },
+            {
+              "id": 32997643477778,
+              "created_at": "2026-02-02T02:14:46Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 32818453513490,
+                  "public": true,
+                  "body": "Sorry I’ve decided to withdraw my application plz return my money!!!\n Sent from my iPhone",
+                  "created_at": "2026-02-02T02:14:46Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    32818453513490
+                  ],
+                  "subject": "[{{ticket.account}}] Re: {{ticket.title}}",
+                  "body": "{% unless ticket.latest_comment.value contains '![Email Tracking pixel](https://backend.growthdot.com' or ticket.ticket_field_360021250320 == '1' or ticket.requester.role != 'End-user' %} <p style=\"height:0;margin:0;\"><img alt='Track Resource' src=\"https://backend.growthdot.com/reply-after-this/{{ticket.id}}_{{ticket.latest_comment.id}}.gif\"></p> {% endunless %}Your Ticket ID ({{ticket.id}}) has been updated. You can reply to this email to provide any additional comments. Your request is currently under review, and we will get back to you as soon as possible.\n{{ticket.comments_formatted}}",
+                  "created_at": "2026-02-02T02:14:46Z"
+                },
+                {
+                  "type": "Notification",
+                  "recipients": [
+                    31750668344082
+                  ],
+                  "subject": "[{{ticket.account}}] Re: {{ticket.title}}",
+                  "body": "This ticket (#{{ticket.id}}) has been updated.\n\n{{ticket.comments_formatted}}",
+                  "created_at": "2026-02-02T02:14:46Z"
+                }
+              ]
+            },
+            {
+              "id": 33016914819730,
+              "created_at": "2026-02-02T15:13:24Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "undefined undefined:Application status was changed to: BOT - PAYMENT FAILED",
+                  "created_at": "2026-02-02T15:13:24Z"
+                }
+              ]
+            },
+            {
+              "id": 33016986856338,
+              "created_at": "2026-02-02T15:14:22Z",
+              "events": [
+                {
+                  "type": "Comment",
+                  "author_id": 4602485547794,
+                  "public": false,
+                  "body": "Passport Book (Government Fee) Charged Successfully  Fee has been charged successfully   Original transaction id: 11629654823  Fee transaction id: 11659127490  Amount: 149  Status: successful  Charged at: 2026-02-02 11:14:21  Type: Passport Book (Government Fee)    Email Sent to Customer \n\n\n\n    \n    \n    Government Fee Charged\n    \n\n\n\n     \n        \n\n         \n             Hi Karan, \n\n             We wanted to let you know that we have charged the U.S. government passport fee to your card. This is a separate charge from your GovAssist service fee and goes directly to the government for processing your passport application. \n\n             Charge details \n             \n                 \n                     Amount charged: $149.00 \n                     Transaction ID: 11659127490 \n                     Original order: 11629654823 \n                     Date: February 2, 2026 \n                 \n             \n\n             What happens next \n             Your passport application and government fee have been submitted to the U.S. Department of State. You will receive status updates via email as your application progresses through processing. \n\n             Common questions \n\n             Why was I charged twice? \n             The first charge was for GovAssist's professional assistance service. This second charge is the official government passport fee, which is required by the U.S. Department of State to process your application. When you signed up, you authorized us to pay this fee on your behalf. \n\n             Is this a legitimate charge? \n             Yes. This charge was authorized when you completed your application with us. The government fee is mandatory for all passport applications. \n\n             What if I have questions? \n             Our support team is here to help. Simply reply to this email or contact us through our website. \n\n             \n                 Thanks,\nGovAssist Support \n             \n\n             \n                 © 2026 GovAssist. All rights reserved.",
+                  "created_at": "2026-02-02T15:14:22Z"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "david-ga.up.railway.app",
+            "user-agent": "ElevenLabs/1.0",
+            "content-length": "36",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "34.59.11.47",
+            "x-forwarded-host": "david-ga.up.railway.app",
+            "x-forwarded-proto": "https",
+            "x-railway-edge": "railway/us-west2",
+            "x-railway-request-id": "4fXXbv1NQieQRr7in6XIxQ",
+            "x-real-ip": "34.59.11.47",
+            "x-request-start": "1773836443112"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "id": 20726913,
+            "mode": "standard"
+          },
+          "webhookUrl": "https://david-ga.up.railway.app/webhook/get_ticket_events",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "id": "27361532",
+          "mode": "standard"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "invalid resource requested": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Prepare Input Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Loop Vars": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Next Audit Page": {
+      "main": [
+        [
+          {
+            "node": "Set Next Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Next Loop": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Last End-User Comment": {
+      "main": [
+        [
+          {
+            "node": "Extract only relevant events1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Multi-page audit?": {
+      "main": [
+        [
+          {
+            "node": "Set Loop Vars",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract Last End-User Comment1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract comments and notifications",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Extract Last End-User Comment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract only relevant events": {
+      "main": [
+        [
+          {
+            "node": "Extract key values to be used2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Get Next Audit Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Last End-User Comment1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Extract key values to be used1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract key values to be used1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract key values to be used2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract comments and notifications": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Ticket Audit": {
+      "main": [
+        [
+          {
+            "node": "Multi-page audit?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "invalid resource requested",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "Standard Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract only relevant events1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set captured values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set captured values": {
+      "main": [
+        [
+          {
+            "node": "Prepare Input Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Input Data": {
+      "main": [
+        [
+          {
+            "node": "Ticket Audit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "528ae5f0-ecb8-46af-86c6-58c2bbcc537e",
+  "meta": {
+    "instanceId": "2cb10662097dc9dbb69ac2774c57a632f219b96c7c727adf7672283f83b2620f"
+  },
+  "id": "I2HAFVHaDpJJK20n",
+  "tags": []
+}

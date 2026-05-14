@@ -1,0 +1,225 @@
+{
+  "name": "zendesk_get_user",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "user_id",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "118e5864-cd10-41af-9e85-f8ce65433823",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        912,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "sales_ticket_id",
+              "value": "="
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        1376,
+        464
+      ],
+      "id": "e9c96c30-2503-4a83-89ab-0834ca50159c",
+      "name": "Execution Data",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43e11f98-ee3d-43ba-82d3-37ca1f9aefb5",
+              "name": "sales_ticket_id",
+              "value": "={{ $json.ticket.id }}",
+              "type": "string"
+            },
+            {
+              "id": "3fe97a8d-8a27-4e1a-aec0-eee8154683f4",
+              "name": "sales_ticket_tags",
+              "value": "={{ $json.ticket.tags }}",
+              "type": "array"
+            },
+            {
+              "id": "a80d8f11-3413-49bb-9ec5-637f3e5b9746",
+              "name": "subject",
+              "value": "={{ $json.ticket.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "4a51ff42-0518-4282-ac52-a7051334546d",
+              "name": "channel",
+              "value": "={{ $json.ticket.via.channel }}",
+              "type": "string"
+            },
+            {
+              "id": "8c4f252a-3edd-40c9-8f41-9bad8d5dbb6b",
+              "name": "description",
+              "value": "={{ $json.ticket.description }}",
+              "type": "string"
+            },
+            {
+              "id": "14c4af85-a2ad-4157-875a-ad082290651c",
+              "name": "requester_id",
+              "value": "={{ $json.ticket.requester_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1632,
+        480
+      ],
+      "id": "401100c0-40c9-4148-a931-c5da580aa6a0",
+      "name": "Response",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "08d1bec5-1054-46ae-bdd7-37681479cc07",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "0485d318-76f1-4d5c-8e9b-22025f378760",
+              "name": "url",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "033270c3-ec89-4b7f-b665-4a90281b362d",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "aab9b51c-3a2b-4a58-a65f-c614e067c2c1",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "30c78228-d1cd-48c7-a1b5-b34e48bc9afc",
+              "name": "created_at",
+              "value": "={{ $json.created_at }}",
+              "type": "string"
+            },
+            {
+              "id": "168fff26-4566-443e-a159-6028d0eca733",
+              "name": "updated_at",
+              "value": "={{ $json.updated_at }}",
+              "type": "string"
+            },
+            {
+              "id": "95ab0409-3124-4167-a01a-a3b4ddd2078b",
+              "name": "phone",
+              "value": "={{ $json.phone }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1632,
+        256
+      ],
+      "id": "e2d05b55-4704-4d74-b157-f794324f91cd",
+      "name": "Get Response"
+    },
+    {
+      "parameters": {
+        "resource": "user",
+        "operation": "get",
+        "id": "={{ $json.user_id }}"
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        256
+      ],
+      "id": "bff2fbde-f814-4321-8f79-c75efe572e00",
+      "name": "Get a user",
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "user_id": "35319429155474"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get a user",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a user": {
+      "main": [
+        [
+          {
+            "node": "Get Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "122d206b-4ea0-49c6-b729-a55c3f398a82",
+  "meta": {
+    "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"
+  },
+  "id": "sJtuMC3jRFVTJTjX",
+  "tags": []
+}

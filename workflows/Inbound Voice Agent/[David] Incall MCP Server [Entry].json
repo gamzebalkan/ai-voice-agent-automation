@@ -1,0 +1,364 @@
+{
+  "name": "[David] Incall MCP Server [Entry]",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "bearerAuth",
+        "path": "david-ga-mcp3/entry"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        48,
+        -48
+      ],
+      "id": "c486472a-6c3d-44bc-9159-93e138554458",
+      "name": "MCP Server Trigger",
+      "webhookId": "037258e5-e450-41a9-9a8c-b65fb5c0860d",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "vvhwoGCEE3rcqH8w",
+          "name": "EL Bearer Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Check and confirm the identity of an existing customer. \nStructure to input should be:\n\"name\": this key is optional and name may contain incorrect spelling, which is acceptable \n\"Street_address\": street address and full name are the bare minimum identity confirmation criteria\n\"ticket_id\": optionally, the id of the ticket\n\"order_id\": optionally, if the customer has an order id\n\"email\": must have exact email that we have on record, this field is mandatory when phone number is not available\n\n\"caller_id\": this may optionally be passed on, when the parameter is available\n\"called_number\": this may optionally be passed on, when the parameter is available\n\"call_sid\": this may optionally be passed on, when the parameter is available\n\nYou must include all fields mentioned, but for the optional ones you would also be able to use a NULL value\n\nThis function will return an \"output\", which will commonly have two sides (two keys in a json): it will determine if we have validation of the customer's identity or not and it will describe the reasoning. \n\nTo use this successfully, first obtain the customer email or phone number, as needed, and then have them provide their name and street address. \n\nThis needs to run for 15 to 60 seconds. Running this multiple times with the same query does not help make it faster. In fact, it is counter-recommended to run this tool multiple times. You should wait for the tool to finish and provide the result before attempting to use it again.",
+        "workflowId": {
+          "__rl": true,
+          "value": "eVl5HfckULJT8oRr",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/eVl5HfckULJT8oRr",
+          "cachedResultName": "check_identity_mcp [Entry]"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name', ``, 'string') }}",
+            "street_address": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('street_address', ``, 'string') }}",
+            "ticket_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ticket_id', ``, 'string') }}",
+            "order_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('order_id', ``, 'string') }}",
+            "call_sid": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('call_sid', ``, 'string') }}",
+            "called_number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('called_number', ``, 'string') }}",
+            "caller_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('caller_id', ``, 'string') }}",
+            "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "street_address",
+              "displayName": "street_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "order_id",
+              "displayName": "order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "caller_id",
+              "displayName": "caller_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "called_number",
+              "displayName": "called_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "call_sid",
+              "displayName": "call_sid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -80,
+        416
+      ],
+      "id": "0edac2e1-8f85-44aa-b655-7329c72513f7",
+      "name": "check_identity_mcp"
+    },
+    {
+      "parameters": {
+        "description": "Use this tool to determine what is the main ticket t hat we are using to interact with the user. \nFor paid users, as in actual customers, this is commonly a sales ticket.\nDo not try this function without a clear identification of the user, either by phone, email or user_id (zendesk user id that is)",
+        "workflowId": {
+          "__rl": true,
+          "value": "Zvidcnh8yI4yZ9Kz",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Zvidcnh8yI4yZ9Kz",
+          "cachedResultName": "pick_working_ticket [Entry]"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('query', `Unless otherwise instructed, this can be null`, 'string') }}",
+            "requester": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('requester', `Follow this format below and fill in what you have, make it a null value where you don't know the value.\n{\"email\": null, \"phone\": null, \"user_id\": null}`, 'string') }}",
+            "product_hint": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('product_hint', `what kind of product are we dealing with? \npassport/visa/eta? `, 'string') }}",
+            "known_tickets": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('known_tickets', `Can be an empty list like this: []\nOr it can contain actual ticket ids, like [1223423122,212124353453]`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "requester",
+              "displayName": "requester",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_hint",
+              "displayName": "product_hint",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "known_tickets",
+              "displayName": "known_tickets",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        416
+      ],
+      "id": "5c283156-9d87-40ee-bcf1-f1d75a85409e",
+      "name": "pick_working_ticket"
+    },
+    {
+      "parameters": {
+        "description": "Call this tool to get all ticket events. This is a Zendesk ticket audit containing the ticket timeline events. All fields with a null or empty value are removed from the result.\nYou will need to provide a json payload as follows:\n{\n  \"id\":<ticket id integer>,\n \"mode\": \"recent\" | \"standard\"\n}\nThe ticket ID is always a number, a large integer number. Anything else will error out, so don't even try it. When you are checking the ticket just to confirm that an update was made correctly, simply use mode \"recent\" with the same ticket ID. Rest of the time, mode \"standard\".\nMode is always a string, should be either:\n- \"recent\" - gets the last 10 events on a ticket\nOR it may be\n- \"standard\" - gets all events on the ticket. You should use standard the first time when you look at a ticket, but you should use \"recent\" whenever you are checking for recent updates.\nYou should not use Standard more than once per run, as the result can overwhelm your context window.\nThe tool will return the ticket events. The response will contain:\nAll comments and notifications - This is a series of all internal notes, notifications or public comment that exists on the ticket. This contains any and all messages ever sent to the customer in the scope of the ticket.\nLatest user comment: the body, timestamp and user id of the last public comment made by the requester.\nAll requester comments: this is an easy to digest summary of all comments made by the requester.\nTime Elapsed since Last customer reply: self explained, how much time passed since the  customer's last reply.",
+        "workflowId": {
+          "__rl": true,
+          "value": "I2HAFVHaDpJJK20n",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/I2HAFVHaDpJJK20n",
+          "cachedResultName": "get_ticket_events [Entry]"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id', `sales ticket id`, 'string') }}",
+            "mode": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('mode', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mode",
+              "displayName": "mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        416
+      ],
+      "id": "1f75032b-e12b-4e1d-a581-757248f4816b",
+      "name": "get_ticket_events"
+    },
+    {
+      "parameters": {
+        "description": "This tool is to be used exclusively for migrated tickets!\n\nSpecial instructions: \nAs you are now working under zendesk instance named entryllc.zendesk.com, you need to be aware that some tickets in this instance have been migrated from a previous zendesk instance, named travelassist. \n\nBecause migration is now in full effect, you must follow the process below when you encounter such migrated tickets. \nThe protocol is that: \n- you retrieve context from the old instance via this 'migrated_ticket_events' tool \n- you continue working the ticket normally (5-digit or 6-digit integer returned from the pick_working_ticket, which will update the current entryllc instance)\n\nWHEN TO CALL THIS TOOL? / HOW TO IDENTIFY MIGRATED TICKETS?\nmigrated tickets contain the tag migrated_from_old_zendesk and, at the top of the first internal note / ticket description, at the very beginning of the ticket, there will be a hiperlinked text in the http, stating \"This is a migrated ticket\" and this will link to the old ticket (contains the old ticket id right there at the end of this link)\n\nFor migrated tickets, if you find some information is missing or there was some issue with migrating the new ticket, you may operate on the new ticket to complete the missing information. You will find field id mappings of equivalent fields inside the dedicated tool description.\n\n\n---\n\nCall this tool to get ALL ticket events. This is a Zendesk ticket audit containing the ticket timeline events. All fields with a null or empty value are removed from the result.  \n\nHere are field mapping from old travelassist zendesk instance into this current entryllc instance:\n\n\nGroup ID for Level 1 (general landing): 360000953880\nGroup ID for Passports (fulfillment): 20857976594322\nGroup ID for Resolution Management Team (Billing): 360000995960\nGroup ID for CBs & RDR Alerts : 29183142512402\nJamie Lee: 31750668344082\nIT (automation): 4602485547794\nCasey Miller (Resolution Management / billing AI): 29095481834258\n\nYou will need to provide a json payload as follows:\n{\n  \"ticket_id\":<ticket id integer>,\n \"mode\": \"recent\" | \"standard\"\n}\n\nThe ticket ID is always a number, a large integer number. Anything else will error out, so don't even try it. \nWhen you are checking the ticket just to confirm that an update was made correctly, simply use mode \"recent\" with the same ticket ID. Rest of the time, mode \"standard\".\n\nMode is always a string, should be either:- \"recent\" - gets the last 10 events on a ticket OR it may be- \"standard\" - gets all events on the ticket. \n\nYou should use standard the first time when you look at a ticket, but you should use \"recent\" whenever you are checking for recent updates.\nYou should not use Standard more than once per sales ticket in the same run, as the result can overwhelm your context window.\n\nThe tool will return the ticket events. The response will contain:\nAll comments and notifications - This is a series of all internal notes, notifications or public comment that exists on the ticket. This contains any and all messages ever sent to the customer in the scope of the ticket.\n\nLatest user comment: the body, timestamp and user id of the last public comment made by the requester.\n\nAll requester comments: this is an easy to digest summary of all comments made by the requester.\n\nTime Elapsed since Last customer reply: self explained, how much time passed since the  customer's last reply.\n\nprevious_group_id: This is the Zendesk user ID of the previous group that was assigned to this ticket\n\nlast_human_assignee_id: This is the Zendesk user ID of the last assignee that was assigned to this ticket",
+        "workflowId": {
+          "__rl": true,
+          "value": "Wdm4BaQZh6tBf7Oz",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Wdm4BaQZh6tBf7Oz",
+          "cachedResultName": "migrated_ticket_events"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "mode": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('mode', ``, 'string') }}",
+            "ticket_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ticket_id', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "mode",
+              "displayName": "mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        416
+      ],
+      "id": "1e9fbc2b-3436-44ff-bca0-2bfa5b26ba04",
+      "name": "migrated_ticket_events"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "check_identity_mcp": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "pick_working_ticket": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_ticket_events": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "migrated_ticket_events": {
+      "ai_tool": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "40edf29d-5c44-4910-90e7-843159473909",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2cb10662097dc9dbb69ac2774c57a632f219b96c7c727adf7672283f83b2620f"
+  },
+  "id": "cfWZ4gI63C1rHTPK",
+  "tags": []
+}

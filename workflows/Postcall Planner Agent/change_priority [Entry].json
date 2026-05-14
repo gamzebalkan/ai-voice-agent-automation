@@ -1,0 +1,681 @@
+{
+  "name": "change_priority [Entry]",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "798c4f3a-af78-4e63-a0ee-ee76535707f6",
+              "name": "Response",
+              "value": "Priority set to Urgent.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        512
+      ],
+      "id": "9789968d-ed2f-4e15-a587-e28e645744f5",
+      "name": "Response"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "798c4f3a-af78-4e63-a0ee-ee76535707f6",
+              "name": "Response",
+              "value": "Priority set to High.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        1024
+      ],
+      "id": "47e6aa4c-f11c-46f4-b9f7-91760dadc874",
+      "name": "Response1"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "sales_ticket_id",
+              "type": "any"
+            },
+            {
+              "name": "priority_flag",
+              "type": "any"
+            },
+            {
+              "name": "reason",
+              "type": "any"
+            },
+            {
+              "name": "assignee_id",
+              "type": "any"
+            },
+            {
+              "name": "group_id",
+              "type": "any"
+            },
+            {
+              "name": "sales_ticket_priority",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1712,
+        912
+      ],
+      "id": "73fb3d2d-f79a-414c-bcc6-29c01358a1f2",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('When Executed by Another Workflow').item.json.priority_flag }}",
+                    "rightValue": "urgent_flag",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2fd21b54-b018-40a5-a1b5-1e5858eec8c3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Urgent flag"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d9210233-dc43-4589-87cc-532b676f9a64",
+                    "leftValue": "={{ $('When Executed by Another Workflow').item.json.priority_flag }}",
+                    "rightValue": "high_flag",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "High flag"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "No flag"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1344,
+        896
+      ],
+      "id": "9f070088-6524-497d-9f28-615320cefbb8",
+      "name": "Check flag"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ee15a71b-4a16-411f-9e60-794b4bf2c5d0",
+              "leftValue": "={{ $json.sales_ticket_priority }}",
+              "rightValue": "high",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "0f26db15-a1f0-405a-961e-dbb103c52fbe",
+              "leftValue": "={{ $json.sales_ticket_priority }}",
+              "rightValue": "urgent",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -960,
+        912
+      ],
+      "id": "0bdfd5c6-8213-45a1-aa30-bf4225d684b5",
+      "name": "Already high or urgent?"
+    },
+    {
+      "parameters": {
+        "errorMessage": "No priority escalation needed."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        1312
+      ],
+      "id": "38508f49-29d0-4fbc-bf87-e8afdaf95845",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "798c4f3a-af78-4e63-a0ee-ee76535707f6",
+              "name": "Response",
+              "value": "Priority tool was called but no change was made on the ticket.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -432,
+        336
+      ],
+      "id": "c812c077-8125-4860-8ea7-7aa870565220",
+      "name": "Response2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "798c4f3a-af78-4e63-a0ee-ee76535707f6",
+              "name": "Response",
+              "value": "Priority tool was called but no change was made on the ticket.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -432,
+        768
+      ],
+      "id": "1c103d15-781f-41cd-9bbb-add29a60df75",
+      "name": "Response3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0f26db15-a1f0-405a-961e-dbb103c52fbe",
+              "leftValue": "={{ $json.sales_ticket_priority }}",
+              "rightValue": "urgent",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -944,
+        512
+      ],
+      "id": "05587068-2ab5-4625-9d0d-567f76cf199a",
+      "name": "Already urgent?"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "10psh1ilovhOtEL9",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/10psh1ilovhOtEL9",
+          "cachedResultName": "Zendesk Safe Caller"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.ticket_id }}",
+            "source": "=https://entry.app.n8n.cloud/workflow/5TYuO5Au91aI32iN/debug/{{ $execution.id }}",
+            "target": "ticket",
+            "operation": "update",
+            "payload": "={\n  \"priority\": \"urgent\",\n  \"comment\": {\n    \"author_id\": 32164381873810,\n    \"html_body\": \"<p>This ticket requires immediate attention. I am changing its priority to Urgent. </p><p>Here's my reasoning: {{ $('When Executed by Another Workflow').item.json.reason }}</p>\",\n    \"public\": false\n  }\n}",
+            "options": "{}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "target",
+              "displayName": "target",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "operation",
+              "displayName": "operation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "payload",
+              "displayName": "payload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "options",
+              "displayName": "options",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        288
+      ],
+      "id": "5ffbbf9c-986e-4dfb-ad07-077eb7c33e6e",
+      "name": "Zendesk Safe Caller",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "id": "={{ $('When Executed by Another Workflow').item.json.ticket_id }}",
+        "updateFields": {}
+      },
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [
+        320,
+        512
+      ],
+      "id": "d2dbb2f6-aef8-4752-b5b4-065a63402c2e",
+      "name": "NO field for priority on ZD node",
+      "credentials": {
+        "zendeskApi": {
+          "id": "r6Mcqrp6YkvDbbjZ",
+          "name": "Zendesk account 2"
+        }
+      },
+      "disabled": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error on priority escalation."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        736
+      ],
+      "id": "47ad7ee0-72b2-4675-80a4-7912727ec843",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error on priority escalation."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        1232
+      ],
+      "id": "fdea7a61-ba63-44d2-b526-12d5e38bff7c",
+      "name": "Stop and Error2"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"ticket\": {\n    \"priority\": \"urgent\",\n    \"comment\": {\n      \"author_id\": 34685489132818,\n      \"html_body\": \"<p>This ticket requires immediate attention. I am changing its priority to Urgent.</p><p>Here's my reasoning: {{ $('When Executed by Another Workflow').item.json.reason }}</p>\",\n      \"public\": false\n    }\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -432,
+        528
+      ],
+      "id": "b1dfb41b-6a9f-4b4d-98e9-06bb93cc6dda",
+      "name": "Escalate to urgent",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"ticket\": {\n    \"priority\": \"high\",\n    \"comment\": {\n      \"author_id\": 34685489132818,\n      \"html_body\": \"<p>This ticket requires immediate attention. I am changing its priority to High.</p><p>Here's my reasoning: {{ $('When Executed by Another Workflow').item.json.reason }}</p>\",\n      \"public\": false\n    }\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -432,
+        1040
+      ],
+      "id": "60a95d38-f5c4-461b-a5b8-94a73f8f4f0c",
+      "name": "Escalate to high",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "Sales_Ticket_ID",
+              "value": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}"
+            },
+            {
+              "key": "Priority_Flag",
+              "value": "={{ $json.priority_flag }}"
+            },
+            {
+              "key": "Current_Priority",
+              "value": "={{ $json.current_ticket_priority }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1,
+      "position": [
+        -1344,
+        1264
+      ],
+      "id": "8d448093-ce6e-4723-b7a1-c57130708d0d",
+      "name": "Execution Data"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "sales_ticket_id": "330640",
+          "priority_flag": "urgent_flag",
+          "reason": "Customer requested cancellation and refund; ticket is currently unassigned and service shows “Less than 24 hours,” so faster handling may be required.",
+          "assignee_id": "",
+          "group_id": "33803643912722",
+          "sales_ticket_priority": "high"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Check flag",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check flag": {
+      "main": [
+        [
+          {
+            "node": "Already urgent?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Already high or urgent?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Already high or urgent?": {
+      "main": [
+        [
+          {
+            "node": "Response3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Escalate to high",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Already urgent?": {
+      "main": [
+        [
+          {
+            "node": "Response2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Escalate to urgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zendesk Safe Caller": {
+      "main": [
+        []
+      ]
+    },
+    "NO field for priority on ZD node": {
+      "main": [
+        []
+      ]
+    },
+    "Escalate to urgent": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalate to high": {
+      "main": [
+        [
+          {
+            "node": "Response1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "ad9e36db-42d8-40f9-9ed4-bd90ceca8dbf",
+  "meta": {
+    "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"
+  },
+  "id": "vRhbV75rE8TpQmWq",
+  "tags": []
+}
