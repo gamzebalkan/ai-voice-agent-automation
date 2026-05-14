@@ -50,7 +50,7 @@
           "parameters": [
             {
               "name": "xi-api-key",
-              "value": "[PLACE YOUR API KEY HERE]"
+              "value": "[PLACE YOUR ELEVENLABS API KEY HERE]"
             }
           ]
         },
@@ -124,7 +124,7 @@
           "parameters": [
             {
               "name": "xi-api-key",
-              "value": "sk_e162b0634c5f624dac136ac738fc407643875af60c78cc94"
+              "value": "[PLACE YOUR ELEVENLABS API KEY HERE]"
             }
           ]
         },
@@ -155,7 +155,7 @@
           "parameters": [
             {
               "name": "xi-api-key",
-              "value": "sk_e162b0634c5f624dac136ac738fc407643875af60c78cc94"
+              "value": "[PLACE YOUR ELEVENLABS API KEY HERE]"
             }
           ]
         },
