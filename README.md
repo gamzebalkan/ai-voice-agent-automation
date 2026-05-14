@@ -58,7 +58,7 @@ USER (Xs): ...
  - merge_tickets
  - leave_call_summary
  - send_followup_email
- - Update_Application_Status [Entry]
+ - update_application_status
  - escalate_to_billing
  - change_priority
  - reopen_ticket
