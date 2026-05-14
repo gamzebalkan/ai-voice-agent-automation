@@ -148,7 +148,7 @@ Use these labels only when clearly supported by the ticket summary:
 - Intake/Information received
 - More information needed from customer
 - Draft prepared / awaiting confirmation (where applicable)
-- Draft confirmed by client / Govt fee settlement pending
+- Draft confirmed by client / Gov fee settlement pending
 - Government payment failed / retrying payment
 - Submitted (to government portal)
 - Waiting for decision / in process
