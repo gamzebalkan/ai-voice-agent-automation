@@ -1843,7 +1843,7 @@
           "value": "fiD0HqMaeTvDyFbk",
           "mode": "list",
           "cachedResultUrl": "/workflow/fiD0HqMaeTvDyFbk",
-          "cachedResultName": "Update_Application_Status [Entry]"
+          "cachedResultName": "update_application_status"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",
