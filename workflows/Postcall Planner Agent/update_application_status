@@ -1,5 +1,5 @@
 {
-  "name": "Update_Application_Status [Entry]",
+  "name": "update_application_status",
   "nodes": [
     {
       "parameters": {
