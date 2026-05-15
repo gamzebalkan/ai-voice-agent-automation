@@ -294,16 +294,16 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "10psh1ilovhOtEL9",
+          "value": "[Zendesk_Safe_Caller_workflow_id]",
           "mode": "list",
-          "cachedResultUrl": "/workflow/10psh1ilovhOtEL9",
+          "cachedResultUrl": "/workflow/[Zendesk_Safe_Caller_workflow_id]",
           "cachedResultName": "Zendesk Safe Caller"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
             "id": "={{ $json.ticket_id }}",
-            "source": "=https://entry.app.n8n.cloud/workflow/5TYuO5Au91aI32iN/debug/{{ $execution.id }}",
+            "source": "=https://[your_brand_name].app.n8n.cloud/workflow/[workflow_id]/debug/{{ $execution.id }}",
             "target": "ticket",
             "operation": "update",
             "payload": "={\n  \"priority\": \"urgent\",\n  \"comment\": {\n    \"author_id\": 32164381873810,\n    \"html_body\": \"<p>This ticket requires immediate attention. I am changing its priority to Urgent. </p><p>Here's my reasoning: {{ $('When Executed by Another Workflow').item.json.reason }}</p>\",\n    \"public\": false\n  }\n}",
@@ -427,7 +427,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -462,7 +462,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
