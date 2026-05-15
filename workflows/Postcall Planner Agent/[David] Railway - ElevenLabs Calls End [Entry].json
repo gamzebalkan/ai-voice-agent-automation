@@ -4332,7 +4332,7 @@
               "tag_ids": []
             }
           },
-          "webhookUrl": "[PLACE YOUR WEBHOOK URL HERE]",
+          "webhookUrl": "https://[place_your_webhook_url_here]",
           "executionMode": "production"
         },
         "pairedItem": {
