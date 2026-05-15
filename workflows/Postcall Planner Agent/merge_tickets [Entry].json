@@ -392,7 +392,7 @@
             },
             {
               "key": "Debug_Link",
-              "value": "=https://david-ga.up.railway.app/workflow/qXWFmAmpYVt3IBV0/debug/{{$execution.id}}"
+              "value": "=https://[YOUR_RAILWAY_HOST_URL]/workflow/[YOUR_WORKFLOW_ID]/debug/{{ $execution.id }}"
             },
             {
               "key": "Main_Ticket_Type",
@@ -414,9 +414,9 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "10psh1ilovhOtEL9",
+          "value": "[Zendesk_Safe_Caller_workflow_id]",
           "mode": "list",
-          "cachedResultUrl": "/workflow/10psh1ilovhOtEL9",
+          "cachedResultUrl": "/workflow/[Zendesk_Safe_Caller_workflow_id]",
           "cachedResultName": "Zendesk Safe Caller [NOT IN USE]"
         },
         "workflowInputs": {
@@ -1196,7 +1196,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}/merge.json",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}/merge.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
@@ -1233,7 +1233,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}/merge.json",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}/merge.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
@@ -1378,7 +1378,7 @@
     {
       "parameters": {
         "method": "=POST",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}/merge.json",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}/merge.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
