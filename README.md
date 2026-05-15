@@ -52,16 +52,22 @@ Powered by ChatGPT 5.5, the Post-Call Planner evaluates the runtime data and rou
 
 ## 🔧 System Features & Capabilities
 
+## 🔧 System Features & Capabilities
+
 - ⚡ **Non-Blocking Ingestion:** Instantly responds to ElevenLabs `post_call_transcription` events with a `200 OK` to prevent webhook timeouts.
 - 🧩 **MCP-Based Architecture:** Uses highly reliable, decoupled Model Context Protocol communication for real-time tool calls.
-- 🎛️ **Granular Tool Ecosystem:** Empowered with individual node tools including:
-  * `zendesk_search` & `zendesk_get_user`
-  * `create_call_ticket` & `merge_tickets`
-  * `leave_call_summary` & `send_followup_email`
-  * `update_application_status` (UCC Backend)
-  * `escalate_to_billing` & `change_priority`
-  * `reopen_ticket` & `solve_ticket`
-
+- 🎛️ **Available Tools:**
+  * `zendesk_search`
+  * `zendesk_get_user`
+  * `reopen_ticket`
+  * `create_call_ticket`
+  * `merge_tickets`
+  * `leave_call_summary`
+  * `send_followup_email`
+  * `update_application_status`
+  * `escalate_to_billing`
+  * `change_priority`
+  * `solve_ticket`
 ---
 
 ## 🚀 Deployment & Setup
