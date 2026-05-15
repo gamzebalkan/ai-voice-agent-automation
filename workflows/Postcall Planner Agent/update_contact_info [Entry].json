@@ -25,7 +25,7 @@
     },
     {
       "parameters": {
-        "url": "=https://entryllc.zendesk.com/api/v2/users/30844357565586",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/30844357565586",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "options": {
@@ -613,7 +613,7 @@
     {
       "parameters": {
         "method": "PATCH",
-        "url": "=https://entryllc.zendesk.com/api/v2/users/{{ $('When Executed by Another Workflow').item.json.requester_id }}",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/{{ $('When Executed by Another Workflow').item.json.requester_id }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -648,7 +648,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://entryllc.zendesk.com/api/v2/users/{{ $('When Executed by Another Workflow').item.json.requester_id }}.json",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/{{ $('When Executed by Another Workflow').item.json.requester_id }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -889,7 +889,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://entryllc.zendesk.com/api/v2/users/{{ $('When Executed by Another Workflow').item.json.requester_id }}/identities.json",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/{{ $('When Executed by Another Workflow').item.json.requester_id }}/identities.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
