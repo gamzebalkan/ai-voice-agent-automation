@@ -52,8 +52,6 @@ Powered by ChatGPT 5.5, the Post-Call Planner evaluates the runtime data and rou
 
 ## 🔧 System Features & Capabilities
 
-## 🔧 System Features & Capabilities
-
 - ⚡ **Non-Blocking Ingestion:** Instantly responds to ElevenLabs `post_call_transcription` events with a `200 OK` to prevent webhook timeouts.
 - 🧩 **MCP-Based Architecture:** Uses highly reliable, decoupled Model Context Protocol communication for real-time tool calls.
 - 🎛️ **Available Tools:**
