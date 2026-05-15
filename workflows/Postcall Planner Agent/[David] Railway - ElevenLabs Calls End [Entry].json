@@ -8,14 +8,14 @@
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "fba3f23b-6709-485d-bffe-f9608ba5c1aa",
+      "id": "[YOUR_NODE_ID]",
       "name": "Call Ended",
       "type": "n8n-nodes-base.webhook",
       "position": [
         -2352,
         384
       ],
-      "webhookId": "24125604-7db9-4350-b85f-a58c3709166c",
+      "webhookId": "[YOUR_WEBHOOK_ID]",
       "typeVersion": 2,
       "notes": "Eleven Labs call ended\n\nwsec_fac72b7539268ad5147302898115f7cbc1ffcbe3a26352c4083e66ddbd56abea"
     },
