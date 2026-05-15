@@ -4,7 +4,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "elce/entry",
+        "path": "[YOUR_WEBHOOK_PATH]",
         "responseMode": "responseNode",
         "options": {}
       },
