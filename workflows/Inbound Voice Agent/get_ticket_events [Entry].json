@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "errorMessage": "={{ $json.error.message }}...\n\nDebug Link: https://primary-production-08e3.up.railway.app/workflow/9Z0obijop6SkbJxi/debug/{{ $execution.id }}"
+        "errorMessage": "={{ $json.error.message }}...\n\nDebug Link: https://YOUR_RAILWAY_DOMAIN/workflow/[WORKFLOW_ID]/debug/{{ $execution.id }}"
       },
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
@@ -66,7 +66,7 @@
             {
               "id": "bf903706-b0c3-4fcb-bcc4-db54f34a931c",
               "name": "Debug link",
-              "value": "=https://primary-production-08e3.up.railway.app/workflow/9Z0obijop6SkbJxi/debug/{{$execution.id}}",
+              "value": "=https://YOUR_RAILWAY_DOMAIN/workflow/[WORKFLOW_ID]/debug/{{ $execution.id }}",
               "type": "string"
             }
           ]
