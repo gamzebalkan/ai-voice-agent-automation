@@ -244,9 +244,9 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "10psh1ilovhOtEL9",
+          "value": "[Zendesk_Safe_Caller_workflow_id]",
           "mode": "list",
-          "cachedResultUrl": "/workflow/10psh1ilovhOtEL9",
+          "cachedResultUrl": "/workflow/[Zendesk_Safe_Caller_workflow_id]",
           "cachedResultName": "Zendesk Safe Caller"
         },
         "workflowInputs": {
@@ -553,7 +553,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -641,7 +641,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.call_ticket_id }}",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.call_ticket_id }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
