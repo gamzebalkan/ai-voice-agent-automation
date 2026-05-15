@@ -1,6 +1,6 @@
 # AI Voice Agent Automation & Orchestration
 
-## 🤖 ElevenLabs × n8n × Zendesk × Railway
+## 🤖 ElevenLabs -> n8n -> Zendesk
 
 An enterprise-grade, end-to-end AI Voice Agent system designed for automated inbound call handling in travel assistance. The system architecture is cleanly split into two specialized layers: a real-time **In-Call Agent** for secure data intake and a **Post-Call Automation Layer** powered by an advanced LLM planner to execute safe, rule-based operational workflows within Zendesk and backend systems.
 
