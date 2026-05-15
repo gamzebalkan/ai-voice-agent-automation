@@ -5,7 +5,7 @@
       "parameters": {
         "operation": "getAll",
         "options": {
-          "query": "=requester:\"+19412863623\" "
+          "query": "=requester:\"[SAMPLE PHONE NUMBER]\" "
         }
       },
       "type": "n8n-nodes-base.zendesk",
@@ -84,16 +84,16 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "10psh1ilovhOtEL9",
+          "value": "[Zendesk_Safe_Caller_workflow_id]",
           "mode": "list",
-          "cachedResultUrl": "/workflow/10psh1ilovhOtEL9",
+          "cachedResultUrl": "/workflow/[Zendesk_Safe_Caller_workflow_id]",
           "cachedResultName": "Zendesk Safe Caller"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",
           "value": {
             "id": "={{ $json.ticket_id }}",
-            "source": "=https://entry.app.n8n.cloud/workflow/5TYuO5Au91aI32iN/debug/{{ $execution.id }}",
+            "source": "=https://[your_brand_name].app.n8n.cloud/workflow/[workflow_id]/debug/{{ $execution.id }}",
             "target": "ticket",
             "operation": "update",
             "payload": "={{\n  Object.assign(\n    {},\n    $json.payload,\n    {\n      comment: {\n        author_id: \"32164381873810\",\n        html_body: $('When Executed by Another Workflow').item.json.call_summary,\n        public: false\n      }\n    }\n  ).toJsonString()\n}}\n",
@@ -382,7 +382,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.main_ticket_id }}.json",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.main_ticket_id }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
