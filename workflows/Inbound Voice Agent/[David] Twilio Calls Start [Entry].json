@@ -1,10 +1,10 @@
 {
-  "name": "[David] Twilio Calls Start [Entry]",
+  "name": "[David] Twilio Calls Start [<YOUR_BRAND_NAME>]",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "twilio-start/entry",
+        "path": "<WEBHOOK_PATH>",
         "responseMode": "lastNode",
         "options": {}
       },
@@ -16,7 +16,7 @@
       ],
       "id": "c42b92ea-71db-4c7c-ad33-a921824af619",
       "name": "Twilio Call initiated",
-      "webhookId": "47d41d0c-ef9e-46ac-b863-6f5e930c5ff0",
+      "webhookId": "<WEBHOOK_ID>",
       "notes": "Eleven Labs call ended\n\nwsec_fac72b7539268ad5147302898115f7cbc1ffcbe3a26352c4083e66ddbd56abea"
     },
     {
@@ -327,7 +327,7 @@
             {
               "id": "f290c873-05d4-498f-9f14-24c22f715828",
               "name": "conversation_config_override",
-              "value": "={\"agent\": {\"first_message\": \"Hello {{ $('Search for the user in Zendesk').first().json.name }}! Thank you for calling Entry.\"}}",
+              "value": "={\"agent\": {\"first_message\": \"Hello {{ $('Search for the user in Zendesk').first().json.name }}! Thank you for calling <YOUR_BRAND_NAME>.\"}}",
               "type": "object"
             }
           ]
@@ -362,7 +362,7 @@
             {
               "id": "f290c873-05d4-498f-9f14-24c22f715828",
               "name": "conversation_config_override",
-              "value": "={\"agent\": {\"first_message\": \"Hello! Thank you for calling Entry. I am Maya, your virtual assistant. How may I assist you?\"}}",
+              "value": "={\"agent\": {\"first_message\": \"Hello! Thank you for calling <YOUR_BRAND_NAME>. I am Maya, your virtual assistant. How may I assist you?\"}}",
               "type": "object"
             }
           ]
@@ -424,7 +424,7 @@
       ],
       "id": "c9b8af9a-0836-4e06-a91f-0c0aada7d873",
       "name": "Wait",
-      "webhookId": "ed608124-a60b-4802-a63c-585a4141d6da"
+      "webhookId": "<WEBHOOK_ID>"
     },
     {
       "parameters": {
@@ -636,7 +636,7 @@
             {
               "id": "fa8cec80-bb9f-4f69-816f-1ae93ffc735f",
               "name": "=conversation_config_override",
-              "value": "={\"agent\": {\"first_message\": \"Hello! Thank you for calling Entry. This is David. How can I help you today?\"}}",
+              "value": "={\"agent\": {\"first_message\": \"Hello! Thank you for calling <YOUR_BRAND_NAME>. This is David. How can I help you today?\"}}",
               "type": "object"
             }
           ]
@@ -659,7 +659,7 @@
             {
               "id": "fa8cec80-bb9f-4f69-816f-1ae93ffc735f",
               "name": "=conversation_config_override",
-              "value": "={\"agent\": {\"first_message\": \"Hello! Thanks for calling Entry. This is David. How can I help you today?\"}}",
+              "value": "={\"agent\": {\"first_message\": \"Hello! Thanks for calling <YOUR_BRAND_NAME>. This is David. How can I help you today?\"}}",
               "type": "object"
             }
           ]
@@ -682,7 +682,7 @@
             {
               "id": "fa8cec80-bb9f-4f69-816f-1ae93ffc735f",
               "name": "=conversation_config_override",
-              "value": "={\"agent\": {\"first_message\": \"Hello {{ $json.first_name }}! Thank you for calling Entry. How can I help you today?\"}}",
+              "value": "={\"agent\": {\"first_message\": \"Hello {{ $json.first_name }}! Thank you for calling <YOUR_BRAND_NAME>. How can I help you today?\"}}",
               "type": "object"
             }
           ]
@@ -706,7 +706,7 @@
             {
               "id": "fa8cec80-bb9f-4f69-816f-1ae93ffc735f",
               "name": "=conversation_config_override",
-              "value": "={\"agent\": {\"first_message\": \"Hi {{ $json.first_name }}, thanks for calling Entry! How can I help you today?\"}}",
+              "value": "={\"agent\": {\"first_message\": \"Hi {{ $json.first_name }}, thanks for calling <YOUR_BRAND_NAME>! How can I help you today?\"}}",
               "type": "object"
             }
           ]
@@ -868,7 +868,7 @@
             {
               "id": "fa8cec80-bb9f-4f69-816f-1ae93ffc735f",
               "name": "=conversation_config_override",
-              "value": "={\"agent\": {\"first_message\": \"Hello {{ $json.dynamic_variables.first_name }}! Thank you for calling Entry. How can I help you today?\"}}",
+              "value": "={\"agent\": {\"first_message\": \"Hello {{ $json.dynamic_variables.first_name }}! Thank you for calling <YOUR_BRAND_NAME>. How can I help you today?\"}}",
               "type": "object"
             }
           ]
@@ -891,7 +891,7 @@
             {
               "id": "fa8cec80-bb9f-4f69-816f-1ae93ffc735f",
               "name": "=conversation_config_override",
-              "value": "={\"agent\": {\"first_message\": \"Hi {{ $('OpenAI').item.json.message.content.first_name }}, thanks for calling Entry! How can I help you today?\"}}",
+              "value": "={\"agent\": {\"first_message\": \"Hi {{ $('OpenAI').item.json.message.content.first_name }}, thanks for calling <YOUR_BRAND_NAME>! How can I help you today?\"}}",
               "type": "object"
             }
           ]
