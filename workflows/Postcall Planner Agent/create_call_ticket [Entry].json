@@ -141,7 +141,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://entryllc.zendesk.com/api/v2/tickets.json",
+        "url": "https://[your_brand_name].zendesk.com/api/v2/tickets.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
@@ -247,12 +247,12 @@
       ],
       "id": "f51165dc-63ce-4f4e-aa41-322aefa9c636",
       "name": "Wait",
-      "webhookId": "acd7f569-dce8-4bb1-b9a7-9ad61240e7bf"
+      "webhookId": "[WEBHOOK_ID]"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://entryllc.zendesk.com/api/v2/tickets.json",
+        "url": "https://[your_brand_name].zendesk.com/api/v2/tickets.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
@@ -289,7 +289,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://entryllc.zendesk.com/api/v2/tickets.json",
+        "url": "https://[your_brand_name].zendesk.com/api/v2/tickets.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
@@ -324,7 +324,7 @@
     },
     {
       "parameters": {
-        "url": "=https://entryllc.zendesk.com/api/v2/users/search.json",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/search.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendQuery": true,
@@ -355,7 +355,7 @@
     },
     {
       "parameters": {
-        "url": "=https://entryllc.zendesk.com/api/v2/users/search.json",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/search.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendQuery": true,
@@ -557,7 +557,7 @@
       ],
       "id": "5da59504-9029-407e-9581-e24e36184512",
       "name": "Wait1",
-      "webhookId": "acd7f569-dce8-4bb1-b9a7-9ad61240e7bf"
+      "webhookId": "[WEBHHOOK_ID]"
     },
     {
       "parameters": {
@@ -588,7 +588,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $json.ticket.id }}.json",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $json.ticket.id }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
@@ -625,7 +625,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $json.ticket.id }}.json",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $json.ticket.id }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
