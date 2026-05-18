@@ -13,7 +13,7 @@
       ],
       "id": "bc3f4f2a-bbff-4d7d-9c0c-a91f121cc07f",
       "name": "Wait",
-      "webhookId": "6eca6fb4-ac9c-4ef2-a989-fb92135fe9ad"
+      "webhookId": "<WEBHOOK_ID>"
     },
     {
       "parameters": {
@@ -177,7 +177,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.ticket_number_to_escalate }}.json",
+        "url": "=https://<your_brand_name>.zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.ticket_number_to_escalate }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
