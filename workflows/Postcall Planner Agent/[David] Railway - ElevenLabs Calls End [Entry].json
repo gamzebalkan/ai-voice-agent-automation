@@ -4,7 +4,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "elce/entry",
+        "path": "[WEBHOOK_PATH]",
         "responseMode": "responseNode",
         "options": {}
       },
@@ -15,7 +15,7 @@
         -2352,
         384
       ],
-      "webhookId": "24125604-7db9-4350-b85f-a58c3709166c",
+      "webhookId": "[WEBHOOK_ID]",
       "typeVersion": 2,
       "notes": "Eleven Labs call ended\n\nwsec_fac72b7539268ad5147302898115f7cbc1ffcbe3a26352c4083e66ddbd56abea"
     },
