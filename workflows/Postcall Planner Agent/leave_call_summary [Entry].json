@@ -286,7 +286,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.main_ticket_id }}.json",
+        "url": "=https://<your_brand_name>.zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.main_ticket_id }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -420,7 +420,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.main_ticket_id }}/tags.json",
+        "url": "=https://<your_brand_name>.zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.main_ticket_id }}/tags.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -456,7 +456,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.main_ticket_id }}/tags.json",
+        "url": "=https://<your_brand_name>.zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.main_ticket_id }}/tags.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
