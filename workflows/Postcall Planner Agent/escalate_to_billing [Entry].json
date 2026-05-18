@@ -177,7 +177,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.ticket_number_to_escalate }}.json",
+        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.ticket_number_to_escalate }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -212,7 +212,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://primary-casey-dedicated-production.up.railway.app/webhook/v3-ai-billing/entry",
+        "url": "=https://<YOUR_RAILWAY_DOMAIN>/webhook/<WEBHOOK_PATH>",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [

@@ -53,7 +53,7 @@
           "parameters": [
             {
               "name": "xi-api-key",
-              "value": "sk_18746d67f3dc75088fa8463a255c9fdfbac22446e8abde8d"
+              "value": "[PLACE YOUR ELEVENLABS API KEY HERE]"
             }
           ]
         },
@@ -183,8 +183,8 @@
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "85ATCdY0IU0ZjLLT",
-          "cachedResultUrl": "/workflow/85ATCdY0IU0ZjLLT",
+          "value": "[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
           "cachedResultName": "send_followup_email [Entry]"
         },
         "workflowInputs": {
@@ -294,8 +294,8 @@
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "vRhbV75rE8TpQmWq",
-          "cachedResultUrl": "/workflow/vRhbV75rE8TpQmWq",
+          "value": "[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
           "cachedResultName": "change_priority [Entry]"
         },
         "workflowInputs": {
@@ -384,8 +384,8 @@
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "NcoQrkqXvsyH3cAz",
-          "cachedResultUrl": "/workflow/NcoQrkqXvsyH3cAz",
+          "value": "[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
           "cachedResultName": "escalate_to_billing [Entry]"
         },
         "workflowInputs": {
@@ -564,8 +564,8 @@
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "U7SEhUGQOMRYzE3L",
-          "cachedResultUrl": "/workflow/U7SEhUGQOMRYzE3L",
+          "value": "[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
           "cachedResultName": "update_contact_info [Entry]"
         },
         "workflowInputs": {
@@ -654,8 +654,8 @@
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "uO8DjzUtBQF9fqxI",
-          "cachedResultUrl": "/workflow/uO8DjzUtBQF9fqxI",
+          "value": "[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
           "cachedResultName": "merge_tickets [Entry]"
         },
         "workflowInputs": {
@@ -816,8 +816,8 @@
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "BeI6toGdHbumUHBu",
-          "cachedResultUrl": "/workflow/BeI6toGdHbumUHBu",
+          "value": "[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
           "cachedResultName": "leave_call_summary [Entry]"
         },
         "workflowInputs": {
@@ -998,8 +998,8 @@
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "ks17HldAy0RPmxba",
-          "cachedResultUrl": "/workflow/ks17HldAy0RPmxba",
+          "value": "[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
           "cachedResultName": "reopen_ticket [Entry]"
         },
         "workflowInputs": {
@@ -1048,8 +1048,8 @@
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "O1YBAuk0aHdpRWTU",
-          "cachedResultUrl": "/workflow/O1YBAuk0aHdpRWTU",
+          "value": "[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
           "cachedResultName": "solve_ticket [Entry]"
         },
         "workflowInputs": {
@@ -1127,8 +1127,8 @@
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "gZSiZBZtPSFzJ968",
-          "cachedResultUrl": "/workflow/gZSiZBZtPSFzJ968",
+          "value": "[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
           "cachedResultName": "Detective Agent [Entry]"
         },
         "workflowInputs": {
@@ -1341,8 +1341,8 @@
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "yUImhuMJCs1rQtZj",
-          "cachedResultUrl": "/workflow/yUImhuMJCs1rQtZj",
+          "value": "[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
           "cachedResultName": "create_call_ticket [Entry]"
         },
         "workflowInputs": {
@@ -1496,9 +1496,9 @@
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "OVv58xH7Lb3Z4UoD",
-          "cachedResultUrl": "/workflow/OVv58xH7Lb3Z4UoD",
-          "cachedResultName": "Zendesk Safe Caller for Postcall Agent [Entry]"
+          "value": "[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
+          "cachedResultName": "zendesk_search [Entry]"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",
@@ -1606,9 +1606,9 @@
         "description": "Get complete Zendesk User Profile based on User ID. This is something to use when you want to see details about a specific user and you have the User ID ready. This will not work without a valid User ID. \nCall this tool before calling update_contact_info.\n\nImportant:\nThe User ID must be an integer. Sending an email, string, null, or undefined value will cause a 400 Bad Request error.\nExample of a valid User ID: 3222493531410",
         "workflowId": {
           "__rl": true,
-          "value": "sJtuMC3jRFVTJTjX",
+          "value": "[WORKFLOW_ID]",
           "mode": "list",
-          "cachedResultUrl": "/workflow/sJtuMC3jRFVTJTjX",
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
           "cachedResultName": "zendesk_get_user"
         },
         "workflowInputs": {
@@ -1648,10 +1648,10 @@
         "description": "Update the application/UCC status after a verified Sales Ticket has been successfully escalated to Billing. Call at most once per run, only on Path A, only after escalate_to_billing, and only with the exact sales_ticket_id, application_id, and product from the verified Sales Ticket. Use product to distinguish DS-82 (us_passport_ds82) vs DS-11 (us_passport_ds11). Update the application/UCC status after a verified Sales Ticket has been successfully escalated to Billing. Call at most once per run, only on Path A, only after escalate_to_billing, and only with the exact sales_ticket_id, application_id, and product from the verified Sales Ticket. Use product to distinguish DS-82 (us_passport_ds82) vs DS-11 (us_passport_ds11).",
         "workflowId": {
           "__rl": true,
-          "value": "fiD0HqMaeTvDyFbk",
+          "value": "[WORKFLOW_ID]",
           "mode": "list",
-          "cachedResultUrl": "/workflow/fiD0HqMaeTvDyFbk",
-          "cachedResultName": "Update_Application_Status [Entry]"
+          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
+          "cachedResultName": "update_application_status [Entry]"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",

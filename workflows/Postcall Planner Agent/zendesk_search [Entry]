@@ -1,5 +1,5 @@
 {
-  "name": "Zendesk Safe Caller for Postcall Agent [Entry]",
+  "name": "zendesk_search [Entry]",
   "nodes": [
     {
       "parameters": {
