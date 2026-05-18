@@ -132,7 +132,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}.json",
+        "url": "=https://<your_brand_name>.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
