@@ -141,7 +141,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://[your_brand_name].zendesk.com/api/v2/tickets.json",
+        "url": "https://<your_brand_name>.zendesk.com/api/v2/tickets.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
@@ -252,7 +252,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://[your_brand_name].zendesk.com/api/v2/tickets.json",
+        "url": "https://<your_brand_name>.zendesk.com/api/v2/tickets.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
@@ -289,7 +289,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://[your_brand_name].zendesk.com/api/v2/tickets.json",
+        "url": "https://<your_brand_name>.zendesk.com/api/v2/tickets.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
@@ -324,7 +324,7 @@
     },
     {
       "parameters": {
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/search.json",
+        "url": "=https://<your_brand_name>.zendesk.com/api/v2/users/search.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendQuery": true,
@@ -355,7 +355,7 @@
     },
     {
       "parameters": {
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/search.json",
+        "url": "=https://<your_brand_name>.zendesk.com/api/v2/users/search.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendQuery": true,
@@ -588,7 +588,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $json.ticket.id }}.json",
+        "url": "=https://<your_brand_name>.zendesk.com/api/v2/tickets/{{ $json.ticket.id }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
@@ -625,7 +625,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $json.ticket.id }}.json",
+        "url": "=https://<your_brand_name>.zendesk.com/api/v2/tickets/{{ $json.ticket.id }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,
