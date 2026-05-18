@@ -197,8 +197,8 @@ workflows/
 └── Inbound Voice Agent/
 
 prompts/
-├── Postcall Planner Agent Prompt/
-└── Inbound Voice Agent Prompt/
+├── Postcall Planner Agent Prompt
+└── Inbound Voice Agent Prompt
 
 screenshots/
 ├── Case 1/
