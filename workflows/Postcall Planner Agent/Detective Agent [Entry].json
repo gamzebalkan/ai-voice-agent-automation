@@ -50,7 +50,7 @@
           "parameters": [
             {
               "name": "xi-api-key",
-              "value": "[PLACE YOUR ELEVENLABS API KEY HERE]"
+              "value": "<ELEVENLABS_API_KEY>"
             }
           ]
         },
@@ -109,7 +109,7 @@
           "parameters": [
             {
               "name": "xi-api-key",
-              "value": "[PLACE YOUR ELEVENLABS API KEY HERE]"
+              "value": "<ELEVENLABS_API_KEY>"
             }
           ]
         },
