@@ -387,7 +387,7 @@
       ],
       "id": "974b9f8c-0e36-498f-a83e-865de9bde000",
       "name": "Webhook",
-      "webhookId": "41156388-c3b1-4f9a-a7af-ed2d6914b817"
+      "webhookId": "<WEBHOOK_ID>"
     },
     {
       "parameters": {
