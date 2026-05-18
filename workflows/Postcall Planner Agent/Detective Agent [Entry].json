@@ -213,9 +213,9 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "[WORKFLOW_ID]",
+          "value": "<WORKFLOW_ID>",
           "mode": "list",
-          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/<WORKFLOW_ID>",
           "cachedResultName": "merge_tickets [Entry]"
         },
         "workflowInputs": {
@@ -395,9 +395,9 @@
         "description": "Call this tool to get all ticket events. This is a Zendesk ticket audit containing the ticket timeline events. All fields with a null or empty value are removed from the result.\nYou will need to provide a json payload as follows:\n{\n  \"id\":<ticket id integer>,\n \"mode\": \"recent\" | \"standard\"\n}\nThe ticket ID is always a number, a large integer number. Anything else will error out, so don't even try it. When you are checking the ticket just to confirm that an update was made correctly, simply use mode \"recent\" with the same ticket ID. Rest of the time, mode \"standard\".\nMode is always a string, should be either:\n- \"recent\" - gets the last 10 events on a ticket\nOR it may be\n- \"standard\" - gets all events on the ticket. You should use standard the first time when you look at a ticket, but you should use \"recent\" whenever you are checking for recent updates.\nYou should not use Standard more than once per run, as the result can overwhelm your context window.\nThe tool will return the ticket events. The response will contain:\nAll comments and notifications - This is a series of all internal notes, notifications or public comment that exists on the ticket. This contains any and all messages ever sent to the customer in the scope of the ticket.\nLatest user comment: the body, timestamp and user id of the last public comment made by the requester.\nAll requester comments: this is an easy to digest summary of all comments made by the requester.\nTime Elapsed since Last customer reply: self explained, how much time passed since the  customer's last reply.",
         "workflowId": {
           "__rl": true,
-          "value": "[WORKFLOW_ID]",
+          "value": "<WORKFLOW_ID>",
           "mode": "list",
-          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/<WORKFLOW_ID>",
           "cachedResultName": "get_ticket_events [Entry]"
         },
         "workflowInputs": {
@@ -540,9 +540,9 @@
       "parameters": {
         "workflowId": {
           "__rl": true,
-          "value": "[WORKFLOW_ID]",
+          "value": "<WORKFLOW_ID>",
           "mode": "list",
-          "cachedResultUrl": "/workflow/[WORKFLOW_ID]",
+          "cachedResultUrl": "/workflow/<WORKFLOW_ID>",
           "cachedResultName": "create_call_ticket [Entry]"
         },
         "workflowInputs": {
