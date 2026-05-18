@@ -117,7 +117,7 @@
       ],
       "id": "2644d825-116a-4ec4-9db0-eb3b15271055",
       "name": "Wait",
-      "webhookId": "9b405618-58cf-4ffa-9e4d-f10da8a44ed1"
+      "webhookId": "<WEBHOOK_ID>"
     },
     {
       "parameters": {
@@ -163,7 +163,7 @@
       ],
       "id": "83db7b1a-0bcd-4d2b-8fee-6e298169360d",
       "name": "Wait2",
-      "webhookId": "9b405618-58cf-4ffa-9e4d-f10da8a44ed1"
+      "webhookId": "<WEBHOOK_ID>"
     },
     {
       "parameters": {
@@ -687,7 +687,7 @@
     {
       "parameters": {
         "method": "=POST",
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}/merge.json",
+        "url": "=https://<your_brand_name>.zendesk.com/api/v2/tickets/{{ $('Standardize merge data').first().json[\"Target Ticket ID\"] }}/merge.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendHeaders": true,

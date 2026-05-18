@@ -63,12 +63,12 @@
     },
     {
       "parameters": {
-        "url": "=https://api.[your_brand_name].com/api/ai/applications/ds82/{{ $json.application_id }}",
+        "url": "=https://api.<your_brand_name>.com/api/ai/applications/ds82/{{ $json.application_id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
         "specifyHeaders": "json",
-        "jsonHeaders": "{\n  \"x-clf-api-key\":\"[PLACE YOUR CLOUDFARE API KEY HERE]\"\n}",
+        "jsonHeaders": "{\n  \"x-clf-api-key\":\"<CLOUDFARE_API_KEY>\"\n}",
         "options": {
           "response": {
             "response": {
@@ -95,12 +95,12 @@
     },
     {
       "parameters": {
-        "url": "=https://api.[your_brand_name].com/api/ai/applications/ds11/{{ $json.application_id }}",
+        "url": "=https://api.<your_brand_name>.com/api/ai/applications/ds11/{{ $json.application_id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
         "specifyHeaders": "json",
-        "jsonHeaders": "{\n  \"x-clf-api-key\":\"[PLACE YOUR CLOUDFARE API KEY HERE]\"\n}",
+        "jsonHeaders": "{\n  \"x-clf-api-key\":\"<CLOUDFARE_API_KEY>\"\n}",
         "options": {
           "response": {
             "response": {
@@ -143,12 +143,12 @@
     {
       "parameters": {
         "method": "PATCH",
-        "url": "=https://api.[your_brand_name].com/api/ai/applications/ds82/{{ $json.application_id }}",
+        "url": "=https://api.<your_brand_name>.com/api/ai/applications/ds82/{{ $json.application_id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
         "specifyHeaders": "json",
-        "jsonHeaders": "{\n  \"x-clf-api-key\":\"[PLACE YOUR CLOUDFARE API KEY HERE]\"\n}",
+        "jsonHeaders": "{\n  \"x-clf-api-key\":\"<CLOUDFARE_API_KEY>\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"status\": \"{{ $json.status }}\"\n}\n",
@@ -202,12 +202,12 @@
     {
       "parameters": {
         "method": "PATCH",
-        "url": "=https://api.[your_brand_name].com/api/ai/applications/ds11/{{ $json.application_id }}",
+        "url": "=https://api.<your_brand_name>.com/api/ai/applications/ds11/{{ $json.application_id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
         "specifyHeaders": "json",
-        "jsonHeaders": "{\n  \"x-clf-api-key\":\"[PLACE YOUR CLOUDFARE API KEY HERE]\"\n}",
+        "jsonHeaders": "{\n  \"x-clf-api-key\":\"<CLOUDFARE_API_KEY>\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"status\": \"{{ $json.status }}\"\n}\n",
