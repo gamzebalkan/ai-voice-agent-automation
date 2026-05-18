@@ -292,114 +292,6 @@
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "[Zendesk_Safe_Caller_workflow_id]",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/[Zendesk_Safe_Caller_workflow_id]",
-          "cachedResultName": "Zendesk Safe Caller"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "id": "={{ $json.ticket_id }}",
-            "source": "=https://[your_brand_name].app.n8n.cloud/workflow/[workflow_id]/debug/{{ $execution.id }}",
-            "target": "ticket",
-            "operation": "update",
-            "payload": "={\n  \"priority\": \"urgent\",\n  \"comment\": {\n    \"author_id\": 32164381873810,\n    \"html_body\": \"<p>This ticket requires immediate attention. I am changing its priority to Urgent. </p><p>Here's my reasoning: {{ $('When Executed by Another Workflow').item.json.reason }}</p>\",\n    \"public\": false\n  }\n}",
-            "options": "{}"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "id",
-              "displayName": "id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "source",
-              "displayName": "source",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "target",
-              "displayName": "target",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "operation",
-              "displayName": "operation",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "payload",
-              "displayName": "payload",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "options",
-              "displayName": "options",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        304,
-        288
-      ],
-      "id": "5ffbbf9c-986e-4dfb-ad07-077eb7c33e6e",
-      "name": "Zendesk Safe Caller",
-      "disabled": true
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "id": "={{ $('When Executed by Another Workflow').item.json.ticket_id }}",
-        "updateFields": {}
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        320,
-        512
-      ],
-      "id": "d2dbb2f6-aef8-4752-b5b4-065a63402c2e",
-      "name": "NO field for priority on ZD node",
-      "credentials": {
-        "zendeskApi": {
-          "id": "r6Mcqrp6YkvDbbjZ",
-          "name": "Zendesk account 2"
-        }
-      },
-      "disabled": true,
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
         "errorMessage": "Error on priority escalation."
       },
       "type": "n8n-nodes-base.stopAndError",
@@ -427,7 +319,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -462,7 +354,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -523,23 +415,7 @@
       "name": "Execution Data"
     }
   ],
-  "pinData": {
-    "When Executed by Another Workflow": [
-      {
-        "json": {
-          "sales_ticket_id": "330640",
-          "priority_flag": "urgent_flag",
-          "reason": "Customer requested cancellation and refund; ticket is currently unassigned and service shows “Less than 24 hours,” so faster handling may be required.",
-          "assignee_id": "",
-          "group_id": "33803643912722",
-          "sales_ticket_priority": "high"
-        },
-        "pairedItem": {
-          "item": 0
-        }
-      }
-    ]
-  },
+  "pinData": {},
   "connections": {
     "When Executed by Another Workflow": {
       "main": [
@@ -618,16 +494,6 @@
         ]
       ]
     },
-    "Zendesk Safe Caller": {
-      "main": [
-        []
-      ]
-    },
-    "NO field for priority on ZD node": {
-      "main": [
-        []
-      ]
-    },
     "Escalate to urgent": {
       "main": [
         [
@@ -672,7 +538,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "ad9e36db-42d8-40f9-9ed4-bd90ceca8dbf",
+  "versionId": "e513cbda-faf7-4233-ac22-0ebaaac641bd",
   "meta": {
     "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"
   },

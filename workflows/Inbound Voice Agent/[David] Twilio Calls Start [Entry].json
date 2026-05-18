@@ -908,43 +908,7 @@
       "name": "Personal first message3"
     }
   ],
-  "pinData": {
-    "Twilio Call initiated": [
-      {
-        "json": {
-          "headers": {
-            "host": "david-ga-incall.up.railway.app",
-            "user-agent": "ElevenLabs/1.0",
-            "content-length": "218",
-            "accept": "*/*",
-            "accept-encoding": "gzip, deflate, br",
-            "content-type": "application/json",
-            "x-forwarded-for": "34.59.11.47",
-            "x-forwarded-host": "david-ga-incall.up.railway.app",
-            "x-forwarded-proto": "https",
-            "x-railway-edge": "railway/us-west2",
-            "x-railway-request-id": "ovNzkDY6S8OtgBhMn6XIxQ",
-            "x-real-ip": "34.59.11.47",
-            "x-request-start": "1778013375800"
-          },
-          "params": {},
-          "query": {},
-          "body": {
-            "caller_id": "+13135448174",
-            "agent_id": "agent_3601k4mdj3dpe41r5w10pvzhy3bx",
-            "called_number": "+12403037745",
-            "call_sid": "CAac95362f8a9ec98b56f5ffea0a82306b",
-            "conversation_id": "conv_8501kqwxp313ej388njdx57eavvy"
-          },
-          "webhookUrl": "https://david-ga-incall.up.railway.app/webhook/twilio-start/entry",
-          "executionMode": "production"
-        },
-        "pairedItem": {
-          "item": 0
-        }
-      }
-    ]
-  },
+  "pinData": {},
   "connections": {
     "Twilio Call initiated": {
       "main": [

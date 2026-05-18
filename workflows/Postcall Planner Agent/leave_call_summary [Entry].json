@@ -3,29 +3,6 @@
   "nodes": [
     {
       "parameters": {
-        "operation": "getAll",
-        "options": {
-          "query": "=requester:\"[SAMPLE PHONE NUMBER]\" "
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        896,
-        3808
-      ],
-      "id": "3d791eac-a8e7-4309-a8e0-b9f18bb8cc9f",
-      "name": "TEST",
-      "alwaysOutputData": true,
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      }
-    },
-    {
-      "parameters": {
         "workflowInputs": {
           "values": [
             {
@@ -79,91 +56,6 @@
       ],
       "id": "258305ab-4511-46ba-bf95-213aa82dae33",
       "name": "When Executed by Another Workflow"
-    },
-    {
-      "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "[Zendesk_Safe_Caller_workflow_id]",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/[Zendesk_Safe_Caller_workflow_id]",
-          "cachedResultName": "Zendesk Safe Caller"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "id": "={{ $json.ticket_id }}",
-            "source": "=https://[your_brand_name].app.n8n.cloud/workflow/[workflow_id]/debug/{{ $execution.id }}",
-            "target": "ticket",
-            "operation": "update",
-            "payload": "={{\n  Object.assign(\n    {},\n    $json.payload,\n    {\n      comment: {\n        author_id: \"32164381873810\",\n        html_body: $('When Executed by Another Workflow').item.json.call_summary,\n        public: false\n      }\n    }\n  ).toJsonString()\n}}\n",
-            "options": "{}"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "id",
-              "displayName": "id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "source",
-              "displayName": "source",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "target",
-              "displayName": "target",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "operation",
-              "displayName": "operation",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "payload",
-              "displayName": "payload",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "options",
-              "displayName": "options",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        672,
-        3808
-      ],
-      "id": "4e27e966-7cb2-4fad-9661-b2be0bc7a0c5",
-      "name": "Zendesk Safe Caller - PROD BACKUP",
-      "disabled": true
     },
     {
       "parameters": {
@@ -258,6 +150,18 @@
               "id": "87d4066e-d2a3-4389-9f04-23afb5bc0d52",
               "name": "main_ticket_type",
               "value": "={{ $json.main_ticket_type }}",
+              "type": "string"
+            },
+            {
+              "id": "2c7add6c-b443-4682-b70c-f2e1ed0e95c0",
+              "name": "call_summary",
+              "value": "={{ $('Main ticket type').item.json.call_summary }}",
+              "type": "string"
+            },
+            {
+              "id": "cdc00363-e453-4040-85d3-94f2325d93dd",
+              "name": "call_result",
+              "value": "={{ $('Main ticket type').item.json.call_result }}",
               "type": "string"
             }
           ]
@@ -382,12 +286,12 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.main_ticket_id }}.json",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.main_ticket_id }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"ticket\": {\n    \"comment\": {\n      \"author_id\": 34685489132818,\n      \"html_body\": \"<p>{{ $('When Executed by Another Workflow').item.json.call_summary.replace(/\\\"/g, '\\\\\\\"').replace(/\\n/g, '<br>') }}</p>\",\n      \"public\": false\n    },\n    \"status\": \"open\"\n  }\n}",
+        "jsonBody": "={{\nJSON.stringify({\n  ticket: {\n    comment: {\n      author_id: 34685489132818,\n      html_body: $('Derive Callback Tag').item.json.clean_call_summary || '',\n      public: false\n    },\n    status: 'open'\n  }\n})\n}}",
         "options": {
           "response": {
             "response": {
@@ -399,8 +303,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1856,
-        2512
+        2896,
+        2912
       ],
       "id": "65ed4d60-aa4a-4fd8-923c-3f9e5ede66ce",
       "name": "HTTP - Set to open and leave summary",
@@ -422,87 +326,11 @@
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
       "position": [
-        2224,
-        2528
+        3216,
+        3040
       ],
       "id": "d7f5fa69-eeab-4fe1-8149-a2d55d2a5311",
       "name": "Stop and Error2"
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "id": "={{ $('Standardize Data').item.json.main_ticket_id }}",
-        "updateFields": {
-          "status": "open"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        1376,
-        3808
-      ],
-      "id": "d155b7cc-bc82-4166-8075-a90250c821ed",
-      "name": "Set to open",
-      "credentials": {
-        "zendeskApi": {
-          "id": "LT94JnDBkwRZ1hlb",
-          "name": "Zendesk account 2 - Main Account"
-        }
-      },
-      "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "id": "={{ $('Standardize Data').item.json.main_ticket_id }}",
-        "updateFields": {
-          "customFieldsUi": {
-            "customFieldsValues": []
-          },
-          "internalNote": "={{ $('When Executed by Another Workflow').item.json.call_summary }}"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        1600,
-        3808
-      ],
-      "id": "11a19d75-b036-453c-bfe4-afe8baa6d4d2",
-      "name": "Leave summary",
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      },
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "id": "={{ $('Standardize Data').item.json.main_ticket_id }}",
-        "updateFields": {
-          "internalNote": "=Please review the call ticket for call details.",
-          "status": "open"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        2064,
-        4080
-      ],
-      "id": "b9590ae6-1a7f-48b6-b12a-cb820fe50b89",
-      "name": "Set to open and leave summary - via managers",
-      "credentials": {
-        "zendeskApi": {
-          "id": "LT94JnDBkwRZ1hlb",
-          "name": "Zendesk account 2 - Main Account"
-        }
-      },
-      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -521,34 +349,148 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2224,
-        2336
+        3184,
+        2736
       ],
       "id": "49d19e71-d4a7-424a-ba4c-01d01eee31d0",
       "name": "Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "66b417f8-4ba4-43f1-b06c-32c094a9c17c",
+              "leftValue": "={{ $('Derive Callback Tag').item.json.should_add_callback_tag }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2032,
+        2896
+      ],
+      "id": "93e5dd68-ea29-4f2d-95bb-44a3ad0ae9d7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1bf3204-7493-410a-84c3-9d7e3df8a35b",
+              "name": "should_add_callback_tag",
+              "value": "={{ \n  $('When Executed by Another Workflow').item.json.call_result === 'requires specialist review' &&\n  ($('When Executed by Another Workflow').item.json.call_summary || '').includes('meta_tag:callback_requested_specialist_review')\n  }}",
+              "type": "string"
+            },
+            {
+              "id": "8371be80-5a13-49bd-ae47-23b269dfdabd",
+              "name": "clean_call_summary",
+              "value": "={{    ($('When Executed by Another Workflow').item.json.call_summary || '')     .replace('<p>meta_tag:callback_requested_specialist_review</p>', '') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1776,
+        2896
+      ],
+      "id": "57638f74-4895-4ac3-b50f-de6110e80031",
+      "name": "Derive Callback Tag"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.main_ticket_id }}/tags.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"tags\": [\"callback_requested_specialist_review\"]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2304,
+        2720
+      ],
+      "id": "489e42c8-e0a0-4a17-afd7-61f50c691abd",
+      "name": "HTTP - Add tags",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "maxTries": 5,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Standardize Data').item.json.main_ticket_id }}/tags.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zendeskApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"tags\": [\"ai_handled_call\"]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2592,
+        2912
+      ],
+      "id": "977a0fae-a006-4d5d-b02d-ecb0aba62e43",
+      "name": "HTTP - Add tags1",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "maxTries": 5,
+      "credentials": {
+        "zendeskApi": {
+          "id": "LT94JnDBkwRZ1hlb",
+          "name": "Zendesk account 2 - Main Account"
+        }
+      },
+      "onError": "continueRegularOutput"
     }
   ],
-  "pinData": {
-    "When Executed by Another Workflow": [
-      {
-        "json": {
-          "sales_ticket_id": "1153200",
-          "sales_ticket_status": "open",
-          "call_summary": "<p>I located the client’s active U.S. visa (DS-160) sales ticket and reviewed the current milestones with them: photos received (2026-04-07) and payment captured, but the ticket does not yet confirm DS-160 completion/submission, MRV fee payment, or embassy interview scheduling.</p><p>The client requested a clear status update on those specific steps; I documented the request and confirmed the best reply email is rmartin@stephen-martin.com.</p><p>Next step: specialist team to verify DS-160 submission, MRV payment, and interview scheduling status and reply to the client by email.</p><p><strong>Note:</strong> I attempted to merge the created call ticket into the sales ticket, but the merge action was blocked by a rate-limit error; the call ticket may need manual merge.</p>",
-          "assignee_id": "",
-          "group_id": "33803642898066",
-          "product": "grs_-_visa",
-          "call_result": "requires specialist review",
-          "lead_ticket_id": "",
-          "lead_ticket_assignee_id": "",
-          "lead_ticket_group_id": ""
-        },
-        "pairedItem": {
-          "item": 0
-        }
-      }
-    ]
-  },
+  "pinData": {},
   "connections": {
     "When Executed by Another Workflow": {
       "main": [
@@ -617,7 +559,7 @@
             "index": 0
           },
           {
-            "node": "HTTP - Set to open and leave summary",
+            "node": "Derive Callback Tag",
             "type": "main",
             "index": 0
           }
@@ -642,11 +584,45 @@
         ]
       ]
     },
-    "Set to open": {
+    "Response": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
       "main": [
         [
           {
-            "node": "Leave summary",
+            "node": "HTTP - Add tags",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP - Add tags1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Derive Callback Tag": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - Add tags": {
+      "main": [
+        [
+          {
+            "node": "HTTP - Add tags1",
             "type": "main",
             "index": 0
           }
@@ -654,22 +630,15 @@
         []
       ]
     },
-    "Leave summary": {
+    "HTTP - Add tags1": {
       "main": [
-        [],
         [
           {
-            "node": "Set to open and leave summary - via managers",
+            "node": "HTTP - Set to open and leave summary",
             "type": "main",
             "index": 0
           }
         ]
-      ]
-    },
-    "Set to open and leave summary - via managers": {
-      "main": [
-        [],
-        []
       ]
     }
   },
@@ -680,7 +649,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "272be7af-9cc7-477b-9374-7545cd8938aa",
+  "versionId": "5dfa904f-0ba1-4358-8499-eecd3e9973e5",
   "meta": {
     "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"
   },

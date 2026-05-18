@@ -320,7 +320,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('Uniform').first().json[\"Ticket ID\"] }}",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Uniform').first().json[\"Ticket ID\"] }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -354,7 +354,7 @@
     },
     {
       "parameters": {
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('Uniform').first().json[\"Ticket ID\"] }}",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Uniform').first().json[\"Ticket ID\"] }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "options": {
@@ -405,7 +405,7 @@
     },
     {
       "parameters": {
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('Uniform').first().json[\"Ticket ID\"] }}",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('Uniform').first().json[\"Ticket ID\"] }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "options": {
@@ -456,7 +456,7 @@
     },
     {
       "parameters": {
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/search.json?query={{ $json.payload.replaceAll('+','%2B') }} ",
+        "url": "=https://entryllc.zendesk.com/api/v2/search.json?query={{ $json.payload.replaceAll('+','%2B') }} ",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "options": {
@@ -488,7 +488,7 @@
     },
     {
       "parameters": {
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/{{ $('Uniform').first().json[\"Ticket ID\"] }}",
+        "url": "=https://entryllc.zendesk.com/api/v2/users/{{ $('Uniform').first().json[\"Ticket ID\"] }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "options": {
@@ -627,7 +627,7 @@
     },
     {
       "parameters": {
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/search.json?query=requester:stefan.krieger@grupotaiga.com.br tags:sales_ticket",
+        "url": "=https://entryllc.zendesk.com/api/v2/search.json?query=requester:stefan.krieger@grupotaiga.com.br tags:sales_ticket",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "options": {
@@ -786,28 +786,13 @@
     }
   ],
   "pinData": {
-    "When Executed by Another Workflow": [
-      {
-        "json": {
-          "id": "",
-          "source": "zendesk_search",
-          "target": "ticket",
-          "operation": "search",
-          "payload": "16481 status<closed type:ticket",
-          "options": "{}"
-        },
-        "pairedItem": {
-          "item": 0
-        }
-      }
-    ],
     "HTTP Request": [
       {
         "json": {
           "body": {
             "results": [
               {
-                "url": "https://[your_brand_name].zendesk.com/api/v2/tickets/16481.json",
+                "url": "https://entryllc.zendesk.com/api/v2/tickets/16481.json",
                 "id": 16481,
                 "external_id": null,
                 "via": {
@@ -824,7 +809,7 @@
                 "type": "question",
                 "subject": "Your DS82 application",
                 "raw_subject": "Your DS82 application",
-                "description": "## This is a migrated ticket\n\n* * *\n\n![](https://zendesk.s3.us-east-1.wasabisys.com/images/ds82.jpg)\n\n\n\n# This is a Passport Service (Renewal Application DS-82) Sales Ticket.\n\n\n## Please be sure to follow the step by step instructions:\n\n\n### https://[your_brand_name].atlassian.net/wiki/spaces/~569726474/pages/23614095440/Passport+Service\n\n\nPlease be sure to check for other tickets from this customer and merge them as needed.\n\n\n**Application URL:**\nhttps://admin.[your_brand_name].com/ds82/applicant/69ca850ceb2fbb003d9a3b15\n\n\n* * *\n\n**Site ID: undefined**\n**Applicant Information:**\n\n**Applicant_ID:** 69ca850ceb2fbb003d9a3b15\n**Applicant_Status:** New\n**Applicant_Payment_Status:** Captured\n**Applicant_First_Name:** Marie\n**Applicant_Last_Name:** Ramirez\n**Applicant_Email:** mramirez771612@yahoo.com\n**Applicant_Birth_Country:** USA\n**Applicant_Birth_Date:** 1977-07-06\n**Applicant_Created_At:** 2026-03-30 14:13:32\n\n\n* * *\n\n**Payment Information:**\n\n\nCustomer Information\n**Name** Marie Ramirez\n**Email** mramirez771612@yahoo.com\n**Phone** N/A\n**Address** N/A\n\nTransaction Details\n**Order ID** N/A\n**Reference Number** 11883223586\n**Transaction Date** 2026-03-30 14:13:24\n**Transaction Type** CHARGE\n**Payment Method** CREDIT_CARD\n**Payment Gateway** nmi\n\nProducts\nProduct Name Price Quantity Shipping Fee\nRenewal: Passport Application DS82 $119.00 USD 1 $19.95 USD\n2-3 Weeks Expedited $0.00 USD 1 $0.00 USD\n\n### ⚠️ Government Fee Status\n\nThis order does **NOT** include any government fees.\n\nPayment Summary\n**Total Amount** $218.95 USD\n**Shipping Fee** $0.00 USD\n**Platform Fee** $0.00 USD\n**Discount** $0.00 USD\n\n**Company Information:**\n\n\n**Site ID:** entry.com\n**Source Site:** N/A\n\n\n\n* * *\n\n\n### Show Raw Payment Data\n\n**orderId:** 11883223586\n**zendeskId:** null\n**skipZendesk:** false\n**invoiceEmail:** mramirez771612@yahoo.com\n**userEmail:** mramirez771612@yahoo.com\n**invoiceFirstName:** Marie\n**invoiceLastName:** Ramirez\n**invoiceAmountUSD:** 218.95\n**invoiceAmount:** 218.95\n**currency:** USD\n**invoiceZipCode:** 92336\n**referenceNumber:** 11883223586\n**invoiceURL:** null\n**invoiceInfoURL:** null\n**transactionDate:** 2026-03-30 14:13:24\n**avsResponse:** null\n**transactionType:** CHARGE\n**productName:** Renewal: Passport Application DS82, 2-3 Weeks Expedited\n**contractName:** Renewal: Passport Application DS82, 2-3 Weeks Expedited\n**customerPhone:** null\n**cartProducts:**\n**cartProducts 0:**\n**cartProducts 0 id:** 817\n**cartProducts 0 name:** Renewal: Passport Application DS82\n**cartProducts 0 price:** 119\n**cartProducts 0 government_fee:** 0\n**cartProducts 0 shipping_fee:** 19.95\n**cartProducts 0 exclude_from_conversion:** 0\n**cartProducts 0 currency:** USD\n**cartProducts 0 quantity:** 1\n**cartProducts 0 service_speed:** service_speed_standard\n**cartProducts 1:**\n**cartProducts 1 upsell_id:** 314\n**cartProducts 1 name:** 2-3 Weeks Expedited\n**cartProducts 1 price:** 0\n**cartProducts 1 government_fee:** 0\n**cartProducts 1 shipping_fee:** 0\n**cartProducts 1 exclude_from_conversion:** 0\n**cartProducts 1 quantity:** 1\n**cartProducts 1 currency:** USD\n**cartProducts 1 service_speed:** service_speed_expedited\n**applicationId:** 69ca850ceb2fbb003d9a3b15\n**site_id:** entry.com\n**salesAgent:** null\n**couponCode:** null\n**paymentGateway:** nmi\n**cardCountry:** US\n**paymentCountry:** US\n**paymentMethod:** CREDIT_CARD\n**emailTemplateId:** null\n**zendeskProduct:** null\n**shouldCreateZendeskTicket:** true\n**attachment:** null\n**gclid:** null\n**formData:** null\n**formTitle:** null\n**sourceSiteId:** entry.com\n**geState:** null\n**geLocation:** null\n**geCountry:** null\n**geHavePassport:** null\n**geFlow:** null\n**diy:** null\n**tsaStatusInUS:** null\n**tsaFlow:** null\n**discountValue:** 0\n**platformFee:** 0\n**shippingFee:** 0\n**quantity:** 1\n**totalAmount:** 218.95\n**initialCharge:** 218.95\n**serviceSpeed:** service_speed_expedited\n**includeGovFees:** false\n**external_product_name:** Renewal: Passport Application DS82 - Expedited\n**external_charged_amount:** 218.95\n**skipReceiptEmail:** true",
+                "description": "## This is a migrated ticket\n\n* * *\n\n![](https://zendesk.s3.us-east-1.wasabisys.com/images/ds82.jpg)\n\n\n\n# This is a Passport Service (Renewal Application DS-82) Sales Ticket.\n\n\n## Please be sure to follow the step by step instructions:\n\n\n### https://govassist.atlassian.net/wiki/spaces/~569726474/pages/23614095440/Passport+Service\n\n\nPlease be sure to check for other tickets from this customer and merge them as needed.\n\n\n**Application URL:**\nhttps://admin.govassist.com/ds82/applicant/69ca850ceb2fbb003d9a3b15\n\n\n* * *\n\n**Site ID: undefined**\n**Applicant Information:**\n\n**Applicant_ID:** 69ca850ceb2fbb003d9a3b15\n**Applicant_Status:** New\n**Applicant_Payment_Status:** Captured\n**Applicant_First_Name:** Marie\n**Applicant_Last_Name:** Ramirez\n**Applicant_Email:** mramirez771612@yahoo.com\n**Applicant_Birth_Country:** USA\n**Applicant_Birth_Date:** 1977-07-06\n**Applicant_Created_At:** 2026-03-30 14:13:32\n\n\n* * *\n\n**Payment Information:**\n\n\nCustomer Information\n**Name** Marie Ramirez\n**Email** mramirez771612@yahoo.com\n**Phone** N/A\n**Address** N/A\n\nTransaction Details\n**Order ID** N/A\n**Reference Number** 11883223586\n**Transaction Date** 2026-03-30 14:13:24\n**Transaction Type** CHARGE\n**Payment Method** CREDIT_CARD\n**Payment Gateway** nmi\n\nProducts\nProduct Name Price Quantity Shipping Fee\nRenewal: Passport Application DS82 $119.00 USD 1 $19.95 USD\n2-3 Weeks Expedited $0.00 USD 1 $0.00 USD\n\n### ⚠️ Government Fee Status\n\nThis order does **NOT** include any government fees.\n\nPayment Summary\n**Total Amount** $218.95 USD\n**Shipping Fee** $0.00 USD\n**Platform Fee** $0.00 USD\n**Discount** $0.00 USD\n\n**Company Information:**\n\n\n**Site ID:** entry.com\n**Source Site:** N/A\n\n\n\n* * *\n\n\n### Show Raw Payment Data\n\n**orderId:** 11883223586\n**zendeskId:** null\n**skipZendesk:** false\n**invoiceEmail:** mramirez771612@yahoo.com\n**userEmail:** mramirez771612@yahoo.com\n**invoiceFirstName:** Marie\n**invoiceLastName:** Ramirez\n**invoiceAmountUSD:** 218.95\n**invoiceAmount:** 218.95\n**currency:** USD\n**invoiceZipCode:** 92336\n**referenceNumber:** 11883223586\n**invoiceURL:** null\n**invoiceInfoURL:** null\n**transactionDate:** 2026-03-30 14:13:24\n**avsResponse:** null\n**transactionType:** CHARGE\n**productName:** Renewal: Passport Application DS82, 2-3 Weeks Expedited\n**contractName:** Renewal: Passport Application DS82, 2-3 Weeks Expedited\n**customerPhone:** null\n**cartProducts:**\n**cartProducts 0:**\n**cartProducts 0 id:** 817\n**cartProducts 0 name:** Renewal: Passport Application DS82\n**cartProducts 0 price:** 119\n**cartProducts 0 government_fee:** 0\n**cartProducts 0 shipping_fee:** 19.95\n**cartProducts 0 exclude_from_conversion:** 0\n**cartProducts 0 currency:** USD\n**cartProducts 0 quantity:** 1\n**cartProducts 0 service_speed:** service_speed_standard\n**cartProducts 1:**\n**cartProducts 1 upsell_id:** 314\n**cartProducts 1 name:** 2-3 Weeks Expedited\n**cartProducts 1 price:** 0\n**cartProducts 1 government_fee:** 0\n**cartProducts 1 shipping_fee:** 0\n**cartProducts 1 exclude_from_conversion:** 0\n**cartProducts 1 quantity:** 1\n**cartProducts 1 currency:** USD\n**cartProducts 1 service_speed:** service_speed_expedited\n**applicationId:** 69ca850ceb2fbb003d9a3b15\n**site_id:** entry.com\n**salesAgent:** null\n**couponCode:** null\n**paymentGateway:** nmi\n**cardCountry:** US\n**paymentCountry:** US\n**paymentMethod:** CREDIT_CARD\n**emailTemplateId:** null\n**zendeskProduct:** null\n**shouldCreateZendeskTicket:** true\n**attachment:** null\n**gclid:** null\n**formData:** null\n**formTitle:** null\n**sourceSiteId:** entry.com\n**geState:** null\n**geLocation:** null\n**geCountry:** null\n**geHavePassport:** null\n**geFlow:** null\n**diy:** null\n**tsaStatusInUS:** null\n**tsaFlow:** null\n**discountValue:** 0\n**platformFee:** 0\n**shippingFee:** 0\n**quantity:** 1\n**totalAmount:** 218.95\n**initialCharge:** 218.95\n**serviceSpeed:** service_speed_expedited\n**includeGovFees:** false\n**external_product_name:** Renewal: Passport Application DS82 - Expedited\n**external_charged_amount:** 218.95\n**skipReceiptEmail:** true",
                 "priority": "normal",
                 "status": "open",
                 "recipient": null,
@@ -1864,7 +1849,7 @@
                   },
                   {
                     "id": 33720479429906,
-                    "value": "https://url.[your_brand_name].com/xicQ0QMzlSGB"
+                    "value": "https://url.govassist.com/xicQ0QMzlSGB"
                   },
                   {
                     "id": 33720479591058,
@@ -1960,7 +1945,7 @@
                   },
                   {
                     "id": 33808270720530,
-                    "value": "https://doc-review.[your_brand_name].com/?docid=69ca902eeb2fbb003d9adbb2"
+                    "value": "https://doc-review.govassist.com/?docid=69ca902eeb2fbb003d9adbb2"
                   },
                   {
                     "id": 33808327673234,
@@ -2996,7 +2981,7 @@
                   },
                   {
                     "id": 33720479429906,
-                    "value": "https://url.[your_brand_name].com/xicQ0QMzlSGB"
+                    "value": "https://url.govassist.com/xicQ0QMzlSGB"
                   },
                   {
                     "id": 33720479591058,
@@ -3092,7 +3077,7 @@
                   },
                   {
                     "id": 33808270720530,
-                    "value": "https://doc-review.[your_brand_name].com/?docid=69ca902eeb2fbb003d9adbb2"
+                    "value": "https://doc-review.govassist.com/?docid=69ca902eeb2fbb003d9adbb2"
                   },
                   {
                     "id": 33808327673234,
@@ -3190,8 +3175,8 @@
             "zendesk-route": "/api/v2/search",
             "set-cookie": [
               "_zendesk_cookie=BAhJIhl7ImRldmljZV90b2tlbnMiOnt9fQY6BkVU--0bf2100788cb010d0183feca16aaf88ccaf719ca; path=/; expires=Fri, 30 Apr 2027 03:48:18 GMT; secure; HttpOnly; SameSite=None",
-              "__cf_bm=MBZf8mYHjPFCH1n3kCXFHRKXXjWWhZmh4WaScquTcTU-1777531468-1.0.1.1-Fq0cN5oAwQ0D7x0qhLZz1tyKKxit0VLmXa_FP3Y4iNew.zBsY5uNcChlaDtONLySv4gbnWClhGn8GVoUdB84_58SlvLbdKtyxffFR7259L8; path=/; expires=Thu, 30-Apr-26 07:14:28 GMT; domain=.[your_brand_name].zendesk.com; HttpOnly; Secure; SameSite=None",
-              "_cfuvid=DlQ.H3yN9asB_s_n8cPEgbhX3foLGl1grUOhXLBcMLQ-1777531468511-0.0.1.1-604800000; path=/; domain=.[your_brand_name].zendesk.com; HttpOnly; Secure; SameSite=None"
+              "__cf_bm=MBZf8mYHjPFCH1n3kCXFHRKXXjWWhZmh4WaScquTcTU-1777531468-1.0.1.1-Fq0cN5oAwQ0D7x0qhLZz1tyKKxit0VLmXa_FP3Y4iNew.zBsY5uNcChlaDtONLySv4gbnWClhGn8GVoUdB84_58SlvLbdKtyxffFR7259L8; path=/; expires=Thu, 30-Apr-26 07:14:28 GMT; domain=.entryllc.zendesk.com; HttpOnly; Secure; SameSite=None",
+              "_cfuvid=DlQ.H3yN9asB_s_n8cPEgbhX3foLGl1grUOhXLBcMLQ-1777531468511-0.0.1.1-604800000; path=/; domain=.entryllc.zendesk.com; HttpOnly; Secure; SameSite=None"
             ],
             "x-zendesk-origin-server": "classic-app-server-7bb6688f97-qwcxk",
             "x-request-id": "9f4493fa1f849ffa-AMS",

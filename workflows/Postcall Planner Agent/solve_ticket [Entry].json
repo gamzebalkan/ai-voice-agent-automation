@@ -242,91 +242,6 @@
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "[Zendesk_Safe_Caller_workflow_id]",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/[Zendesk_Safe_Caller_workflow_id]",
-          "cachedResultName": "Zendesk Safe Caller"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "id": "={{ $('When Executed by Another Workflow').item.json.ticket_id }}",
-            "target": "ticket",
-            "operation": "update",
-            "payload": "={ \"status\": \"solved\" } ",
-            "options": "{}"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "id",
-              "displayName": "id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "source",
-              "displayName": "source",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": true
-            },
-            {
-              "id": "target",
-              "displayName": "target",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "operation",
-              "displayName": "operation",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "payload",
-              "displayName": "payload",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            },
-            {
-              "id": "options",
-              "displayName": "options",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        3056,
-        -672
-      ],
-      "id": "a01f8bab-41b6-4bd5-bdf4-0b481215a804",
-      "name": "Zendesk Safe Caller - solve",
-      "disabled": true
-    },
-    {
-      "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,
@@ -452,20 +367,6 @@
     },
     {
       "parameters": {
-        "errorMessage": "={{ $json.error.message +'. '+ $json.error.description }}"
-      },
-      "type": "n8n-nodes-base.stopAndError",
-      "typeVersion": 1,
-      "position": [
-        3328,
-        -192
-      ],
-      "id": "660b757e-bf0c-47f3-84f6-31103f865fc7",
-      "name": "Stop and Error1",
-      "disabled": true
-    },
-    {
-      "parameters": {
         "operation": "update",
         "id": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
         "updateFields": {
@@ -553,7 +454,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -600,48 +501,8 @@
     },
     {
       "parameters": {
-        "operation": "update",
-        "id": "={{ $('When Executed by Another Workflow').item.json.call_ticket_id }}",
-        "updateFields": {
-          "assigneeEmail": "managers@immigrate.us",
-          "customFieldsUi": {
-            "customFieldsValues": [
-              {
-                "id": 33720327230994,
-                "value": "not_paid"
-              },
-              {
-                "id": 33720422936082,
-                "value": "managers"
-              },
-              {
-                "id": 33720461775122,
-                "value": "no_refund_requested"
-              }
-            ]
-          }
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        1984,
-        1136
-      ],
-      "id": "c3a2feb4-c99d-438b-890b-0b1659a3f249",
-      "name": "Edit fields",
-      "credentials": {
-        "zendeskApi": {
-          "id": "LT94JnDBkwRZ1hlb",
-          "name": "Zendesk account 2 - Main Account"
-        }
-      },
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.call_ticket_id }}",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.call_ticket_id }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -672,29 +533,6 @@
         }
       },
       "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "id": "={{ $('When Executed by Another Workflow').item.json.call_ticket_id }}",
-        "updateFields": {
-          "status": "solved"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        2560,
-        1136
-      ],
-      "id": "2a83e1fd-150b-4a8e-991e-f3051b4488b2",
-      "name": "Update a ticket",
-      "credentials": {
-        "zendeskApi": {
-          "id": "LT94JnDBkwRZ1hlb",
-          "name": "Zendesk account 2 - Main Account"
-        }
-      }
     },
     {
       "parameters": {
@@ -737,22 +575,7 @@
       "onError": "continueErrorOutput"
     }
   ],
-  "pinData": {
-    "When Executed by Another Workflow": [
-      {
-        "json": {
-          "sales_ticket_id": "",
-          "sales_ticket_status": "",
-          "assignee_id": "",
-          "call_ticket_id": "1815259",
-          "call_result": "could not capture the request"
-        },
-        "pairedItem": {
-          "item": 0
-        }
-      }
-    ]
-  },
+  "pinData": {},
   "connections": {
     "When Executed by Another Workflow": {
       "main": [
@@ -835,11 +658,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Zendesk Safe Caller - solve": {
-      "main": [
-        []
       ]
     },
     "Is assignee Casey or Jamie?": {
@@ -945,12 +763,6 @@
         ]
       ]
     },
-    "Edit fields": {
-      "main": [
-        [],
-        []
-      ]
-    },
     "HTTP - Edit fields, solve tickets": {
       "main": [
         [
@@ -995,7 +807,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "78b49f13-ecd5-434e-a190-18569fc9989b",
+  "versionId": "728b5af0-1199-4c3e-9e63-ca9231e246b5",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"

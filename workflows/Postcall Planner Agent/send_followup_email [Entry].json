@@ -50,12 +50,12 @@
     },
     {
       "parameters": {
-        "url": "=https://api.[your_brand_name].com/api/ai/applications/ds82/{{$json.application_id}}",
+        "url": "=https://api.govassist.com/api/ai/applications/ds82/{{$json.application_id}}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
         "specifyHeaders": "json",
-        "jsonHeaders": "{\n  \"x-clf-api-key\":\"[PLACE YOUR CLOUDFARE API KEY HERE]\"\n}",
+        "jsonHeaders": "{\n  \"x-clf-api-key\":\"p3QdXM0oKRgq3EVuX5H3KnvTGcAwR7YeuXnKn9IN7gPyuTLf\"\n}",
         "options": {
           "response": {
             "response": {
@@ -111,12 +111,12 @@
     {
       "parameters": {
         "method": "PATCH",
-        "url": "=https://api.[your_brand_name].com/api/ai/applications/ds82/{{ $('When Executed by Another Workflow').item.json.application_id }}",
+        "url": "=https://api.govassist.com/api/ai/applications/ds82/{{ $('When Executed by Another Workflow').item.json.application_id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
         "specifyHeaders": "json",
-        "jsonHeaders": "{\n  \"x-clf-api-key\":\"[PLACE YOUR CLOUDFARE API KEY HERE]\"\n}",
+        "jsonHeaders": "{\n  \"x-clf-api-key\":\"p3QdXM0oKRgq3EVuX5H3KnvTGcAwR7YeuXnKn9IN7gPyuTLf\"\n}",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"status\": \"{{ $json.status }}\"\n}\n",
@@ -221,101 +221,8 @@
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "[Zendesk_Safe_Caller_workflow_id]",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/[Zendesk_Safe_Caller_workflow_id]",
-          "cachedResultName": "Zendesk Safe Caller"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "id": "={{ $json.ticket_id }}",
-            "source": "=https://[your_brand_name].app.n8n.cloud/workflow/[workflow_id]/debug/{{ $execution.id }}",
-            "target": "ticket",
-            "operation": "update",
-            "payload": "={{ (Object.assign({ \n  comment: { \n    author_id: \"32164381873810\", \n    html_body: $json.comment, \n    public: true \n  } \n}, {\n  \"status\": $('When Executed by Another Workflow').item.json.current_ticket_status\n}\n\n)).toJsonString() \n\n}}",
-            "options": "{}"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "id",
-              "displayName": "id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "source",
-              "displayName": "source",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "target",
-              "displayName": "target",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "operation",
-              "displayName": "operation",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "payload",
-              "displayName": "payload",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "options",
-              "displayName": "options",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "options": {
-          "waitForSubWorkflow": true
-        }
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        4432,
-        1376
-      ],
-      "id": "3624057d-b805-4afd-88ad-a9a3e158fe2b",
-      "name": "Zendesk Safe Caller",
-      "disabled": true
-    },
-    {
-      "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -347,61 +254,6 @@
         }
       },
       "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "operation": "update",
-        "id": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
-        "updateFields": {
-          "publicReply": "={{ $('Standardize Data').item.json.public_reply_clean }}",
-          "subject": "={{ $('When Executed by Another Workflow').item.json.email_subject }}"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        4528,
-        2352
-      ],
-      "id": "5aab5601-d1fb-4b1d-be2b-b4b1f5ddbcea",
-      "name": "Send public update",
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      },
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "73bb2561-e374-434c-92f1-4d53c9801d67",
-              "name": "ticket_id",
-              "value": "={{ $('When Executed by Another Workflow').item.json.ticket_id }}",
-              "type": "string"
-            },
-            {
-              "id": "385fa138-9197-4bb6-ae93-b0ed9bef8eec",
-              "name": "comment",
-              "value": "={{ $('When Executed by Another Workflow').item.json.public_reply }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        4208,
-        1376
-      ],
-      "id": "e7d89e5f-28f1-41c7-94fc-2e9ecf541e23",
-      "name": "Edit Fields",
-      "disabled": true
     },
     {
       "parameters": {
@@ -635,75 +487,6 @@
     },
     {
       "parameters": {
-        "operation": "update",
-        "id": "={{ $('Split Out Tickets in the Group Pack').item.json.ticket_id }}",
-        "updateFields": {
-          "publicReply": "={{ $('Split Out Tickets in the Group Pack').item.json.public_reply_customized_clean }}"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        3456,
-        800
-      ],
-      "id": "f3bd0bd1-8146-4ad0-8430-bc7967c98c18",
-      "name": "Send public update1",
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      },
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "errorMessage": "Error while sending public update."
-      },
-      "type": "n8n-nodes-base.stopAndError",
-      "typeVersion": 1,
-      "position": [
-        3904,
-        816
-      ],
-      "id": "cb8596b0-25c1-453e-92d8-ef65936393c2",
-      "name": "Stop and Error4"
-    },
-    {
-      "parameters": {
-        "url": "=https://api.[your_brand_name].com/api/ai/applications/ds82/69a76ced9aa77b003d9e2bbf",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendHeaders": true,
-        "specifyHeaders": "json",
-        "jsonHeaders": "{\n  \"x-clf-api-key\":\"[PLACE YOUR CLOUDFARE API KEY HERE]\"\n}",
-        "options": {
-          "response": {
-            "response": {
-              "fullResponse": true
-            }
-          }
-        }
-      },
-      "id": "4839551f-9657-4319-8702-2f7ef80e95c8",
-      "name": "GET Application UCC - TEST",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
-      "position": [
-        3872,
-        1296
-      ],
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "8Rh3AaQteorY8ChS",
-          "name": "CRM (UCC)"
-        }
-      },
-      "disabled": true
-    },
-    {
-      "parameters": {
         "jsCode": "// In n8n Code node, $json is the current item\nconst rawItem = $json;\n\nlet parsedItem;\ntry {\n  parsedItem = (typeof rawItem === 'string') ? JSON.parse(rawItem) : rawItem;\n} catch (e) {\n  throw new Error('Parse failed: input item is not valid JSON');\n}\n\n// participants may be an array OR a JSON string (as in your payload)\nlet participants = parsedItem.participants;\n\nif (typeof participants === 'string') {\n  try {\n    participants = JSON.parse(participants);\n  } catch (e) {\n    throw new Error('Parse failed: participants is not valid JSON');\n  }\n}\n\nif (!Array.isArray(participants)) {\n  throw new Error('Invalid payload: participants is not an array');\n}\n\n// Split Out node expects a field that is an array\nreturn [\n  {\n    json: {\n      participants,\n    },\n  },\n];"
       },
       "type": "n8n-nodes-base.code",
@@ -733,85 +516,12 @@
     },
     {
       "parameters": {
-        "description": "Call this tool to get all ticket events. This is a Zendesk ticket audit containing the ticket timeline events. All fields with a null or empty value are removed from the result.\nYou will need to provide a json payload as follows:\n{\n  \"id\":<ticket_id integer>,\n \"mode\": \"recent\" | \"standard\"\n}\nThe ticket ID is always a number, a large integer number. Anything else will error out, so don't even try it. When you are checking the ticket just to confirm that an update was made correctly, simply use mode \"recent\" with the same ticket ID. Rest of the time, mode \"standard\".\nMode is always a string, should be either:\n- \"recent\" - gets the last 10 events on a ticket\nOR it may be\n- \"standard\" - gets all events on the ticket. You should use standard the first time when you look at a ticket, but you should use \"recent\" whenever you are checking for recent updates.\nYou should not use Standard more than once per run, as the result can overwhelm your context window.\nThe tool will return the ticket events. The response will contain:\nAll comments and notifications - This is a series of all internal notes, notifications or public comment that exists on the ticket. This contains any and all messages ever sent to the customer in the scope of the ticket.\nLatest user comment: the body, timestamp and user id of the last public comment made by the requester.\nAll requester comments: this is an easy to digest summary of all comments made by the requester.\nTime Elapsed since Last customer reply: self explained, how much time passed since the  customer's last reply.",
-        "workflowId": {
-          "__rl": true,
-          "value": "[get_ticket_events_workflow_id]",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/[get_ticket_events_workflow_id]",
-          "cachedResultName": "get_ticket_events [Entry]"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('id', `Zendesk ticket ID (8-digit integer) to fetch events for. Use the participant’s ticket_id (main + each secondary) when iterating through the group pack.`, 'string') }}",
-            "mode": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('mode', `send \"standard\"`, 'string') }}"
-          },
-          "matchingColumns": [
-            "ticket_id"
-          ],
-          "schema": [
-            {
-              "id": "id",
-              "displayName": "id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "mode",
-              "displayName": "mode",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "type": "string",
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
-      "typeVersion": 2.2,
-      "position": [
-        144,
-        656
-      ],
-      "id": "bfd233d1-6f26-4a75-9c60-ecb004b583d7",
-      "name": "ticket_events",
-      "disabled": true
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=Runtime Data: \nsales_ticket_id: {{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}\n\nmail_reason: \n{{ $('When Executed by Another Workflow').item.json.mail_reason }}\n\npublic_reply: {{ $('When Executed by Another Workflow').item.json.public_reply }}\n\npublic_reply_clean: {{ $('When Executed by Another Workflow').item.json.public_reply_clean }} ",
-        "options": {
-          "systemMessage": "You are the assistant of [YOUR_BRAND_NAME] Postcall Planner agent, specialized in group packs. If the customer explicitly asks to receive the requested email/link(s) for every participant in the group pack, you will handle it.\nInputs you receive:\nsales_ticket_id (this is the ticket the planner passed; expected to be the main_application sales ticket)\nmail_reason: \"draft_mail\" | \"photo_upload_mail\" | \"ssn_mail\" | \"other\"\npublic_reply: compressed HTML\npublic_reply_clean: same content as public_reply, but in plain text as the base template\n\nMission:\nIdentify all participant tickets in the group pack (main + secondaries). Use zendesk_search to detect the main_application and secondary_application tickets. \n\nOPERATING STEPS (MANDATORY):\n1) Verify the input ticket first (ONE ticket lookup)\nCall zendesk_search with: type:ticket <sales_ticket_id> status<closed\n\nFrom the returned ticket, read:\n• Group Application from custom field id 33720445734802\n• Main Ticket from custom field id 33720432867218 (this field returns the main ticket id of the group pack). Verify the returned Main Ticket is equal to sales_ticket_id in the Runtime Data, set main_sales_ticket_id = input sales_ticket_id. \nIf the ticket is not found, or Group Application is missing, proceed best-effort and return only the input ticket as a single participant.\n\n(FALLBACK): If trim(group_application) == \"not_a_group\"\nThis is NOT a group pack. Do NOT search for secondaries.\nReturn only the input ticket as the single participant.\n\n2) If trim(group_application) != \"not_a_group\"\nFind connected participant tickets (ALL secondaries) using the Main Ticket field\nCall zendesk_search with:\n• type:ticket status<closed tags:secondary_application custom_field_33720432867218:<main_sales_ticket_id>\nIf this returns [] and main_sales_ticket_id is known, retry ONCE with the value quoted:\n• type:ticket status<closed tags:secondary_application custom_field_33720432867218:\"<main_sales_ticket_id>\"\n\nIMPORTANT NOTES: \n- If more than one secondary_application ticket exists, include ALL of them (dedupe by ticket_id).\n- From the search results, include every ticket whose custom field 33720445734802 value (trimmed) is one of:\nmain_application | secondary_application | large_group_pack\n\n3) Retrieve per-participant product + application_id\nFor every ticket included in participants, retrieve and store: \n• product from custom field id 33720422435090, AND \n• application_id from custom field id 33720463862546 \nThese fields must be included in the output object. Use the ticket objects already returned by zendesk_search when available (do not refetch if fields are present). Do not fetch the same ticket more than once. If unknown/missing, set product/application_id to null for that participant.\n\n4) Personalize greeting + CTA per participant (MANDATORY)\nFor each participant ticket, retrieve the applicant first name and minimally customize the email body with product and applicant_id fields.\n\n4.1 Retrieve applicant first name (ticket_events)\n\nCall ticket_events for each participant ticket to retrieve events.\nInput format: Call ticket_events with id = <participant ticket_id> digits only.\nForbidden: id values that start with call_ or contain non-digits.\nExample calls: ticket_events({ \"id\": 24796488, \"mode\": \"standard\" })\n\nExtract the applicant name from the earliest event that contains a token like: Applicant_First_Name: (case-insensitive match allowed).\nParse rule: take the text after Applicant_First_Name: up to the end of the line / next delimiter, trim whitespace.\nNormalize: Title-case the name for greeting (e.g., MELVIN → Melvin).\nIf no Applicant_First_Name is found or events are unavailable: set applicant_first_name = null and use a neutral greeting (“Hello,”) rather than guessing.\n\n4.2 Update greeting (minimal change)\nModify only the greeting line in both public_reply (HTML) and public_reply_clean (plain text):\nIf applicant_first_name is present: use Dear <Name>,\nElse: use Hello,\nDo not change any other wording, paragraphs, headings, or formatting.\n\n4.3 Update exactly one CTA link (minimal change)\nIdentify the single CTA button link as the <a ...>Click Here</a> element in the HTML (do not alter any other links).\nReplace only its href with the participant-specific CTA link determined by the rules below.\nApply the same link replacement in public_reply_clean by replacing the corresponding CTA URL (or the first URL associated with the CTA text), without altering other text.\n\n4.4 Participant-specific CTA link source (no guessing)\n• If mail_reason == \"draft_mail\": use that participant ticket’s draft_url from custom field id 0.\n• If mail_reason == \"photo_upload_mail\": use that participant ticket’s photo_upload_url from custom field id 33720479429906.\n• If mail_reason == \"ssn_mail\": build using that participant’s application_id (field 33720463862546) and product (field 33720422435090):\n   - DS82: https://secure-request.[your_brand_name].com/?appid=<application_id>&form=ds82\n   - DS11: https://secure-request.[your_brand_name].com/?appid=<application_id>&form=ds11\n• If mail_reason == \"other\": do not change the CTA link; only adjust greeting.\n\nSafety (no fabrication)\n\nIf the required participant-specific CTA value is missing/empty/invalid URL, do not invent a link. Leave the CTA link unchanged for that participant and proceed.\nIMPORTANT: If more than one secondary_application ticket exists, you MUST include ALL of them in the output participants array (not just one).\nParticipant-specific CTA link rule (MANDATORY; used to make the CTA unique per participant):\n\n\n\nOUTPUT FORMAT (MANDATORY):\nReturn ONLY one JSON object (no markdown, no extra text) in the following structure:\n\n{\n\"main_sales_ticket_id\": \"<string>\",\n\"mail_reason\": \"<draft_mail|photo_upload_mail|ssn_mail|other>\",\n\"participant_count\": <number>,\n\"participants\": [\n{\n\"ticket_id\": \"<string>\",\n\"group_application\": \"<main_application|secondary_application|not_a_group|large_group_pack|null>\",\n\"application_id\": \"<string|null>\",\n\"product\": \"<string|null>\",\n\"applicant_first_name\": \"<string|null>\",\n\"public_reply_customized\": \"<compressed_html_string>\",\n\"public_reply_customized_clean\": \"<plain_text_string>\"\n}\n]\n}\n\nNotes:\n• participant_count MUST equal the number of objects in participants.\n• participants MUST include the main_application ticket and ALL secondary_application tickets found (dedupe by ticket_id).\n• public_reply_customized MUST keep the original template content, with ONLY (1) greeting adjusted and (2) the single CTA link updated to the participant-specific link (when mail_reason is draft_mail/photo_upload_mail/ssn_mail).\n• public_reply_customized_clean MUST contain the same content as public_reply_customized but in plain text (no HTML tags).\n• If any required participant field (group_application/product/application_id) is missing for a ticket, include the participant anyway and set missing values to null.",
-          "returnIntermediateSteps": true
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 3.1,
-      "position": [
-        -128,
-        400
-      ],
-      "id": "26b590a2-a66f-4e45-a71a-a6876f2397bf",
-      "name": "Group Pack Handler w. ticket_events",
-      "disabled": true
-    },
-    {
-      "parameters": {
         "assignments": {
           "assignments": [
             {
               "id": "c6be54a9-9a4f-4305-8637-18eb928c25ef",
               "name": "Prompt",
-              "value": "=You are the [YOUR_BRAND_NAME] Postcall Planner agent, specialized in GROUP PACKS.\n\nYou will receive Runtime Data:\n- sales_ticket_id (string/number)\n- mail_reason: \"draft_mail\" | \"photo_upload_mail\" | \"ssn_mail\" | \"other\"\n- public_reply: compressed HTML (baseline template)\n- public_reply_clean: plain text baseline template\n\nMISSION\nIdentify ALL participant tickets in the group pack (MAIN + ALL SECONDARIES), then build ONE combined customized email that includes applicant-specific links for every participant (when mail_reason requires links). Return the final output in the EXACT JSON object schema at the end (not an array, not a string).\n\nIMPORTANT: You MUST use zendesk_search and MUST NOT skip any step below.\n\n====================\nCUSTOM FIELD IDS\n====================\n- group_application: 33720445734802\n- main_ticket_id: 33720432867218  (stores the main ticket id of the group pack; on main it equals itself)\n- product: 33720422435090\n- application_id: 33720463862546\n- draft_url: 0\n- photo_upload_url: 33720479429906\n\n====================\nHELPERS (use in reasoning)\n====================\n- get_cf(ticket, id): find ticket.custom_fields entry with matching id (number) and return its value; else null.\n- norm(x): if string -> trim; if null -> null; else String(x).trim()\n- title_case(s): lower then capitalize first char (single-word name handling is enough).\n- valid_url(u): u is non-empty string and starts with \"http://\" or \"https://\"\n- extract_first_name(description):\n  Find the FIRST line containing \"Applicant_First_Name:\" (case-insensitive), take text after \":\".\n  Trim and Title Case it. If not found, return null.\n- compress_html(html): keep as a single line (remove unnecessary newlines)\n\n====================\nOPERATING STEPS (MANDATORY)\n====================\n\nSTEP 1) Verify the input ticket first (ONE ticket lookup)\nCall zendesk_search with EXACT-ID query to avoid false matches:\n  Query: type:ticket id:<sales_ticket_id> status<closed\n\nIf no ticket returned:\n  Best-effort fallback: treat as a single participant (no secondary search).\n  main_sales_ticket_id = String(sales_ticket_id)\n  participants = [ { ticket_id: main_sales_ticket_id, group_application: null, product: null, application_id: null, applicant_first_name: null, cta_link: null, cta_block_html: null, cta_block_clean: null, cta_note_if_missing: \"Ticket not found in Zendesk.\" } ]\n  Go to STEP 4.\n\nElse:\n  Let input_ticket be the single returned ticket (id must equal sales_ticket_id).\n\nRead:\n  input_group_application = norm(get_cf(input_ticket, 33720445734802))\n  input_main_ticket_field = norm(get_cf(input_ticket, 33720432867218))\n\nDetermine main_sales_ticket_id:\n  - If input_main_ticket_field is null/empty -> main_sales_ticket_id = String(sales_ticket_id)\n  - Else -> main_sales_ticket_id = input_main_ticket_field\n  (main_sales_ticket_id MUST be a string)\n\nIf input_group_application is null/empty:\n  Best-effort: treat as single participant (do NOT search secondaries).\n  participants = [input_ticket]\n  Go to STEP 3 then STEP 4.\n\nFALLBACK (NOT A GROUP):\nIf trim(input_group_application) == \"not_a_group\":\n  This is NOT a group pack. Do NOT search for secondaries.\n  main_sales_ticket_id = String(sales_ticket_id)\n  participants = [input_ticket]\n  Go to STEP 3 then STEP 4.\n\nSTEP 2) If this IS a group pack, find connected participant tickets (ALL secondaries)\n2.1 Always include the MAIN ticket in participants\n- If String(sales_ticket_id) == main_sales_ticket_id:\n    main_ticket_obj = input_ticket\n  Else:\n    Fetch main ticket with ONE lookup:\n      zendesk_search Query: type:ticket id:<main_sales_ticket_id> status<closed\n    - If found, main_ticket_obj = returned ticket\n    - If not found, main_ticket_obj = null (still continue; main will be represented minimally)\n\nInitialize participants list in this order:\n- If main_ticket_obj exists: add main_ticket_obj FIRST\n- Else: add a placeholder participant object with ticket_id = main_sales_ticket_id and null fields (so main is never missing)\n- Then add input_ticket IF its id differs from main_sales_ticket_id (to ensure we don’t lose the ticket passed in)\n\n2.2 Find ALL secondaries using the Main Ticket field + tag\nCall zendesk_search with:\n  Query: type:ticket status<closed tags:secondary_application custom_field_33720432867218:<main_sales_ticket_id>\n\nIf this returns [] then retry ONCE with quoted value:\n  Query: type:ticket status<closed tags:secondary_application custom_field_33720432867218:\"<main_sales_ticket_id>\"\n\nFrom results:\n- Add ALL returned tickets (dedupe by ticket_id)\n- Include ONLY those where norm(group_application field 33720445734802) is one of:\n  \"main_application\" | \"secondary_application\" | \"large_group_pack\"\n  (If a ticket is missing that field but came from this secondary search, include it anyway with group_application = null.)\n\nAfter dedupe, enforce ordering:\n- main ticket first (ticket_id == main_sales_ticket_id)\n- then all others (stable order as discovered)\n\nSTEP 3) Retrieve per-participant fields (NO refetch if already present)\nFor each participant ticket object (or placeholder):\n- ticket_id: String(ticket.id) if ticket object else placeholder id string\n- group_application = norm(get_cf(ticket, 33720445734802)) else null\n- product = norm(get_cf(ticket, 33720422435090)) else null\n- application_id = norm(get_cf(ticket, 33720463862546)) else null\n- applicant_first_name = extract_first_name(ticket.description) else null\n\nCompute cta_link per participant using mail_reason:\n- draft_mail: cta_link = norm(get_cf(ticket, 0))\n- photo_upload_mail: cta_link = norm(get_cf(ticket, 33720479429906))\n- ssn_mail:\n    If application_id and product exist:\n      If product contains \"DS82\" (case-insensitive): cta_link = \"https://url.[your_brand_name].com/ssn/ds82/\" + application_id\n      Else if product contains \"DS11\" (case-insensitive): cta_link = \"https://url.[your_brand_name].com/ssn/ds11/\" + application_id\n      Else cta_link = null\n    Else cta_link = null\n- other: cta_link = null (do not change template CTA)\n\nValidate:\n- If not valid_url(cta_link) => set cta_link = null\n\nCreate per-participant CTA blocks ONLY if mail_reason in (draft_mail, photo_upload_mail, ssn_mail):\n- If applicant_first_name != null AND cta_link != null:\n    Sentence by mail_reason:\n      draft_mail: \"To review the draft for <Name>, use the button below:\"\n      photo_upload_mail: \"To upload the photo for <Name>, use the button below:\"\n      ssn_mail: \"To securely submit the SSN for <Name>, use the button below:\"\n    cta_block_html = <p>[Sentence]</p><p><a href=\"LINK\" style=\"display:inline-block;padding:10px 20px;text-decoration:none;border-radius:4px;background:#0052CC;color:#FFFFFF;\">Click Here</a></p>\n    cta_block_clean = <Name>: <LINK>\n    cta_note_if_missing = null\n- Else:\n    cta_block_html = null\n    cta_block_clean = null\n    If applicant_first_name is null:\n      cta_note_if_missing = \"We could not retrieve the link for one applicant because the applicant name was not found on the ticket. Please reply to this email so we can resend it.\"\n    Else:\n      cta_note_if_missing = \"We could not retrieve the required link for <Name> from the ticket. Please reply to this email so we can resend it.\"\n\nSTEP 4) Build ONE combined customized email body (MANDATORY)\n4.1 Combined greeting\n- Collect all non-null applicant_first_name values from participants in current order\n- Dedupe while preserving order\nGreeting:\n- If 2+ names: \"Dear Name1 and Name2 and Name3,\"\n- If 1 name: \"Dear Name1,\"\n- If none: \"Hello,\"\n\n4.2 Combined CTA section\nIf mail_reason in (draft_mail, photo_upload_mail, ssn_mail):\n- Build combined_cta_html by concatenating, in participant order:\n  - participant.cta_block_html when present\n  - else: <p>[participant.cta_note_if_missing]</p>\n- Build combined_cta_clean similarly:\n  - participant.cta_block_clean when present\n  - else: [participant.cta_note_if_missing]\nIf mail_reason == \"other\":\n- Do NOT replace CTA content; greeting-only customization.\n\n4.3 Minimal template edits (DO NOT materially change other paragraphs)\nStart from public_reply and public_reply_clean as baseline.\n\nHTML:\nA) Replace greeting paragraph ONLY:\n- Replace the first <p>...</p> that begins with \"Hello\" or \"Hi\" or \"Dear\" (case-insensitive) with:\n  <p>[combined_greeting]</p>\n\nB) Replace CTA button block ONLY if mail_reason in (draft_mail, photo_upload_mail, ssn_mail):\n- Replace the FIRST occurrence of <a ...>Click Here</a> (including its wrapping <p> if present) with combined_cta_html.\n- Do not change any other text.\n\nPlain text:\nA) Replace the first greeting line starting with \"Hello\" or \"Hi\" or \"Dear\" with combined_greeting\nB) If mail_reason in (draft_mail, photo_upload_mail, ssn_mail):\n- Replace the single original URL line (the one representing the template’s CTA) with combined_cta_clean section.\n\nEnsure:\n- public_reply_customized is compressed HTML (single line; no unnecessary newlines)\n- public_reply_clean_customized contains the same message in plain text (no HTML tags)\n\n====================\nOUTPUT (STRICT)\n====================\nReturn EXACTLY ONE JSON OBJECT (not a string, not wrapped in an array, no extra commentary) in this schema:\n\n{\n  \"main_sales_ticket_id\": \"<string>\",\n  \"mail_reason\": \"<draft_mail|photo_upload_mail|ssn_mail|other>\",\n  \"participant_count\": <number>,\n  \"public_reply_customized\": \"<compressed_html_string>\",\n  \"public_reply_clean_customized\": \"<plain_text_string>\",\n  \"participants\": [\n    {\n      \"ticket_id\": \"<string>\",\n      \"group_application\": \"<main_application|secondary_application|not_a_group|large_group_pack|null>\",\n      \"application_id\": \"<string|null>\",\n      \"product\": \"<string|null>\",\n      \"applicant_first_name\": \"<string|null>\",\n      \"cta_link\": \"<string|null>\",\n      \"cta_block_html\": \"<compressed_html_fragment|null>\",\n      \"cta_block_clean\": \"<plain_text_fragment|null>\",\n      \"cta_note_if_missing\": \"<string|null>\"\n    }\n  ]\n}\n\nHard requirements:\n- participants MUST include the MAIN ticket (ticket_id == main_sales_ticket_id) even if it must be a placeholder.\n- participants MUST include ALL secondary_application tickets found (dedupe by ticket_id).\n- participant_count MUST be a NUMBER equal to participants.length (not a quoted string).\n- Ordering: MAIN first, then all other participants.\n- Only modify greeting + CTA block in the templates; keep all other paragraphs unchanged.",
+              "value": "=You are the GovAssist Postcall Planner agent, specialized in GROUP PACKS.\n\nYou will receive Runtime Data:\n- sales_ticket_id (string/number)\n- mail_reason: \"draft_mail\" | \"photo_upload_mail\" | \"ssn_mail\" | \"other\"\n- public_reply: compressed HTML (baseline template)\n- public_reply_clean: plain text baseline template\n\nMISSION\nIdentify ALL participant tickets in the group pack (MAIN + ALL SECONDARIES), then build ONE combined customized email that includes applicant-specific links for every participant (when mail_reason requires links). Return the final output in the EXACT JSON object schema at the end (not an array, not a string).\n\nIMPORTANT: You MUST use zendesk_search and MUST NOT skip any step below.\n\n====================\nCUSTOM FIELD IDS\n====================\n- group_application: 33720445734802\n- main_ticket_id: 33720432867218  (stores the main ticket id of the group pack; on main it equals itself)\n- product: 33720422435090\n- application_id: 33720463862546\n- draft_url: 0\n- photo_upload_url: 33720479429906\n\n====================\nHELPERS (use in reasoning)\n====================\n- get_cf(ticket, id): find ticket.custom_fields entry with matching id (number) and return its value; else null.\n- norm(x): if string -> trim; if null -> null; else String(x).trim()\n- title_case(s): lower then capitalize first char (single-word name handling is enough).\n- valid_url(u): u is non-empty string and starts with \"http://\" or \"https://\"\n- extract_first_name(description):\n  Find the FIRST line containing \"Applicant_First_Name:\" (case-insensitive), take text after \":\".\n  Trim and Title Case it. If not found, return null.\n- compress_html(html): keep as a single line (remove unnecessary newlines)\n\n====================\nOPERATING STEPS (MANDATORY)\n====================\n\nSTEP 1) Verify the input ticket first (ONE ticket lookup)\nCall zendesk_search with EXACT-ID query to avoid false matches:\n  Query: type:ticket id:<sales_ticket_id> status<closed\n\nIf no ticket returned:\n  Best-effort fallback: treat as a single participant (no secondary search).\n  main_sales_ticket_id = String(sales_ticket_id)\n  participants = [ { ticket_id: main_sales_ticket_id, group_application: null, product: null, application_id: null, applicant_first_name: null, cta_link: null, cta_block_html: null, cta_block_clean: null, cta_note_if_missing: \"Ticket not found in Zendesk.\" } ]\n  Go to STEP 4.\n\nElse:\n  Let input_ticket be the single returned ticket (id must equal sales_ticket_id).\n\nRead:\n  input_group_application = norm(get_cf(input_ticket, 33720445734802))\n  input_main_ticket_field = norm(get_cf(input_ticket, 33720432867218))\n\nDetermine main_sales_ticket_id:\n  - If input_main_ticket_field is null/empty -> main_sales_ticket_id = String(sales_ticket_id)\n  - Else -> main_sales_ticket_id = input_main_ticket_field\n  (main_sales_ticket_id MUST be a string)\n\nIf input_group_application is null/empty:\n  Best-effort: treat as single participant (do NOT search secondaries).\n  participants = [input_ticket]\n  Go to STEP 3 then STEP 4.\n\nFALLBACK (NOT A GROUP):\nIf trim(input_group_application) == \"not_a_group\":\n  This is NOT a group pack. Do NOT search for secondaries.\n  main_sales_ticket_id = String(sales_ticket_id)\n  participants = [input_ticket]\n  Go to STEP 3 then STEP 4.\n\nSTEP 2) If this IS a group pack, find connected participant tickets (ALL secondaries)\n2.1 Always include the MAIN ticket in participants\n- If String(sales_ticket_id) == main_sales_ticket_id:\n    main_ticket_obj = input_ticket\n  Else:\n    Fetch main ticket with ONE lookup:\n      zendesk_search Query: type:ticket id:<main_sales_ticket_id> status<closed\n    - If found, main_ticket_obj = returned ticket\n    - If not found, main_ticket_obj = null (still continue; main will be represented minimally)\n\nInitialize participants list in this order:\n- If main_ticket_obj exists: add main_ticket_obj FIRST\n- Else: add a placeholder participant object with ticket_id = main_sales_ticket_id and null fields (so main is never missing)\n- Then add input_ticket IF its id differs from main_sales_ticket_id (to ensure we don’t lose the ticket passed in)\n\n2.2 Find ALL secondaries using the Main Ticket field + tag\nCall zendesk_search with:\n  Query: type:ticket status<closed tags:secondary_application custom_field_33720432867218:<main_sales_ticket_id>\n\nIf this returns [] then retry ONCE with quoted value:\n  Query: type:ticket status<closed tags:secondary_application custom_field_33720432867218:\"<main_sales_ticket_id>\"\n\nFrom results:\n- Add ALL returned tickets (dedupe by ticket_id)\n- Include ONLY those where norm(group_application field 33720445734802) is one of:\n  \"main_application\" | \"secondary_application\" | \"large_group_pack\"\n  (If a ticket is missing that field but came from this secondary search, include it anyway with group_application = null.)\n\nAfter dedupe, enforce ordering:\n- main ticket first (ticket_id == main_sales_ticket_id)\n- then all others (stable order as discovered)\n\nSTEP 3) Retrieve per-participant fields (NO refetch if already present)\nFor each participant ticket object (or placeholder):\n- ticket_id: String(ticket.id) if ticket object else placeholder id string\n- group_application = norm(get_cf(ticket, 33720445734802)) else null\n- product = norm(get_cf(ticket, 33720422435090)) else null\n- application_id = norm(get_cf(ticket, 33720463862546)) else null\n- applicant_first_name = extract_first_name(ticket.description) else null\n\nCompute cta_link per participant using mail_reason:\n- draft_mail: cta_link = norm(get_cf(ticket, 0))\n- photo_upload_mail: cta_link = norm(get_cf(ticket, 33720479429906))\n- ssn_mail:\n    If application_id and product exist:\n      If product contains \"DS82\" (case-insensitive): cta_link = \"https://url.govassist.com/ssn/ds82/\" + application_id\n      Else if product contains \"DS11\" (case-insensitive): cta_link = \"https://url.govassist.com/ssn/ds11/\" + application_id\n      Else cta_link = null\n    Else cta_link = null\n- other: cta_link = null (do not change template CTA)\n\nValidate:\n- If not valid_url(cta_link) => set cta_link = null\n\nCreate per-participant CTA blocks ONLY if mail_reason in (draft_mail, photo_upload_mail, ssn_mail):\n- If applicant_first_name != null AND cta_link != null:\n    Sentence by mail_reason:\n      draft_mail: \"To review the draft for <Name>, use the button below:\"\n      photo_upload_mail: \"To upload the photo for <Name>, use the button below:\"\n      ssn_mail: \"To securely submit the SSN for <Name>, use the button below:\"\n    cta_block_html = <p>[Sentence]</p><p><a href=\"LINK\" style=\"display:inline-block;padding:10px 20px;text-decoration:none;border-radius:4px;background:#0052CC;color:#FFFFFF;\">Click Here</a></p>\n    cta_block_clean = <Name>: <LINK>\n    cta_note_if_missing = null\n- Else:\n    cta_block_html = null\n    cta_block_clean = null\n    If applicant_first_name is null:\n      cta_note_if_missing = \"We could not retrieve the link for one applicant because the applicant name was not found on the ticket. Please reply to this email so we can resend it.\"\n    Else:\n      cta_note_if_missing = \"We could not retrieve the required link for <Name> from the ticket. Please reply to this email so we can resend it.\"\n\nSTEP 4) Build ONE combined customized email body (MANDATORY)\n4.1 Combined greeting\n- Collect all non-null applicant_first_name values from participants in current order\n- Dedupe while preserving order\nGreeting:\n- If 2+ names: \"Dear Name1 and Name2 and Name3,\"\n- If 1 name: \"Dear Name1,\"\n- If none: \"Hello,\"\n\n4.2 Combined CTA section\nIf mail_reason in (draft_mail, photo_upload_mail, ssn_mail):\n- Build combined_cta_html by concatenating, in participant order:\n  - participant.cta_block_html when present\n  - else: <p>[participant.cta_note_if_missing]</p>\n- Build combined_cta_clean similarly:\n  - participant.cta_block_clean when present\n  - else: [participant.cta_note_if_missing]\nIf mail_reason == \"other\":\n- Do NOT replace CTA content; greeting-only customization.\n\n4.3 Minimal template edits (DO NOT materially change other paragraphs)\nStart from public_reply and public_reply_clean as baseline.\n\nHTML:\nA) Replace greeting paragraph ONLY:\n- Replace the first <p>...</p> that begins with \"Hello\" or \"Hi\" or \"Dear\" (case-insensitive) with:\n  <p>[combined_greeting]</p>\n\nB) Replace CTA button block ONLY if mail_reason in (draft_mail, photo_upload_mail, ssn_mail):\n- Replace the FIRST occurrence of <a ...>Click Here</a> (including its wrapping <p> if present) with combined_cta_html.\n- Do not change any other text.\n\nPlain text:\nA) Replace the first greeting line starting with \"Hello\" or \"Hi\" or \"Dear\" with combined_greeting\nB) If mail_reason in (draft_mail, photo_upload_mail, ssn_mail):\n- Replace the single original URL line (the one representing the template’s CTA) with combined_cta_clean section.\n\nEnsure:\n- public_reply_customized is compressed HTML (single line; no unnecessary newlines)\n- public_reply_clean_customized contains the same message in plain text (no HTML tags)\n\n====================\nOUTPUT (STRICT)\n====================\nReturn EXACTLY ONE JSON OBJECT (not a string, not wrapped in an array, no extra commentary) in this schema:\n\n{\n  \"main_sales_ticket_id\": \"<string>\",\n  \"mail_reason\": \"<draft_mail|photo_upload_mail|ssn_mail|other>\",\n  \"participant_count\": <number>,\n  \"public_reply_customized\": \"<compressed_html_string>\",\n  \"public_reply_clean_customized\": \"<plain_text_string>\",\n  \"participants\": [\n    {\n      \"ticket_id\": \"<string>\",\n      \"group_application\": \"<main_application|secondary_application|not_a_group|large_group_pack|null>\",\n      \"application_id\": \"<string|null>\",\n      \"product\": \"<string|null>\",\n      \"applicant_first_name\": \"<string|null>\",\n      \"cta_link\": \"<string|null>\",\n      \"cta_block_html\": \"<compressed_html_fragment|null>\",\n      \"cta_block_clean\": \"<plain_text_fragment|null>\",\n      \"cta_note_if_missing\": \"<string|null>\"\n    }\n  ]\n}\n\nHard requirements:\n- participants MUST include the MAIN ticket (ticket_id == main_sales_ticket_id) even if it must be a placeholder.\n- participants MUST include ALL secondary_application tickets found (dedupe by ticket_id).\n- participant_count MUST be a NUMBER equal to participants.length (not a quoted string).\n- Ordering: MAIN first, then all other participants.\n- Only modify greeting + CTA block in the templates; keep all other paragraphs unchanged.",
               "type": "string"
             },
             {
@@ -834,38 +544,6 @@
       ],
       "id": "b2dab6b4-80fb-45f3-8f09-bd88ad500aa1",
       "name": "Prepare Input"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "c6be54a9-9a4f-4305-8637-18eb928c25ef",
-              "name": "Prompt",
-              "value": "=You are the assistant of  [YOUR_BRAND_NAME] Postcall Planner agent, specialized in group packs. If the customer explicitly asks to receive the requested email/link(s) for every participant in the group pack, you will handle it.\nInputs you receive:\nsales_ticket_id (this is the ticket the planner passed; expected to be the main_application sales ticket)\nmail_reason: \"draft_mail\" | \"photo_upload_mail\" | \"ssn_mail\" | \"other\"\npublic_reply: compressed HTML\npublic_reply_clean: same content as public_reply, but in plain text as the base template\n\nMission:\nIdentify all participant tickets in the group pack (main + secondaries). Use zendesk_search to detect the main_application and secondary_application tickets. \n\nOPERATING STEPS (MANDATORY):\n1) Verify the input ticket first (ONE ticket lookup)\nCall zendesk_search with: type:ticket <sales_ticket_id> status<closed\n\nFrom the returned ticket, read:\n• Group Application from custom field id 33720445734802\n• Main Ticket from custom field id 33720432867218 (this field returns the main ticket id of the group pack). Verify the returned Main Ticket is equal to sales_ticket_id in the Runtime Data, set main_sales_ticket_id = input sales_ticket_id. \nIf the ticket is not found, or Group Application is missing, proceed best-effort and return only the input ticket as a single participant.\n\n(FALLBACK): If trim(group_application) == \"not_a_group\"\nThis is NOT a group pack. Do NOT search for secondaries.\nReturn only the input ticket as the single participant.\n\n2) If trim(group_application) != \"not_a_group\"\nFind connected participant tickets (ALL secondaries) using the Main Ticket field\nCall zendesk_search with:\n• type:ticket status<closed tags:secondary_application custom_field_33720432867218:<main_sales_ticket_id>\nIf this returns [] and main_sales_ticket_id is known, retry ONCE with the value quoted:\n• type:ticket status<closed tags:secondary_application custom_field_33720432867218:\"<main_sales_ticket_id>\"\n\nIMPORTANT NOTES: \n- If more than one secondary_application ticket exists, include ALL of them (dedupe by ticket_id).\n- From the search results, include every ticket whose custom field 33720445734802 value (trimmed) is one of:\nmain_application | secondary_application | large_group_pack\n\n3) Retrieve per-participant product + application_id\nFor every ticket included in participants, retrieve and store: \n• product from custom field id 33720422435090, AND \n• application_id from custom field id 33720463862546 \nThese fields must be included in the output object. Use the ticket objects already returned by zendesk_search when available (do not refetch if fields are present). Do not fetch the same ticket more than once. If unknown/missing, set product/application_id to null for that participant.\n\n4) Personalize greeting + CTA per participant (NO extra tool calls)\nFor each participant ticket, extract the applicant first name from the ticket description returned by zendesk_search, then minimally customize the template.\n\n4.1 Extract applicant_first_name from ticket description\n\nSource: participant_ticket.description (from the zendesk_search ticket object you already have).\nParse rule: find the first occurrence of Applicant_First_Name: and capture the value until end-of-line. Example pattern (conceptually): Applicant_First_Name:\\s*([^\\n\\r]+)\nNormalize: trim whitespace; convert to Title Case for greeting (e.g., MELVIN → Melvin).\nIf description is missing or the token isn’t found: set applicant_first_name = null.\n\n4.2 Update greeting (minimal change)\nModify only the greeting line in both public_reply (HTML) and public_reply_clean (plain text):\nIf applicant_first_name is present: use Dear <Name>,\nElse: use Hello,\nDo not change any other wording, paragraphs, headings, or formatting.\n\n4.3 Update exactly one CTA link (minimal change)\nIdentify the single CTA button link as the <a ...>Click Here</a> element in the HTML (do not alter any other links).\nReplace only its href with the participant-specific CTA link determined by the rules below.\nApply the same link replacement in public_reply_clean by replacing the corresponding CTA URL (or the first URL associated with the CTA text), without altering other text.\n\n4.4 Participant-specific CTA link source (no guessing)\n• If mail_reason == \"draft_mail\": use that participant ticket’s draft_url from custom field id 0.\n• If mail_reason == \"photo_upload_mail\": use that participant ticket’s photo_upload_url from custom field id 33720479429906.\n• If mail_reason == \"ssn_mail\": build using that participant’s application_id (field 33720463862546) and product (field 33720422435090):\n   - DS82: https://secure-request.[your_brand_name].com/?appid=<application_id>&form=ds82\n   - DS11: https://secure-request.[your_brand_name].com/?appid=<application_id>&form=ds11\n• If mail_reason == \"other\": do not change the CTA link; only adjust greeting.\n\nSafety (no fabrication)\n\nIf the required participant-specific CTA value is missing/empty/invalid URL, do not invent a link. Leave the CTA link unchanged for that participant and proceed.\nIMPORTANT: If more than one secondary_application ticket exists, you MUST include ALL of them in the output participants array (not just one).\nParticipant-specific CTA link rule (MANDATORY; used to make the CTA unique per participant):\n\n\n\nOUTPUT FORMAT (MANDATORY):\nReturn ONLY one JSON object (no markdown, no extra text) in the following structure:\n\n{\n\"main_sales_ticket_id\": \"<string>\",\n\"mail_reason\": \"<draft_mail|photo_upload_mail|ssn_mail|other>\",\n\"participant_count\": <number>,\n\"participants\": [\n{\n\"ticket_id\": \"<string>\",\n\"group_application\": \"<main_application|secondary_application|not_a_group|large_group_pack|null>\",\n\"application_id\": \"<string|null>\",\n\"product\": \"<string|null>\",\n\"applicant_first_name\": \"<string|null>\",\n\"public_reply_customized\": \"<compressed_html_string>\",\n\"public_reply_customized_clean\": \"<plain_text_string>\"\n}\n]\n}\n\nNotes:\n• participant_count MUST equal the number of objects in participants.\n• participants MUST include the main_application ticket and ALL secondary_application tickets found (dedupe by ticket_id).\n• public_reply_customized MUST keep the original template content, with ONLY (1) greeting adjusted and (2) the single CTA link updated to the participant-specific link (when mail_reason is draft_mail/photo_upload_mail/ssn_mail).\n• public_reply_customized_clean MUST contain the same content as public_reply_customized but in plain text (no HTML tags).\n• If any required participant field (group_application/product/application_id) is missing for a ticket, include the participant anyway and set missing values to null.",
-              "type": "string"
-            },
-            {
-              "id": "7f94acb8-0b67-4130-8473-bde401b86564",
-              "name": "Runtime Data",
-              "value": "=Runtime Data: \nsales_ticket_id: {{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}\n\nmail_reason: \n{{ $('When Executed by Another Workflow').item.json.mail_reason }}\n\npublic_reply: {{ $('When Executed by Another Workflow').item.json.public_reply }}\n\npublic_reply_clean: {{ $('When Executed by Another Workflow').item.json.public_reply_clean }} ",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {
-          "ignoreConversionErrors": true
-        }
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -240,
-        688
-      ],
-      "id": "b028d0c5-e362-4a31-be07-3fe08c941b52",
-      "name": "Prepare Input - Multiple Mails",
-      "disabled": true
     },
     {
       "parameters": {
@@ -902,7 +580,7 @@
             {
               "id": "c6be54a9-9a4f-4305-8637-18eb928c25ef",
               "name": "Prompt",
-              "value": "=You are the assistant of  [YOUR_BRAND_NAME] Postcall Planner agent, specialized in group packs. If the customer explicitly asks to receive the requested email/link(s) for every participant in the group pack, you will handle it.\nInputs you receive:\nsales_ticket_id (this is the ticket the planner passed; expected to be the main_application sales ticket)\nmail_reason: \"draft_mail\" | \"photo_upload_mail\" | \"ssn_mail\" | \"other\"\npublic_reply: compressed HTML\npublic_reply_clean: same content as public_reply, but in plain text as the base template\n\nMission:\nIdentify all participant tickets in the group pack (main + secondaries). Use zendesk_search to detect the main_application and secondary_application tickets. \n\nOPERATING STEPS (MANDATORY):\n1) Verify the input ticket first (ONE ticket lookup)\nCall zendesk_search with: type:ticket <sales_ticket_id> status<closed\n\nFrom the returned ticket, read:\n• Group Application from custom field id 33720445734802\n• Main Ticket from custom field id 33720432867218 (this field returns the main ticket id of the group pack). Verify the returned Main Ticket is equal to sales_ticket_id in the Runtime Data, set main_sales_ticket_id = input sales_ticket_id. \nIf the ticket is not found, or Group Application is missing, proceed best-effort and return only the input ticket as a single participant.\n\n(FALLBACK): If trim(group_application) == \"not_a_group\"\nThis is NOT a group pack. Do NOT search for secondaries.\nReturn only the input ticket as the single participant.\n\n2) If trim(group_application) != \"not_a_group\"\nFind connected participant tickets (ALL secondaries) using the Main Ticket field\nCall zendesk_search with:\n• type:ticket status<closed tags:secondary_application custom_field_33720432867218:<main_sales_ticket_id>\nIf this returns [] and main_sales_ticket_id is known, retry ONCE with the value quoted:\n• type:ticket status<closed tags:secondary_application custom_field_33720432867218:\"<main_sales_ticket_id>\"\n\nIMPORTANT NOTES: \n- If more than one secondary_application ticket exists, include ALL of them (dedupe by ticket_id).\n- From the search results, include every ticket whose custom field 33720445734802 value (trimmed) is one of:\nmain_application | secondary_application | large_group_pack\n\n3) Retrieve per-participant product + application_id\nFor every ticket included in participants, retrieve and store: \n• product from custom field id 33720422435090, AND \n• application_id from custom field id 33720463862546 \nThese fields must be included in the output object. Use the ticket objects already returned by zendesk_search when available (do not refetch if fields are present). Do not fetch the same ticket more than once. If unknown/missing, set product/application_id to null for that participant.\n\n4) Build ONE combined customized email body for the whole group pack (MANDATORY)\nYou must generate a single email body that includes all applicant-specific links (main + all secondaries) in one message.\n\n4.1 Extract applicant names from zendesk_search ticket description\nFor each participant ticket object returned by zendesk_search, extract applicant_first_name from ticket.description by parsing the first Applicant_First_Name: line.\nNormalize: trim; Title Case (e.g., MELVIN → Melvin).\nIf not found: applicant_first_name = null.\n\n4.2 Create a combined greeting\nCollect all non-null applicant_first_name values (dedupe, preserve main-first ordering).\nIf 2+ names exist: Dear <Name1> and <Name2>[ and <Name3>...],\nIf only 1 name exists: Dear <Name1>,\nIf none exist: Hello,\nIMPORTANT: If a name is missing, do not add placeholders (do not write “and Customer”); greet only with known names.\n\n4.3 Build a combined CTA section (one section, many applicants)\nDetermine each participant’s cta_link using the same mail_reason rules:\n• draft_mail → custom field 0 (draft_url)\n• photo_upload_mail → custom field 33720479429906 (photo_upload_url)\n• ssn_mail → build from that participant’s application_id + product (DS82/DS11 rules)\n• other → do not change CTA links; greeting-only customization\nFor each participant:\nIf applicant_first_name AND valid cta_link exist: include a short line + a CTA button, e.g. HTML: <p>To upload the photo for Melvin, use the button below:</p><p><a href=\"LINK\" style=\"display:inline-block;padding:10px 20px;text-decoration:none;border-radius:4px;background:#0052CC;color:#FFFFFF;\">Click Here</a></p> Plain text: Melvin: LINK\nIf link is missing/invalid OR name is missing: do not create a button. Add an explicit line explaining the link is unavailable for that applicant and they should reply for assistance.\nExample HTML: <p>We could not retrieve the photo upload link for one applicant from the ticket. Please reply to this email so we can resend it.</p>\nExample plain text: similar message.\n\n4.4 Apply minimal template edits\nStart from public_reply/ public_reply_clean as the baseline.\nOnly modify:\nthe greeting, and\nreplace the single existing CTA button block (<a ...>Click Here</a>) with the combined CTA section described above.\nDo not materially change any other paragraphs.\n\nResulting outputs:\npublic_reply_customized (compressed HTML)\npublic_reply_clean_customized (plain text)\n\n\n\n{\n  \"main_sales_ticket_id\": \"<string>\",\n  \"mail_reason\": \"<draft_mail|photo_upload_mail|ssn_mail|other>\",\n  \"participant_count\": 2,\n  \"public_reply_customized\": \"<compressed_html_string>\",\n  \"public_reply_clean_customized\": \"<plain_text_string>\",\n  \"participants\": [\n    {\n      \"ticket_id\": \"<string>\",\n      \"group_application\": \"<main_application|secondary_application|not_a_group|large_group_pack|null>\",\n      \"application_id\": \"<string|null>\",\n      \"product\": \"<string|null>\",\n      \"applicant_first_name\": \"<string|null>\",\n      \"cta_link\": \"<string|null>\",\n      \"cta_block_html\": \"<compressed_html_fragment|null>\",\n      \"cta_block_clean\": \"<plain_text_fragment|null>\",\n      \"cta_note_if_missing\": \"<string|null>\"\n    }\n  ]\n}\n\n\n\nNotes:\n• participant_count MUST equal the number of objects in participants.\n• participants MUST include the main_application ticket and ALL secondary_application tickets found (dedupe by ticket_id).\n• public_reply_customized MUST keep the original template content, with ONLY (1) greeting adjusted and (2) the single CTA link updated to the participant-specific link (when mail_reason is draft_mail/photo_upload_mail/ssn_mail).\n• public_reply_customized_clean MUST contain the same content as public_reply_customized but in plain text (no HTML tags).\n• If any required participant field (group_application/product/application_id) is missing for a ticket, include the participant anyway and set missing values to null.",
+              "value": "=You are the assistant of GovAssist Postcall Planner agent, specialized in group packs. If the customer explicitly asks to receive the requested email/link(s) for every participant in the group pack, you will handle it.\nInputs you receive:\nsales_ticket_id (this is the ticket the planner passed; expected to be the main_application sales ticket)\nmail_reason: \"draft_mail\" | \"photo_upload_mail\" | \"ssn_mail\" | \"other\"\npublic_reply: compressed HTML\npublic_reply_clean: same content as public_reply, but in plain text as the base template\n\nMission:\nIdentify all participant tickets in the group pack (main + secondaries). Use zendesk_search to detect the main_application and secondary_application tickets. \n\nOPERATING STEPS (MANDATORY):\n1) Verify the input ticket first (ONE ticket lookup)\nCall zendesk_search with: type:ticket <sales_ticket_id> status<closed\n\nFrom the returned ticket, read:\n• Group Application from custom field id 33720445734802\n• Main Ticket from custom field id 33720432867218 (this field returns the main ticket id of the group pack). Verify the returned Main Ticket is equal to sales_ticket_id in the Runtime Data, set main_sales_ticket_id = input sales_ticket_id. \nIf the ticket is not found, or Group Application is missing, proceed best-effort and return only the input ticket as a single participant.\n\n(FALLBACK): If trim(group_application) == \"not_a_group\"\nThis is NOT a group pack. Do NOT search for secondaries.\nReturn only the input ticket as the single participant.\n\n2) If trim(group_application) != \"not_a_group\"\nFind connected participant tickets (ALL secondaries) using the Main Ticket field\nCall zendesk_search with:\n• type:ticket status<closed tags:secondary_application custom_field_33720432867218:<main_sales_ticket_id>\nIf this returns [] and main_sales_ticket_id is known, retry ONCE with the value quoted:\n• type:ticket status<closed tags:secondary_application custom_field_33720432867218:\"<main_sales_ticket_id>\"\n\nIMPORTANT NOTES: \n- If more than one secondary_application ticket exists, include ALL of them (dedupe by ticket_id).\n- From the search results, include every ticket whose custom field 33720445734802 value (trimmed) is one of:\nmain_application | secondary_application | large_group_pack\n\n3) Retrieve per-participant product + application_id\nFor every ticket included in participants, retrieve and store: \n• product from custom field id 33720422435090, AND \n• application_id from custom field id 33720463862546 \nThese fields must be included in the output object. Use the ticket objects already returned by zendesk_search when available (do not refetch if fields are present). Do not fetch the same ticket more than once. If unknown/missing, set product/application_id to null for that participant.\n\n4) Build ONE combined customized email body for the whole group pack (MANDATORY)\nYou must generate a single email body that includes all applicant-specific links (main + all secondaries) in one message.\n\n4.1 Extract applicant names from zendesk_search ticket description\nFor each participant ticket object returned by zendesk_search, extract applicant_first_name from ticket.description by parsing the first Applicant_First_Name: line.\nNormalize: trim; Title Case (e.g., MELVIN → Melvin).\nIf not found: applicant_first_name = null.\n\n4.2 Create a combined greeting\nCollect all non-null applicant_first_name values (dedupe, preserve main-first ordering).\nIf 2+ names exist: Dear <Name1> and <Name2>[ and <Name3>...],\nIf only 1 name exists: Dear <Name1>,\nIf none exist: Hello,\nIMPORTANT: If a name is missing, do not add placeholders (do not write “and Customer”); greet only with known names.\n\n4.3 Build a combined CTA section (one section, many applicants)\nDetermine each participant’s cta_link using the same mail_reason rules:\n• draft_mail → custom field 0 (draft_url)\n• photo_upload_mail → custom field 33720479429906 (photo_upload_url)\n• ssn_mail → build from that participant’s application_id + product (DS82/DS11 rules)\n• other → do not change CTA links; greeting-only customization\nFor each participant:\nIf applicant_first_name AND valid cta_link exist: include a short line + a CTA button, e.g. HTML: <p>To upload the photo for Melvin, use the button below:</p><p><a href=\"LINK\" style=\"display:inline-block;padding:10px 20px;text-decoration:none;border-radius:4px;background:#0052CC;color:#FFFFFF;\">Click Here</a></p> Plain text: Melvin: LINK\nIf link is missing/invalid OR name is missing: do not create a button. Add an explicit line explaining the link is unavailable for that applicant and they should reply for assistance.\nExample HTML: <p>We could not retrieve the photo upload link for one applicant from the ticket. Please reply to this email so we can resend it.</p>\nExample plain text: similar message.\n\n4.4 Apply minimal template edits\nStart from public_reply/ public_reply_clean as the baseline.\nOnly modify:\nthe greeting, and\nreplace the single existing CTA button block (<a ...>Click Here</a>) with the combined CTA section described above.\nDo not materially change any other paragraphs.\n\nResulting outputs:\npublic_reply_customized (compressed HTML)\npublic_reply_clean_customized (plain text)\n\n\n\n{\n  \"main_sales_ticket_id\": \"<string>\",\n  \"mail_reason\": \"<draft_mail|photo_upload_mail|ssn_mail|other>\",\n  \"participant_count\": 2,\n  \"public_reply_customized\": \"<compressed_html_string>\",\n  \"public_reply_clean_customized\": \"<plain_text_string>\",\n  \"participants\": [\n    {\n      \"ticket_id\": \"<string>\",\n      \"group_application\": \"<main_application|secondary_application|not_a_group|large_group_pack|null>\",\n      \"application_id\": \"<string|null>\",\n      \"product\": \"<string|null>\",\n      \"applicant_first_name\": \"<string|null>\",\n      \"cta_link\": \"<string|null>\",\n      \"cta_block_html\": \"<compressed_html_fragment|null>\",\n      \"cta_block_clean\": \"<plain_text_fragment|null>\",\n      \"cta_note_if_missing\": \"<string|null>\"\n    }\n  ]\n}\n\n\n\nNotes:\n• participant_count MUST equal the number of objects in participants.\n• participants MUST include the main_application ticket and ALL secondary_application tickets found (dedupe by ticket_id).\n• public_reply_customized MUST keep the original template content, with ONLY (1) greeting adjusted and (2) the single CTA link updated to the participant-specific link (when mail_reason is draft_mail/photo_upload_mail/ssn_mail).\n• public_reply_customized_clean MUST contain the same content as public_reply_customized but in plain text (no HTML tags).\n• If any required participant field (group_application/product/application_id) is missing for a ticket, include the participant anyway and set missing values to null.",
               "type": "string"
             },
             {
@@ -959,32 +637,8 @@
     },
     {
       "parameters": {
-        "operation": "update",
-        "id": "={{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}",
-        "updateFields": {
-          "publicReply": "={{ $('Standardize Data').item.json.public_reply_clean }}"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        4944,
-        2464
-      ],
-      "id": "d160daee-0a26-4fe0-a26a-8bd96342a4fb",
-      "name": "Send public update - via managers",
-      "credentials": {
-        "zendeskApi": {
-          "id": "LT94JnDBkwRZ1hlb",
-          "name": "Zendesk account 2 - Main Account"
-        }
-      },
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "=zendesk_search\n\nPurpose  \n-------\nQuery Zendesk’s Search API and receive the raw JSON matches. You supply only the **`query`** string; the system takes care of authentication, pagination, and error handling.\n\nInput  \n-----\n* **query** – a UTF-8 search expression up to 2 KB, for example: \n  type:ticket ticket:24788821 status<closed\n  24788821 status<closed\n  type:ticket 24788821 status<closed tags:main_application\n  type:ticket status<closed tags:secondary_application custom_field_33720432867218:24788821\n  type:ticket status<closed tags:secondary_application custom_field_33720432867218:\"24788821\"\n  type:ticket status<closed requester:+18083916579\n  type:ticket status<closed requester:\"+18083916579\"\n  type:ticket requester:example@email.com status<closed \n\n\nCore Search Syntax  \n------------------\n* **type:** limits the resource you search (`ticket`, `user`, `organization`, `group`). \n\n* **Property keywords** like `status`, `requester`, `tags`, `created`, `updated`, etc., can be paired with `:`, `<`, `>`, `<=`, or `>=`. Example: `status<closed` returns any ticket in *new*, *open*, *pending*, or *hold*. \n\n* Allowed status values are *new, open, pending, hold, solved, closed*. \n* Wrap multi-word phrases in quotes: `\"passport renewal\"`.   \n* Use logical operators `AND`, `OR`, and unary `-` (NOT); group with parentheses.   \n\nSystem Limits  \n-------------\nZendesk returns only the first **1 000** records of any search and stops after **100** pages at 100 results each. \nNew or updated records may take a minute or two to appear in results. \n\n [YOUR_BRAND_NAME] Tags (use in `tags:` filters)  \n---------------------------------------\n* `sales_ticket` – master thread for every paid order.  \n* `govfee_paid`, `govfee_paid2` – government-fee collected.  \n* `online_renewal_draft_confirmed`, `online_draft_created` – passport-renewal milestones.  \n* Product cues: `esta`, `ds160`, `schengenpro`, `passport_renewal`.\n\nBest-Practice Tips  \n------------------\n1. Start narrow: combine `type:` with at least one field (`status`, `requester`, or `tags`) to avoid the 1 000-hit ceiling. \n2. Use `status<closed` whenever you want “active” tickets (everything except *closed*).  \n3. Tags are indexed—filter by them first, then add free-text if needed. \n4. Combine dates with status to find stale work, e.g. `type:ticket status:open updated<2025-07-01`.   \n\nQuery De-duplication (CRITICAL)\n\nYou MUST maintain a per-run list/set called attempted_zendesk_search_queries.\nBefore calling zendesk_search, check whether the exact query string has already been attempted in this run. If yes, DO NOT call it again (even if the prior result was [], errored, or timed out). Proceed to the next fallback step or stop if no fallbacks remain.\nIf you need a “retry,” it must be a different query string (e.g., quoted vs unquoted phone, phone vs email, adding/removing a filter).\nIn the final output, include tools_called with counts (e.g., \"zendesk_search x3\") so duplicate attempts are detectable.\n\n\nAutomatic Responses  \n-------------------\n* *400 Bad Request* – your syntax is invalid; adjust the query and retry with a different query string.\n* *Empty array* – no matches; broaden or refine your criteria and retry with a different query string.\n\nRecent Update:\n* Zendesk no longer allows sort_by and sort_order within queries. Using these will make the search return no results (and also no errors, so be careful, avoid using these even if instructed to do so elsewhere)",
+        "toolDescription": "=zendesk_search\n\nPurpose  \n-------\nQuery Zendesk’s Search API and receive the raw JSON matches. You supply only the **`query`** string; the system takes care of authentication, pagination, and error handling.\n\nInput  \n-----\n* **query** – a UTF-8 search expression up to 2 KB, for example: \n  type:ticket ticket:24788821 status<closed\n  24788821 status<closed\n  type:ticket 24788821 status<closed tags:main_application\n  type:ticket status<closed tags:secondary_application custom_field_33720432867218:24788821\n  type:ticket status<closed tags:secondary_application custom_field_33720432867218:\"24788821\"\n  type:ticket status<closed requester:+18083916579\n  type:ticket status<closed requester:\"+18083916579\"\n  type:ticket requester:example@email.com status<closed \n\n\nCore Search Syntax  \n------------------\n* **type:** limits the resource you search (`ticket`, `user`, `organization`, `group`). \n\n* **Property keywords** like `status`, `requester`, `tags`, `created`, `updated`, etc., can be paired with `:`, `<`, `>`, `<=`, or `>=`. Example: `status<closed` returns any ticket in *new*, *open*, *pending*, or *hold*. \n\n* Allowed status values are *new, open, pending, hold, solved, closed*. \n* Wrap multi-word phrases in quotes: `\"passport renewal\"`.   \n* Use logical operators `AND`, `OR`, and unary `-` (NOT); group with parentheses.   \n\nSystem Limits  \n-------------\nZendesk returns only the first **1 000** records of any search and stops after **100** pages at 100 results each. \nNew or updated records may take a minute or two to appear in results. \n\nGovAssist Tags (use in `tags:` filters)  \n---------------------------------------\n* `sales_ticket` – master thread for every paid order.  \n* `govfee_paid`, `govfee_paid2` – government-fee collected.  \n* `online_renewal_draft_confirmed`, `online_draft_created` – passport-renewal milestones.  \n* Product cues: `esta`, `ds160`, `schengenpro`, `passport_renewal`.\n\nBest-Practice Tips  \n------------------\n1. Start narrow: combine `type:` with at least one field (`status`, `requester`, or `tags`) to avoid the 1 000-hit ceiling. \n2. Use `status<closed` whenever you want “active” tickets (everything except *closed*).  \n3. Tags are indexed—filter by them first, then add free-text if needed. \n4. Combine dates with status to find stale work, e.g. `type:ticket status:open updated<2025-07-01`.   \n\nQuery De-duplication (CRITICAL)\n\nYou MUST maintain a per-run list/set called attempted_zendesk_search_queries.\nBefore calling zendesk_search, check whether the exact query string has already been attempted in this run. If yes, DO NOT call it again (even if the prior result was [], errored, or timed out). Proceed to the next fallback step or stop if no fallbacks remain.\nIf you need a “retry,” it must be a different query string (e.g., quoted vs unquoted phone, phone vs email, adding/removing a filter).\nIn the final output, include tools_called with counts (e.g., \"zendesk_search x3\") so duplicate attempts are detectable.\n\n\nAutomatic Responses  \n-------------------\n* *400 Bad Request* – your syntax is invalid; adjust the query and retry with a different query string.\n* *Empty array* – no matches; broaden or refine your criteria and retry with a different query string.\n\nRecent Update:\n* Zendesk no longer allows sort_by and sort_order within queries. Using these will make the search return no results (and also no errors, so be careful, avoid using these even if instructed to do so elsewhere)",
         "operation": "getAll",
         "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
         "options": {
@@ -1008,12 +662,12 @@
     },
     {
       "parameters": {
-        "description": "zendesk_search\n\nPurpose\n-------\nSearch [YOUR BRAND NAME] Zendesk for the matching Sales Ticket and return the verified Sales Ticket context used by the Post-call Planner prompt.\n\nPublished Input Contract\n------------------------\nThe published workflow schema has these fields: id, source, target, operation, payload, options.\n\nFor every search call, set the fields exactly like this:\n- id: empty string\n- source: \"zendesk_search\"\n- target: \"ticket\"\n- operation: \"search\"\n- payload: the Zendesk search query string\n- options: empty string\n\nDo not pass a field named query. The query string must go in payload. Never set operation to update/create/get/tags/get-clean when using zendesk_search for searching.\n\nZendesk Query Guidance\n----------------------\nUse Zendesk search syntax in payload. Prefer narrow ticket searches such as:\n- requester:<email> status<closed tags:sales_ticket\n- requester:\"<phone>\" status<closed tags:sales_ticket\n- type:ticket status<closed tags:sales_ticket\n- type:ticket ticket:<ticket_id> status<closed\n\nDo not include sort_by or sort_order. Maintain a per-run attempted_zendesk_search_queries list and do not call zendesk_search twice with the exact same payload string.\n\nOutput\n------\nThe wrapper returns one top-level verified_sales_ticket object, matching the Post-call Planner prompt terminology. It does not return the full Zendesk ticket object and does not wrap the object under results.\n\nverified_sales_ticket may contain:\n- sales_ticket_id\n- sales_ticket_tags\n- channel\n- subject\n- description\n- requester_id\n- sales_ticket_status\n- priority\n- assignee_id\n- group_id\n- group_application\n- product\n- application_id (Zendesk custom field \"Applicant ID\"; not \"Application Number\")\n- draft_url\n- photo_upload_url\n\nIf no matching ticket is found, verified_sales_ticket is an empty object. Use that as no verified Sales Ticket exists and continue with the prompt's no-ticket path.",
+        "description": "zendesk_search\n\nPurpose\n-------\nSearch Entry Zendesk for the matching Sales Ticket and return the verified Sales Ticket context used by the Post-call Planner prompt.\n\nPublished Input Contract\n------------------------\nThe published workflow schema has these fields: id, source, target, operation, payload, options.\n\nFor every search call, set the fields exactly like this:\n- id: empty string\n- source: \"zendesk_search\"\n- target: \"ticket\"\n- operation: \"search\"\n- payload: the Zendesk search query string\n- options: empty string\n\nDo not pass a field named query. The query string must go in payload. Never set operation to update/create/get/tags/get-clean when using zendesk_search for searching.\n\nZendesk Query Guidance\n----------------------\nUse Zendesk search syntax in payload. Prefer narrow ticket searches such as:\n- requester:<email> status<closed tags:sales_ticket\n- requester:\"<phone>\" status<closed tags:sales_ticket\n- type:ticket status<closed tags:sales_ticket\n- type:ticket ticket:<ticket_id> status<closed\n\nDo not include sort_by or sort_order. Maintain a per-run attempted_zendesk_search_queries list and do not call zendesk_search twice with the exact same payload string.\n\nOutput\n------\nThe wrapper returns one top-level verified_sales_ticket object, matching the Post-call Planner prompt terminology. It does not return the full Zendesk ticket object and does not wrap the object under results.\n\nverified_sales_ticket may contain:\n- sales_ticket_id\n- sales_ticket_tags\n- channel\n- subject\n- description\n- requester_id\n- sales_ticket_status\n- priority\n- assignee_id\n- group_id\n- group_application\n- product\n- application_id (Zendesk custom field \"Applicant ID\"; not \"Application Number\")\n- draft_url\n- photo_upload_url\n\nIf no matching ticket is found, verified_sales_ticket is an empty object. Use that as no verified Sales Ticket exists and continue with the prompt's no-ticket path.",
         "workflowId": {
           "__rl": true,
           "mode": "list",
-          "value": "[Zendesk_Safe_Caller_workflow_id]",
-          "cachedResultUrl": "/workflow/[Zendesk_Safe_Caller_workflow_id]",
+          "value": "OVv58xH7Lb3Z4UoD",
+          "cachedResultUrl": "/workflow/OVv58xH7Lb3Z4UoD",
           "cachedResultName": "Zendesk Safe Caller for Postcall Agent [Entry]"
         },
         "workflowInputs": {
@@ -1092,23 +746,7 @@
       "rewireOutputLogTo": "ai_tool"
     }
   ],
-  "pinData": {
-    "When Executed by Another Workflow": [
-      {
-        "json": {
-          "sales_ticket_id": "527615",
-          "public_reply": "<p>Hello David!, you'll be very happy to see this message when your eletricity comes back on.",
-          "public_reply_clean": "Hello David!,",
-          "product": "us_passport_ds82",
-          "application_id": "6988de4df9c0670027d69bd1",
-          "mail_reason": "draft_mail",
-          "group_application": "main_application",
-          "group_pack_flag": "false",
-          "email_subject": "Your  [YOUR_BRAND_NAME]draft review link"
-        }
-      }
-    ]
-  },
+  "pinData": {},
   "connections": {
     "When Executed by Another Workflow": {
       "main": [
@@ -1184,11 +822,6 @@
         ]
       ]
     },
-    "Zendesk Safe Caller": {
-      "main": [
-        []
-      ]
-    },
     "HTTP - Send public update": {
       "main": [
         [
@@ -1201,23 +834,6 @@
         [
           {
             "node": "Stop and Error1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send public update": {
-      "main": [
-        [],
-        []
-      ]
-    },
-    "Edit Fields": {
-      "main": [
-        [
-          {
-            "node": "Zendesk Safe Caller",
             "type": "main",
             "index": 0
           }
@@ -1298,18 +914,6 @@
         ]
       ]
     },
-    "Send public update1": {
-      "main": [
-        [],
-        [
-          {
-            "node": "Stop and Error4",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Parse Output": {
       "main": [
         [
@@ -1324,17 +928,6 @@
     "Split Out Tickets in the Group Pack": {
       "main": [
         []
-      ]
-    },
-    "ticket_events": {
-      "ai_tool": [
-        [
-          {
-            "node": "Group Pack Handler w. ticket_events",
-            "type": "ai_tool",
-            "index": 0
-          }
-        ]
       ]
     },
     "Prepare Input": {
@@ -1357,12 +950,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Send public update - via managers": {
-      "main": [
-        [],
-        []
       ]
     },
     "zendesk_search -": {
@@ -1389,7 +976,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "81360599-26f8-4abe-a267-049bfb8bb066",
+  "versionId": "1a2f4d01-3b1e-4fe1-84e3-7c7bb4dff9f1",
   "meta": {
     "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"
   },

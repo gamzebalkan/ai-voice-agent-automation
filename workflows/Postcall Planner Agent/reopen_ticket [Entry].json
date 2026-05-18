@@ -70,96 +70,6 @@
     },
     {
       "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "[Zendesk_Safe_Caller_workflow_id]",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/[Zendesk_Safe_Caller_workflow_id]",
-          "cachedResultName": "Zendesk Safe Caller"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "id": "={{ $('When Executed by Another Workflow').item.json.ticket_id }}",
-            "target": "ticket",
-            "operation": "update",
-            "payload": "={ \"status\": \"open\" } ",
-            "options": "{}"
-          },
-          "matchingColumns": [],
-          "schema": [
-            {
-              "id": "id",
-              "displayName": "id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "source",
-              "displayName": "source",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": true
-            },
-            {
-              "id": "target",
-              "displayName": "target",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "operation",
-              "displayName": "operation",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "payload",
-              "displayName": "payload",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": false
-            },
-            {
-              "id": "options",
-              "displayName": "options",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "canBeUsedToMatch": true,
-              "removed": false
-            }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.2,
-      "position": [
-        1664,
-        416
-      ],
-      "id": "45f34838-93d2-4bab-91db-31065c15129b",
-      "name": "Zendesk Safe Caller - Set ST Status to Open",
-      "disabled": true
-    },
-    {
-      "parameters": {
         "assignments": {
           "assignments": [
             {
@@ -222,7 +132,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}.json",
+        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $('When Executed by Another Workflow').item.json.sales_ticket_id }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -268,19 +178,7 @@
       "name": "Stop and Error2"
     }
   ],
-  "pinData": {
-    "When Executed by Another Workflow": [
-      {
-        "json": {
-          "sales_ticket_id": "19888",
-          "sales_ticket_status": "solved"
-        },
-        "pairedItem": {
-          "item": 0
-        }
-      }
-    ]
-  },
+  "pinData": {},
   "connections": {
     "When Executed by Another Workflow": {
       "main": [
@@ -309,11 +207,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Zendesk Safe Caller - Set ST Status to Open": {
-      "main": [
-        []
       ]
     },
     "Set status to open": {
@@ -360,7 +253,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "430f63d8-b40d-46d2-977b-3d7e812f88e7",
+  "versionId": "44dcad8b-8ad8-4130-a879-c95354eb7648",
   "meta": {
     "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"
   },

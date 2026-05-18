@@ -3,146 +3,6 @@
   "nodes": [
     {
       "parameters": {
-        "resource": "user",
-        "operation": "get",
-        "id": "={{ $json.requester_id }}"
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        -384,
-        1040
-      ],
-      "id": "7a88db57-f6cc-4b2b-8861-d098f0062695",
-      "name": "Test search2",
-      "alwaysOutputData": true,
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/30844357565586",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "zendeskApi",
-        "options": {
-          "response": {
-            "response": {
-              "fullResponse": true
-            }
-          }
-        }
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -96,
-        -144
-      ],
-      "id": "208c43be-1a70-4d8c-bae4-1d1aa2c41dd5",
-      "name": "Get a user",
-      "retryOnFail": true,
-      "waitBetweenTries": 5000,
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      },
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "content": "{\n  \"x-clf-api-key\":\"p3QdXM0oKRgq3EVuX5H3KnvTGcAwR7YeuXnKn9IN7gPyuTLf\"\n}"
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        -304,
-        112
-      ],
-      "typeVersion": 1,
-      "id": "405a7418-0125-4645-8bfd-55b2e81ddadd",
-      "name": "Sticky Note"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "7830d508-a217-45c5-990f-df7f915bd492",
-              "name": "body.user.phone",
-              "value": "={{ $json.body.user.phone }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        224,
-        -160
-      ],
-      "id": "392eaf04-6539-4d16-b752-9f0a7b951bd9",
-      "name": "Edit Fields"
-    },
-    {
-      "parameters": {
-        "content": "HTTP Request \nthis works: \n\n\n{\n  \"user\": {\n    \"phone\": \"+905551112233\"\n  }\n}\n",
-        "height": 176
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        -704,
-        -144
-      ],
-      "typeVersion": 1,
-      "id": "02321ff3-8696-4463-adb2-788e7ff1954a",
-      "name": "Sticky Note1"
-    },
-    {
-      "parameters": {
-        "operation": "getAll",
-        "returnAll": true,
-        "options": {
-          "query": "ticket: 24233056 status<closed"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        -272,
-        -416
-      ],
-      "id": "d43e73dd-c0ea-4f06-9e18-9cd0753a87f9",
-      "name": "Test search3",
-      "alwaysOutputData": true,
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "content": "TEST TICKET \nticket: 24233056, \nuser: 30844357565586 "
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        -672,
-        -384
-      ],
-      "typeVersion": 1,
-      "id": "9ef11b4c-c498-41a5-a4de-6b4daf03796a",
-      "name": "Sticky Note2"
-    },
-    {
-      "parameters": {
         "workflowInputs": {
           "values": [
             {
@@ -180,166 +40,6 @@
       ],
       "id": "8a09ec8e-ee47-447b-8f07-b0010fabd710",
       "name": "When Executed by Another Workflow"
-    },
-    {
-      "parameters": {
-        "operation": "getAll",
-        "returnAll": true,
-        "options": {
-          "query": "=type:ticket requester:\"dddingo@hotmail.com\""
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        80,
-        1008
-      ],
-      "id": "7f87ea7f-e1fb-49e7-b6ab-4858d05d9289",
-      "name": "Test search4",
-      "alwaysOutputData": true,
-      "credentials": {
-        "zendeskApi": {
-          "id": "LT94JnDBkwRZ1hlb",
-          "name": "Zendesk account 2 - Main Account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "getAll",
-        "returnAll": true,
-        "options": {
-          "query": "=type:ticket requester:\"+13174323624\" tags:call_overflow status<closed "
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        -592,
-        1040
-      ],
-      "id": "ac05d0f8-5a9c-41f8-9299-277ab06c055d",
-      "name": "Test search5",
-      "alwaysOutputData": true,
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "content": "TEST\n\nRory Andrews \nticket:24698816\n\n+14358280693 (direct line)\n+14358281917\n\n\n\n\n\n\n\nResult: \nIf the primary phone is not direct line and the second one is ->  it updates it instead of adding it",
-        "height": 384,
-        "width": 1168,
-        "color": 4
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        -912,
-        560
-      ],
-      "typeVersion": 1,
-      "id": "f75279b2-e241-4f8a-abb9-b907eb8214e6",
-      "name": "Sticky Note3"
-    },
-    {
-      "parameters": {
-        "resource": "user",
-        "operation": "update",
-        "id": "={{ $json.requester_id }}",
-        "updateFields": {
-          "phone": "=+905556100909"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        -32,
-        -416
-      ],
-      "id": "fce017ab-4b1e-4eec-b3bb-662c2225f645",
-      "name": "Test update",
-      "alwaysOutputData": true,
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "getAll",
-        "returnAll": true,
-        "options": {
-          "query": "ticket: 24698816 status<closed"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        -576,
-        640
-      ],
-      "id": "1f247c72-212e-4e54-a0ed-e198ae1e68f2",
-      "name": "Test ticket search",
-      "alwaysOutputData": true,
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "resource": "user",
-        "operation": "get",
-        "id": "={{ $json.requester_id }}"
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        -368,
-        640
-      ],
-      "id": "238609ca-61a7-4884-a21d-58eb1a17e697",
-      "name": "Test user search",
-      "alwaysOutputData": true,
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "resource": "user",
-        "operation": "update",
-        "id": "={{ $json.id }}",
-        "updateFields": {
-          "phone": "=+14358281917"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        -144,
-        640
-      ],
-      "id": "c0d55ce4-a1a2-4057-a81a-07f7da550869",
-      "name": "Test phone update",
-      "alwaysOutputData": true,
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      }
     },
     {
       "parameters": {
@@ -444,176 +144,8 @@
     },
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "c0b8eac9-9f93-4238-ba91-b2815a0f6a8e",
-              "leftValue": "={{ $('When Executed by Another Workflow').item.json.caller_id }}",
-              "rightValue": "={{ $('When Executed by Another Workflow').item.json.requester_phone }}",
-              "operator": {
-                "type": "string",
-                "operation": "notEquals"
-              }
-            },
-            {
-              "id": "261bad05-9d0c-4e58-9a43-7c2293c0a783",
-              "leftValue": "={{ $('When Executed by Another Workflow').item.json.caller_id }}",
-              "rightValue": "anonymous",
-              "operator": {
-                "type": "string",
-                "operation": "notEquals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        1568,
-        1392
-      ],
-      "id": "96fe33af-490b-47b8-b382-9881298bd53a",
-      "name": "Phone number should be added?"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "c0b8eac9-9f93-4238-ba91-b2815a0f6a8e",
-              "leftValue": "={{ $('When Executed by Another Workflow').item.json.corrected_email }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "notEmpty",
-                "singleValue": true
-              }
-            },
-            {
-              "id": "4317ef81-56f6-4808-8bfe-b34552612217",
-              "leftValue": "={{ $('When Executed by Another Workflow').item.json.corrected_email }}",
-              "rightValue": "={{ $('When Executed by Another Workflow').item.json.requester_email }}",
-              "operator": {
-                "type": "string",
-                "operation": "notEquals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        1360,
-        1472
-      ],
-      "id": "6771d4be-f1f5-4547-8067-2a13351839e5",
-      "name": "Email should be corrected?"
-    },
-    {
-      "parameters": {
-        "resource": "user",
-        "operation": "update",
-        "id": "={{ $('When Executed by Another Workflow').item.json.requester_id }}",
-        "updateFields": {
-          "phone": "={{ $('When Executed by Another Workflow').item.json.requester_phone }}"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        1600,
-        -80
-      ],
-      "id": "c046fa30-5992-49c1-a67c-00d7b24ab980",
-      "name": "Update phone - failsafe for indirect line",
-      "alwaysOutputData": true,
-      "credentials": {
-        "zendeskApi": {
-          "id": "r6Mcqrp6YkvDbbjZ",
-          "name": "Zendesk account 2"
-        }
-      },
-      "disabled": true
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "c0b8eac9-9f93-4238-ba91-b2815a0f6a8e",
-              "leftValue": "={{ $('When Executed by Another Workflow').item.json.requester_phone }}",
-              "rightValue": "={{ $('When Executed by Another Workflow').item.json.requester_phone }}",
-              "operator": {
-                "type": "string",
-                "operation": "exists",
-                "singleValue": true
-              }
-            },
-            {
-              "id": "5522663e-7257-41e3-87d0-d6d523f81b22",
-              "leftValue": "={{ $('When Executed by Another Workflow').item.json.caller_id }}",
-              "rightValue": "anonymous",
-              "operator": {
-                "type": "string",
-                "operation": "notEquals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        1088,
-        -64
-      ],
-      "id": "199c2cf9-6d05-40bb-b6e2-7d10c1f54b55",
-      "name": "If requester_phone is not null?",
-      "disabled": true
-    },
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        1360,
-        -80
-      ],
-      "id": "4bc23e06-feb6-4845-823f-05ac3b1fc78c",
-      "name": "Wait",
-      "webhookId": "c37fdc0a-2542-492e-b66c-24e5ae0bd2f0",
-      "disabled": true
-    },
-    {
-      "parameters": {
         "method": "PATCH",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/{{ $('When Executed by Another Workflow').item.json.requester_id }}",
+        "url": "=https://entryllc.zendesk.com/api/v2/users/{{ $('When Executed by Another Workflow').item.json.requester_id }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -648,7 +180,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/{{ $('When Executed by Another Workflow').item.json.requester_id }}.json",
+        "url": "=https://entryllc.zendesk.com/api/v2/users/{{ $('When Executed by Another Workflow').item.json.requester_id }}.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -679,52 +211,6 @@
         }
       },
       "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "operation": "getAll",
-        "returnAll": true,
-        "options": {
-          "query": "=requester: {{ $json.phone }}"
-        }
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        16,
-        1232
-      ],
-      "id": "3acc6239-d725-4ddb-8c72-3fb98e432c56",
-      "name": "TEST - user search",
-      "alwaysOutputData": true,
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "resource": "user",
-        "operation": "get",
-        "id": "={{ $json.requester_id }}"
-      },
-      "type": "n8n-nodes-base.zendesk",
-      "typeVersion": 1,
-      "position": [
-        -240,
-        1232
-      ],
-      "id": "19695c07-58a8-43a5-9e40-35ed64b591c5",
-      "name": "TEST - user search1",
-      "alwaysOutputData": true,
-      "credentials": {
-        "zendeskApi": {
-          "id": "gXvcotdQKkLy8319",
-          "name": "Zendesk account 3 - David"
-        }
-      }
     },
     {
       "parameters": {
@@ -889,7 +375,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://[your_brand_name].zendesk.com/api/v2/users/{{ $('When Executed by Another Workflow').item.json.requester_id }}/identities.json",
+        "url": "=https://entryllc.zendesk.com/api/v2/users/{{ $('When Executed by Another Workflow').item.json.requester_id }}/identities.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "sendBody": true,
@@ -922,72 +408,13 @@
       "onError": "continueErrorOutput"
     }
   ],
-  "pinData": {
-    "When Executed by Another Workflow": [
-      {
-        "json": {
-          "sales_ticket_id": "19888",
-          "requester_id": "34712959603986",
-          "requester_phone": "+13144962135",
-          "caller_id": "+13144962135",
-          "requester_email": "pat.brown.852@gmail.com",
-          "updated_email": "dddingo@hotmail.com"
-        },
-        "pairedItem": {
-          "item": 0
-        }
-      }
-    ]
-  },
+  "pinData": {},
   "connections": {
-    "Test search2": {
-      "main": [
-        []
-      ]
-    },
-    "Get a user": {
-      "main": [
-        [
-          {
-            "node": "Edit Fields",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Test search3": {
-      "main": [
-        []
-      ]
-    },
     "When Executed by Another Workflow": {
       "main": [
         [
           {
             "node": "Code in JavaScript",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Test ticket search": {
-      "main": [
-        [
-          {
-            "node": "Test user search",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Test user search": {
-      "main": [
-        [
-          {
-            "node": "Test phone update",
             "type": "main",
             "index": 0
           }
@@ -1030,46 +457,6 @@
         ]
       ]
     },
-    "Phone number should be added?": {
-      "main": [
-        [],
-        []
-      ]
-    },
-    "Email should be corrected?": {
-      "main": [
-        [],
-        []
-      ]
-    },
-    "If requester_phone is not null?": {
-      "main": [
-        [
-          {
-            "node": "Wait",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        []
-      ]
-    },
-    "Wait": {
-      "main": [
-        [
-          {
-            "node": "Update phone - failsafe for indirect line",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Update phone - failsafe for indirect line": {
-      "main": [
-        []
-      ]
-    },
     "Update a user phone": {
       "main": [
         [
@@ -1100,17 +487,6 @@
         [
           {
             "node": "Update a user email - w. identity",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "TEST - user search1": {
-      "main": [
-        [
-          {
-            "node": "TEST - user search",
             "type": "main",
             "index": 0
           }
@@ -1184,7 +560,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "24d87f1f-dc6b-4641-9d17-2d782ec2280a",
+  "versionId": "5dd2b3a2-09cf-4d70-86d7-773e0a6dfdf4",
   "meta": {
     "instanceId": "9c27b8c4dc2fa999316a793a27fcd4d6b8a03e4416b1644148c7309158354a6b"
   },
