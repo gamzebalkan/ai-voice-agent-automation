@@ -192,12 +192,20 @@ This ensures operational resilience even under incomplete webhook payload condit
 
 # 📂 Repository Structure
 
-```text
 workflows/
+├── Postcall Planner Agent/
+└── Inbound Voice Agent/
+
 prompts/
+├── Postcall Planner Agent/
+└── Inbound Voice Agent/
+
 screenshots/
+├── Case 1/
+├── Case 2/
+└── Other Examples/
+
 README.md
-```
 
 ---
 
