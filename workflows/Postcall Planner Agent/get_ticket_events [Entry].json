@@ -303,7 +303,7 @@
       ],
       "id": "8fa8647f-85a6-4334-8e54-fa81229fb871",
       "name": "Wait2",
-      "webhookId": "44b374cd-906f-4efd-a095-4892f87b3e05"
+      "webhookId": "<WEBHOOK_ID>"
     },
     {
       "parameters": {
@@ -429,7 +429,7 @@
     },
     {
       "parameters": {
-        "url": "=https://entryllc.zendesk.com/api/v2/tickets/{{ $json.id }}/audits.json",
+        "url": "=https://<your_brand_name>.zendesk.com/api/v2/tickets/{{ $json.id }}/audits.json",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "zendeskApi",
         "options": {
@@ -973,7 +973,7 @@
       ],
       "id": "66e87e74-7fd8-47e4-9af8-944e270dd386",
       "name": "Webhook",
-      "webhookId": "ed699c72-4302-4487-bfe2-f57975a81a74"
+      "webhookId": "<WEBHOOK_ID>"
     },
     {
       "parameters": {
