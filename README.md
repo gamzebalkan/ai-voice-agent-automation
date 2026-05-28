@@ -1,163 +1,65 @@
 # AI Voice Agent Automation & Orchestration
-
 ### 🤖 ElevenLabs → n8n → Zendesk AI Support System
 
-An AI Voice Agent automation system designed for automated inbound call handling and post-call workflow orchestration in travel assistance operations.
+An enterprise-grade automation system designed for automated inbound call handling and post-call workflow orchestration in travel assistance operations. 
 
-The platform combines a real-time voice intake assistant with a rule-based LLM-powered post-call automation layer to reduce manual support workload, automate ticket operations, and streamline customer service workflows inside Zendesk and connected backend systems.
-
-The architecture is intentionally split into two specialized layers to maximize operational safety, maintainability, and scalability.
-
-
+By separating a real-time voice intake assistant from an LLM-powered post-call automation layer, the platform maximizes operational safety, reduces manual workload, and streamlines customer service inside Zendesk.
 
 ---
 
-
 ## 🏗️ System Architecture
 
-The infrastructure runs entirely on a self-hosted Railway environment and integrates ElevenLabs, Twilio, n8n, Zendesk, and OpenAI-powered agents.
-
+The entire infrastructure is self-hosted on **Railway**, integrating ElevenLabs, Twilio, n8n, Zendesk, and OpenAI (ChatGPT 5.5).
 
 ### 1. In-Call Layer (Real-Time Intake Assistant)
-
-#### Tech Stack
-- ElevenLabs
-- Twilio
-- n8n
-- Zendesk
-- Railway
-- OpenAI (ChatGPT 5.5)
-
-#### Responsibilities
-
-The In-Call Agent operates during the live phone conversation and is intentionally restricted to safe, read-only operations.
-
-Its primary responsibilities include:
-- Customer identity verification
-- Ticket lookup and retrieval
-- Capturing user requests
-- Reading ticket timelines and metadata
-- Collecting structured intake information
-
-#### Safety Design
-
-To maintain system integrity and avoid unintended live modifications:
-- The In-Call Agent operates in a strict **read-only / no-write mode**
-- It cannot modify Zendesk tickets
-- It cannot perform backend write operations
-- It does not provide sensitive operational guidance
-
-#### MCP Connectivity
-
-The system securely communicates with n8n workflows through an MCP-based architecture using Bearer Token authentication.
-
+* **Tech Stack:** ElevenLabs, Twilio, n8n, Zendesk, Railway, OpenAI
+* **Responsibilities:** Operates during live conversations under a strict **read-only / no-write mode** to maintain system integrity.
+    * Verifies customer identity and performs ticket lookups.
+    * Captures user requests and collects structured intake info.
+    * Reads ticket timelines and metadata without making modifications.
+* **Connectivity:** Communicates securely with n8n workflows via an MCP-based architecture using Bearer Token authentication.
 
 ### 2. Post-Call Automation Layer (Planner Agent)
-
-#### Tech Stack
-- n8n
-- Zendesk
-- Railway
-- OpenAI (ChatGPT 5.5)
-
-#### Responsibilities
-
-After the phone call ends, the Post-Call Planner Agent orchestrates complex operational workflows across Zendesk and connected backend systems.
-
-The workflow:
-1. Receives ElevenLabs `post_call_transcription` webhook events
-2. Immediately returns `200 OK` to avoid webhook blocking
-3. Retrieves full conversation data from ElevenLabs API
-4. Normalizes transcripts into a lightweight structured format
-5. Sends runtime data to the LLM Planner Agent
-6. Executes rule-based operational workflows
+* **Tech Stack:** n8n, Zendesk, Railway, OpenAI
+* **Responsibilities:** Orchestrates complex post-call workflows upon receiving the ElevenLabs `post_call_transcription` webhook.
+* **Execution Pipeline:**
+    1.  **Ingest:** Receives webhook and immediately returns `200 OK` (non-blocking).
+    2.  **Fetch & Normalize:** Retrieves raw data from ElevenLabs API and converts transcripts into a lightweight, structured JSON format to minimize noise and optimize token usage.
+    3.  **Process:** Sends runtime data to the LLM Planner Agent.
+    4.  **Execute:** Triggers rule-based operational workflows across connected systems.
 
 ---
 
 ## ⚡ Key Features
 
-- Non-blocking webhook ingestion
-- LLM-powered operational orchestration
-- MCP-based real-time architecture
-- Structured transcript normalization: Before reaching the LLM layer, raw transcripts are transformed into a clean structured format to reduce context noise and optimize token usage. This preprocessing step improves agent reasoning quality, runtime efficiency, context clarity, ownsdtream analytics consistency.
-- Strict ticket validation logic
-- Read-only live-call safety model
-- Automated Zendesk workflow handling
-- Analytics-ready structured JSON outputs
-- Modular n8n workflow architecture
-- 🕵️ Fallback Detective Agent logic: if transcript data is unavailable, a dedicated fallback sub-workflow automatically activates to locate related Zendesk tickets and recover operational context
+* **Dual-Layer Safety Model:** Read-only live-call interactions paired with a secure post-call write layer.
+* **Non-Blocking Webhook Ingestion:** Immediate handshake response preventing webhook timeouts.
+* **Transcript Normalization:** Pre-processing pipeline that improves agent reasoning and downstream analytics consistency.
+* **🕵️ Fallback Detective Agent:** Dedicated sub-workflow that automatically activates to recover operational context and locate related tickets if transcript data is missing.
+* **Enterprise Integrations:** Native MCP-based real-time architecture, strict ticket validation, and modular n8n design.
 
 ---
 
-
 ## 🧠 Agent Execution Logic
 
-The Planner Agent evaluates runtime data and routes execution through one of three operational paths.
+The Planner Agent evaluates runtime data and routes execution through one of three restricted operational paths:
 
-### 🟢 Path A — Verified Active Sales Ticket Found
-
-Most common operational flow.
-
-Possible actions:
-- Create a dedicated call ticket
-- Merge tickets into active sales tickets
-- Add internal call summaries
-- Reopen tickets when necessary
-- Update ticket priority
-- Escalate billing-related requests
-- Send approved follow-up emails
-- Synchronize status with backend systems
-- Solve tickets when no further action is required
-
-Additional logic:
-- Customer frustration detection
-- Urgency detection based on travel dates
-- Customer profile enrichment
-- Phone number synchronization
-
-
-
-### 🟡 Path B — No Related Ticket or Customer Found
-
-Fallback flow for unidentified callers.
-
-Actions:
-- Create isolated Zendesk call ticket
-- Attach transcript summary
-- Store runtime execution data
-- Route for manual triage
-
-
-
-### 🔵 Path C — Lead Ticket Found
-
-Dedicated flow for unpaid or lead-based customer records.
-
-Actions are intentionally restricted to:
-- Lead-safe updates
-- Controlled field modifications
-- Non-destructive operational handling
+| Execution Path | Trigger Condition | Core Actions |
+| :--- | :--- | :--- |
+| **🟢 Path A** | Verified Active Sales Ticket Found | • Merge/create tickets & update priority<br>• Add internal call summaries & reopen tickets<br>• Detect customer frustration/urgency<br>• Send approved follow-up emails & sync backend |
+| **🟡 Path B** | No Related Ticket or Customer Found | • Create isolated Zendesk call ticket<br>• Attach transcript summary & store execution data<br>• Route to manual triage queue |
+| **🔵 Path C** | Lead Ticket Found (Unpaid/Lead Records) | • Restricted to lead-safe updates<br>• Controlled field modifications<br>• Non-destructive operational handling |
 
 ---
 
 ## 🛠️ Available Agent Tools
 
-The Planner Agent operates through constrained tool execution rules.
+Tool execution paths are strictly constrained to prevent unsafe or unauthorized actions:
 
-Available tools include:
-- `zendesk_search`
-- `zendesk_get_user`
-- `create_call_ticket`
-- `merge_tickets`
-- `leave_call_summary`
-- `send_followup_email`
-- `update_application_status`
-- `escalate_to_billing`
-- `change_priority`
-- `reopen_ticket`
-- `solve_ticket`
-
-Tool execution paths are strictly controlled to prevent unsafe or invalid actions.
+* **Search & Retrieval:** `zendesk_search`, `zendesk_get_user`
+* **Ticket Management:** `create_call_ticket`, `merge_tickets`, `reopen_ticket`, `solve_ticket`, `change_priority`
+* **Communications & Logs:** `leave_call_summary`, `send_followup_email`
+* **Backend Operations:** `update_application_status`, `escalate_to_billing`
 
 ---
 
@@ -179,7 +81,6 @@ screenshots/
 
 README.md
 ```
-
 ---
 
 ## 🚀 Deployment & Setup
@@ -190,22 +91,9 @@ The infrastructure runs entirely self-hosted on **Railway**. Ensure your running
 
 
 ### 2. Secrets & Credentials Management
-All secrets and Bearer tokens must be stored securely using n8n Credentials or server environment variables.
-* ElevenLabs API Key
-* Zendesk API Credentials
-* OpenAI API Key
-* Internal UCC System authentication keys
+Configure necessary integration keys (`ElevenLabs`, `Zendesk`, `OpenAI`, `UCC System`) securely via n8n Credentials or server environment variables.
 
-Never commit:
-- API keys
-- `.env` files
-- Bearer tokens
-- Webhook secrets
-- Customer PII
-- Real transcripts
-- Internal URLs
-- Sensitive backend configuration
-
+> ⚠️ **Critical Security:** Never commit API keys, `.env` files, webhook secrets, customer PII, or internal system URLs to the repository.
 
 
 ### 3. Import Workflows into n8n
@@ -224,12 +112,6 @@ Webhook endpoint:
 
 ```text
 POST https://<your-n8n-instance>/webhook/elce/entry
-```
-
-Event:
-
-```text
-post_call_transcription
 ```
 
 ---
