@@ -75,41 +75,16 @@ The workflow:
 - Non-blocking webhook ingestion
 - LLM-powered operational orchestration
 - MCP-based real-time architecture
-- Structured transcript normalization
+- Structured transcript normalization: Before reaching the LLM layer, raw transcripts are transformed into a clean structured format to reduce context noise and optimize token usage. This preprocessing step improves agent reasoning quality, runtime efficiency, context clarity, ownsdtream analytics consistency.
 - Strict ticket validation logic
 - Read-only live-call safety model
 - Automated Zendesk workflow handling
 - Analytics-ready structured JSON outputs
 - Modular n8n workflow architecture
-- Fallback Detective Agent logic
+- 🕵️ Fallback Detective Agent logic: if transcript data is unavailable, a dedicated fallback sub-workflow automatically activates to locate related Zendesk tickets and recover operational context
 
 ---
 
-### 🧾 Transcript Normalization
-
-Before reaching the LLM layer, raw transcripts are transformed into a clean structured format to reduce context noise and optimize token usage. 
-This preprocessing step improves agent reasoning quality, runtime efficiency, context clarity, ownsdtream analytics consistency.
-
-Example:
-
-```text
-AGENT (12s): Hello, how may I assist you today?
-USER (15s): I need help with my travel booking.
-```
-
-### 🕵️ Detective Agent Fallback
-
-If transcript data is unavailable, a dedicated fallback sub-workflow automatically activates.
-
-The Detective Agent attempts to:
-- Identify customers via Caller ID
-- Locate related Zendesk tickets
-- Recover operational context
-- Maintain workflow continuity
-
-This ensures operational resilience even under incomplete webhook payload conditions.
-
----
 
 ## 🧠 Agent Execution Logic
 
