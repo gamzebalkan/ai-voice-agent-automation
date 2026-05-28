@@ -118,13 +118,13 @@ POST https://<your-n8n-instance>/webhook/elce/entry
 
 ## 🔒 Security & Compliance
 
-- Strict Bearer Token verification for MCP communication
-- No hardcoded secrets inside workflows
-- No customer PII stored in repository files
-- Public repository examples must remain redacted
-- Internal operational links are never exposed externally
+The platform is engineered around zero-trust and operational safety boundaries.
 
-The system is designed with operational safety and controlled execution as core architectural principles.
+* **Secrets & Credentials:** All integration keys (`ElevenLabs`, `Zendesk`, `OpenAI`, `UCC System`) must be stored securely via n8n Credentials or server environment variables. 
+* **Data Privacy & PII:** No customer PII, real conversation transcripts, or internal system URLs are stored or exposed within the repository. Public examples remain strictly redacted.
+* **Architectural Boundaries:** Strict Bearer Token verification is enforced for all MCP communications, ensuring zero hardcoded secrets within active workflows.
+
+> ⚠️ **CRITICAL SECURITY NOTE:** Never commit `.env` files, API keys, bearer tokens, or webhook secrets to the version control system.
 
 ---
 
