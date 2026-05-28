@@ -8,7 +8,10 @@ The platform combines a real-time voice intake assistant with a rule-based LLM-p
 
 The architecture is intentionally split into two specialized layers to maximize operational safety, maintainability, and scalability.
 
-----
+
+
+---
+
 
 ## 🏗️ System Architecture
 
