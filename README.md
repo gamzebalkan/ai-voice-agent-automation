@@ -10,7 +10,7 @@ By separating a real-time voice intake assistant from an LLM-powered post-call a
 
 ## 🏗️ System Architecture
 
-The entire infrastructure is self-hosted on **Railway**, integrating ElevenLabs, Twilio, n8n, Zendesk, and OpenAI (ChatGPT 5.5).
+The entire infrastructure is self-hosted on Railway, integrating ElevenLabs, Twilio, n8n, Zendesk, and OpenAI (ChatGPT 5.5).
 
 ### 1. In-Call Layer (Real-Time Intake Assistant)
 * **Tech Stack:** ElevenLabs, Twilio, n8n, Zendesk, Railway, OpenAI
