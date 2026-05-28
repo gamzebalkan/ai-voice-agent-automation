@@ -1,6 +1,6 @@
-# AI Voice Agent Automation & Orchestration
+## AI Voice Agent Automation & Orchestration
 
-## 🤖 ElevenLabs → n8n → Zendesk AI Support System
+### 🤖 ElevenLabs → n8n → Zendesk AI Support System
 
 An AI Voice Agent automation system designed for automated inbound call handling and post-call workflow orchestration in travel assistance operations.
 
@@ -10,13 +10,13 @@ The architecture is intentionally split into two specialized layers to maximize 
 
 ---
 
-# 🏗️ System Architecture
+## 🏗️ System Architecture
 
 The infrastructure runs entirely on a self-hosted Railway environment and integrates ElevenLabs, Twilio, n8n, Zendesk, and OpenAI-powered agents.
 
-## 1. In-Call Layer (Real-Time Intake Assistant)
+### 1. In-Call Layer (Real-Time Intake Assistant)
 
-### Tech Stack
+#### Tech Stack
 - ElevenLabs
 - Twilio
 - n8n
@@ -24,7 +24,7 @@ The infrastructure runs entirely on a self-hosted Railway environment and integr
 - Railway
 - OpenAI (ChatGPT 5.5)
 
-### Responsibilities
+#### Responsibilities
 
 The In-Call Agent operates during the live phone conversation and is intentionally restricted to safe, read-only operations.
 
@@ -35,7 +35,7 @@ Its primary responsibilities include:
 - Reading ticket timelines and metadata
 - Collecting structured intake information
 
-### Safety Design
+#### Safety Design
 
 To maintain system integrity and avoid unintended live modifications:
 - The In-Call Agent operates in a strict **read-only / no-write mode**
@@ -43,21 +43,21 @@ To maintain system integrity and avoid unintended live modifications:
 - It cannot perform backend write operations
 - It does not provide sensitive operational guidance
 
-### MCP Connectivity
+#### MCP Connectivity
 
 The system securely communicates with n8n workflows through an MCP-based architecture using Bearer Token authentication.
 
 ---
 
-## 2. Post-Call Automation Layer (Planner Agent)
+### 2. Post-Call Automation Layer (Planner Agent)
 
-### Tech Stack
+#### Tech Stack
 - n8n
 - Zendesk
 - Railway
 - OpenAI (ChatGPT 5.5)
 
-### Responsibilities
+#### Responsibilities
 
 After the phone call ends, the Post-Call Planner Agent orchestrates complex operational workflows across Zendesk and connected backend systems.
 
@@ -71,7 +71,7 @@ The workflow:
 
 ---
 
-# 🧾 Transcript Normalization
+## 🧾 Transcript Normalization
 
 Before reaching the LLM layer, raw transcripts are transformed into a clean structured format to reduce context noise and optimize token usage.
 
@@ -90,11 +90,11 @@ This preprocessing step improves:
 
 ---
 
-# 🧠 Agent Execution Logic
+## 🧠 Agent Execution Logic
 
 The Planner Agent evaluates runtime data and routes execution through one of three operational paths.
 
-## 🟢 Path A — Verified Active Sales Ticket Found
+### 🟢 Path A — Verified Active Sales Ticket Found
 
 Most common operational flow.
 
@@ -117,7 +117,7 @@ Additional logic:
 
 ---
 
-## 🟡 Path B — No Related Ticket or Customer Found
+### 🟡 Path B — No Related Ticket or Customer Found
 
 Fallback flow for unidentified callers.
 
@@ -129,7 +129,7 @@ Actions:
 
 ---
 
-## 🔵 Path C — Lead Ticket Found
+### 🔵 Path C — Lead Ticket Found
 
 Dedicated flow for unpaid or lead-based customer records.
 
@@ -140,7 +140,7 @@ Actions are intentionally restricted to:
 
 ---
 
-# 🛠️ Available Agent Tools
+## 🛠️ Available Agent Tools
 
 The Planner Agent operates through constrained tool execution rules.
 
@@ -161,7 +161,7 @@ Tool execution paths are strictly controlled to prevent unsafe or invalid action
 
 ---
 
-# ⚡ Key Features
+## ⚡ Key Features
 
 - Non-blocking webhook ingestion
 - LLM-powered operational orchestration
@@ -176,7 +176,7 @@ Tool execution paths are strictly controlled to prevent unsafe or invalid action
 
 ---
 
-# 🕵️ Detective Agent Fallback
+## 🕵️ Detective Agent Fallback
 
 If transcript data is unavailable, a dedicated fallback sub-workflow automatically activates.
 
@@ -190,7 +190,7 @@ This ensures operational resilience even under incomplete webhook payload condit
 
 ---
 
-# 📂 Repository Structure
+## 📂 Repository Structure
 
 workflows/
 ├── Postcall Planner Agent/
@@ -209,14 +209,14 @@ README.md
 
 ---
 
-# 🚀 Deployment & Setup
+## 🚀 Deployment & Setup
 
-## 1. Environment & Infrastructure
+### 1. Environment & Infrastructure
 The infrastructure runs entirely self-hosted on **Railway**. Ensure your running instance has public endpoints exposed for your n8n webhooks to interface with Twilio and ElevenLabs.
 
 ---
 
-## 2. Secrets & Credentials Management
+### 2. Secrets & Credentials Management
 All secrets and Bearer tokens must be stored securely using n8n Credentials or server environment variables.
 * ElevenLabs API Key
 * Zendesk API Credentials
@@ -235,7 +235,7 @@ Never commit:
 
 ---
 
-## 3. Import Workflows into n8n
+### 3. Import Workflows into n8n
 
 1. Import `[David] Railway - ElevenLabs Calls End [Entry].json`
 2. Import all required sub-workflows
@@ -245,7 +245,7 @@ Never commit:
 
 ---
 
-## 4. Configure ElevenLabs Webhook
+### 4. Configure ElevenLabs Webhook
 
 Webhook endpoint:
 
@@ -261,7 +261,7 @@ post_call_transcription
 
 ---
 
-# 🔒 Security & Compliance
+## 🔒 Security & Compliance
 
 - Strict Bearer Token verification for MCP communication
 - No hardcoded secrets inside workflows
@@ -273,7 +273,7 @@ The system is designed with operational safety and controlled execution as core 
 
 ---
 
-# 📌 Notes
+## 📌 Notes
 
 - Workflows are designed for manual n8n import
 - No CI/CD synchronization is required
@@ -281,8 +281,6 @@ The system is designed with operational safety and controlled execution as core 
 - The repository is intended for architecture demonstration and portfolio purposes
 
 ---
-
-# 📄 License
 
 ## 📄 License
 
