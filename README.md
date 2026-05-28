@@ -284,8 +284,10 @@ The system is designed with operational safety and controlled execution as core 
 
 # 📄 License
 
-Proprietary
+## 📄 License
 
-This repository is shared for portfolio and demonstration purposes only.
+This project is proprietary and confidential. All rights intellectual and material property belong exclusively to **Entry LLC**. 
 
-Unauthorized use, reproduction, or distribution is prohibited.
+Authorized personnel may access this repository for evaluation and maintenance purposes subject to company NDAs. Any unauthorized copying, distribution, alteration, or usage of this software via any medium is strictly prohibited.
+
+For complete legal terms and compliance metrics, please refer to the main [LICENSE](LICENSE) file.
