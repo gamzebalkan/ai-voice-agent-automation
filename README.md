@@ -13,7 +13,7 @@ The architecture is intentionally split into two specialized layers to maximize 
 ## 🏗️ System Architecture
 
 The infrastructure runs entirely on a self-hosted Railway environment and integrates ElevenLabs, Twilio, n8n, Zendesk, and OpenAI-powered agents.
----
+
 
 ### 1. In-Call Layer (Real-Time Intake Assistant)
 
