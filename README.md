@@ -48,7 +48,6 @@ To maintain system integrity and avoid unintended live modifications:
 
 The system securely communicates with n8n workflows through an MCP-based architecture using Bearer Token authentication.
 
----
 
 ### 2. Post-Call Automation Layer (Planner Agent)
 
@@ -70,11 +69,26 @@ The workflow:
 5. Sends runtime data to the LLM Planner Agent
 6. Executes rule-based operational workflows
 
+
+## ⚡ Key Features
+
+- Non-blocking webhook ingestion
+- LLM-powered operational orchestration
+- MCP-based real-time architecture
+- Structured transcript normalization
+- Strict ticket validation logic
+- Read-only live-call safety model
+- Automated Zendesk workflow handling
+- Analytics-ready structured JSON outputs
+- Modular n8n workflow architecture
+- Fallback Detective Agent logic
+
 ---
 
-## 🧾 Transcript Normalization
+### 🧾 Transcript Normalization
 
-Before reaching the LLM layer, raw transcripts are transformed into a clean structured format to reduce context noise and optimize token usage.
+Before reaching the LLM layer, raw transcripts are transformed into a clean structured format to reduce context noise and optimize token usage. 
+This preprocessing step improves agent reasoning quality, runtime efficiency, context clarity, ownsdtream analytics consistency.
 
 Example:
 
@@ -83,11 +97,17 @@ AGENT (12s): Hello, how may I assist you today?
 USER (15s): I need help with my travel booking.
 ```
 
-This preprocessing step improves:
-- Agent reasoning quality
-- Runtime efficiency
-- Context clarity
-- Downstream analytics consistency
+### 🕵️ Detective Agent Fallback
+
+If transcript data is unavailable, a dedicated fallback sub-workflow automatically activates.
+
+The Detective Agent attempts to:
+- Identify customers via Caller ID
+- Locate related Zendesk tickets
+- Recover operational context
+- Maintain workflow continuity
+
+This ensures operational resilience even under incomplete webhook payload conditions.
 
 ---
 
@@ -159,35 +179,6 @@ Available tools include:
 - `solve_ticket`
 
 Tool execution paths are strictly controlled to prevent unsafe or invalid actions.
-
----
-
-## ⚡ Key Features
-
-- Non-blocking webhook ingestion
-- LLM-powered operational orchestration
-- MCP-based real-time architecture
-- Structured transcript normalization
-- Strict ticket validation logic
-- Read-only live-call safety model
-- Automated Zendesk workflow handling
-- Analytics-ready structured JSON outputs
-- Modular n8n workflow architecture
-- Fallback Detective Agent logic
-
----
-
-## 🕵️ Detective Agent Fallback
-
-If transcript data is unavailable, a dedicated fallback sub-workflow automatically activates.
-
-The Detective Agent attempts to:
-- Identify customers via Caller ID
-- Locate related Zendesk tickets
-- Recover operational context
-- Maintain workflow continuity
-
-This ensures operational resilience even under incomplete webhook payload conditions.
 
 ---
 
