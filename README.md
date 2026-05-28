@@ -9,6 +9,7 @@ The platform combines a real-time voice intake assistant with a rule-based LLM-p
 The architecture is intentionally split into two specialized layers to maximize operational safety, maintainability, and scalability.
 
 
+
 ## 🏗️ System Architecture
 
 The infrastructure runs entirely on a self-hosted Railway environment and integrates ElevenLabs, Twilio, n8n, Zendesk, and OpenAI-powered agents.
@@ -110,7 +111,7 @@ Additional logic:
 - Customer profile enrichment
 - Phone number synchronization
 
----
+
 
 ### 🟡 Path B — No Related Ticket or Customer Found
 
@@ -122,7 +123,7 @@ Actions:
 - Store runtime execution data
 - Route for manual triage
 
----
+
 
 ### 🔵 Path C — Lead Ticket Found
 
@@ -174,6 +175,7 @@ screenshots/
 
 README.md
 ```
+
 ---
 
 ## 🚀 Deployment & Setup
@@ -181,7 +183,7 @@ README.md
 ### 1. Environment & Infrastructure
 The infrastructure runs entirely self-hosted on **Railway**. Ensure your running instance has public endpoints exposed for your n8n webhooks to interface with Twilio and ElevenLabs.
 
----
+
 
 ### 2. Secrets & Credentials Management
 All secrets and Bearer tokens must be stored securely using n8n Credentials or server environment variables.
@@ -200,7 +202,7 @@ Never commit:
 - Internal URLs
 - Sensitive backend configuration
 
----
+
 
 ### 3. Import Workflows into n8n
 
@@ -210,7 +212,7 @@ Never commit:
 4. Configure credentials inside n8n
 5. Enable workflows
 
----
+
 
 ### 4. Configure ElevenLabs Webhook
 
