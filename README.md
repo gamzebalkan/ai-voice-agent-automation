@@ -22,7 +22,7 @@ The entire infrastructure is self-hosted on Railway, integrating ElevenLabs, Twi
 
 ### 2. Post-Call Automation Layer (Planner Agent)
 * **Tech Stack:** n8n, Zendesk, Railway, OpenAI
-* **Responsibilities:** Orchestrates complex post-call workflows upon receiving the ElevenLabs `post_call_transcription` webhook.
+* **Responsibilities:** Orchestrates complex post-call workflows upon receiving the ElevenLabs post-call webhook event.
 * **Execution Pipeline:**
     1.  **Ingest:** Receives webhook and immediately returns `200 OK` (non-blocking).
     2.  **Fetch & Normalize:** Retrieves raw data from ElevenLabs API and converts transcripts into a lightweight, structured JSON format to minimize noise and optimize token usage.
