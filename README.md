@@ -99,21 +99,11 @@ Configure necessary integration keys (`ElevenLabs`, `Zendesk`, `OpenAI`, `UCC Sy
 
 ### 3. Import Workflows into n8n
 
-1. Import `[David] Railway - ElevenLabs Calls End [Entry].json`
-2. Import all required sub-workflows
-3. Reconnect workflow references if necessary
-4. Configure credentials inside n8n
-5. Enable workflows
-
-
-
-### 4. Configure ElevenLabs Webhook
-
-Webhook endpoint:
-
-```text
-POST https://<your-n8n-instance>/webhook/elce/entry
-```
+1. **Import:** Import `[David] Railway - ElevenLabs Calls End [Entry].json` and all required sub-workflows into your n8n instance.
+2. **Re-link:** Reconnect workflow/sub-workflow references where necessary.
+3. **Configure Environment:** Update all placeholders (e.g., agent identifiers, custom workflow IDs, webhook URLs, API keys, internal system URLs and backend endpoints.s) to match your own environment. 
+4. **Credentials:** Configure and link your credentials inside n8n.
+5. **Deploy:** Enable the workflows to start receiving live events.
 
 ---
 
